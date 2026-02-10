@@ -1,0 +1,153 @@
+{
+  "header": {
+    "title": "European Heritage",
+    "monuments": "monuments"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "map": "Map"
+  },
+  "home": {
+    "heroTitle": "Discover European Heritage",
+    "heroSubtitle": "Explore over {{count}} monuments, historic buildings and archaeological sites in Spain, Portugal and France.",
+    "exploreMonuments": "Explore monuments",
+    "viewOnMap": "View on map",
+    "monuments": "Monuments",
+    "withLocation": "With location",
+    "withWikipedia": "With Wikipedia",
+    "images": "Images",
+    "heritageMap": "Heritage Map",
+    "viewFullMap": "View full map",
+    "featuredMonuments": "Featured monuments",
+    "loading": "Loading...",
+    "viewAll": "View all",
+    "exploreByCountry": "Explore by country",
+    "exploreByRegion": "Explore by region",
+    "monumentsCount": "{{count}} monuments"
+  },
+  "search": {
+    "title": "Search monuments",
+    "searching": "Searching...",
+    "results": "{{count}} results",
+    "sortBy": "Sort:",
+    "nameAZ": "Name A-Z",
+    "nameZA": "Name Z-A",
+    "municipalityAZ": "Municipality A-Z",
+    "municipalityZA": "Municipality Z-A",
+    "show": "Show:",
+    "previous": "Previous",
+    "next": "Next",
+    "noResults": "No monuments found",
+    "noResultsHint": "Try modifying the search filters",
+    "sortAZ": "A-Z",
+    "sortZA": "Z-A"
+  },
+  "filters": {
+    "search": "Search",
+    "searchPlaceholder": "Monument name...",
+    "country": "Country",
+    "allCountries": "All countries",
+    "region": "Region",
+    "allRegions": "All regions",
+    "province": "Province",
+    "allProvinces": "All provinces",
+    "municipality": "Municipality",
+    "allMunicipalities": "All municipalities",
+    "category": "Category",
+    "allCategories": "All categories",
+    "type": "Type",
+    "allTypes": "All types",
+    "style": "Style",
+    "allStyles": "All styles",
+    "onlyWikipedia": "Only with Wikipedia",
+    "onlyImage": "Only with image",
+    "reset": "Clear",
+    "filters": "Filters",
+    "location": "Location",
+    "classification": "Classification",
+    "options": "Options",
+    "showFilters": "Show filters",
+    "hideFilters": "Hide filters",
+    "portugal": {
+      "region": "District",
+      "province": "District",
+      "municipality": "Municipality"
+    },
+    "france": {
+      "region": "Region",
+      "province": "Department",
+      "municipality": "Commune"
+    }
+  },
+  "detail": {
+    "loading": "Loading monument...",
+    "error": "Error",
+    "notFound": "Monument not found",
+    "backToSearch": "Back to search",
+    "back": "Back",
+    "defaultTitle": "Monument",
+    "description": "Description",
+    "history": "History",
+    "dating": "Dating",
+    "date": "Date",
+    "construction": "Construction",
+    "period": "Period",
+    "century": "Century",
+    "technicalDetails": "Technical details",
+    "architect": "Architect",
+    "material": "Material",
+    "height": "Height",
+    "area": "Area",
+    "sources": "Sources and bibliography",
+    "location": "Location",
+    "locationInfo": "Location information",
+    "openGoogleMaps": "Open in Google Maps",
+    "links": "Links",
+    "information": "Information",
+    "countryLabel": "Country",
+    "regionLabel": "Region",
+    "provinceLabel": "Province",
+    "comarca": "County",
+    "municipalityLabel": "Municipality",
+    "locality": "Locality",
+    "address": "Address",
+    "bce": "BCE"
+  },
+  "map": {
+    "loading": "Loading monuments...",
+    "loadingShort": "Loading...",
+    "viewDetail": "View detail",
+    "zoomHint": "Zoom in for detail",
+    "monuments": "monuments",
+    "monumentsInRegions": "{{count}} monuments in {{regions}} regions",
+    "monumentsCount": "{{count}} monuments",
+    "title": "Heritage Map",
+    "legend": {
+      "castles": "Castles",
+      "churches": "Churches",
+      "palaces": "Palaces",
+      "archaeology": "Archaeology",
+      "ethnologic": "Ethnological",
+      "others": "Others"
+    }
+  },
+  "select": {
+    "typeToSeeMore": "Type to see {{count}} more...",
+    "noResults": "No results",
+    "searchPlaceholder": "Search..."
+  },
+  "footer": {
+    "dataSources": "Data sources:",
+    "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Open data reused according to their respective licences"
+  },
+  "language": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "pt": "Português",
+    "ca": "Català",
+    "eu": "Euskara",
+    "gl": "Galego"
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "header": {
+    "title": "Patrimonio Europeo",
+    "monuments": "monumentos"
+  },
+  "nav": {
+    "home": "Inicio",
+    "search": "Buscar",
+    "map": "Mapa"
+  },
+  "home": {
+    "heroTitle": "Descobre o Patrimonio Europeo",
+    "heroSubtitle": "Explora máis de {{count}} monumentos, edificios históricos e xacementos arqueolóxicos de España, Portugal e Francia.",
+    "exploreMonuments": "Explorar monumentos",
+    "viewOnMap": "Ver no mapa",
+    "monuments": "Monumentos",
+    "withLocation": "Con localización",
+    "withWikipedia": "Con Wikipedia",
+    "images": "Imaxes",
+    "heritageMap": "Mapa do Patrimonio",
+    "viewFullMap": "Ver mapa completo",
+    "featuredMonuments": "Monumentos destacados",
+    "loading": "Cargando...",
+    "viewAll": "Ver todos",
+    "exploreByCountry": "Explorar por país",
+    "exploreByRegion": "Explorar por rexión",
+    "monumentsCount": "{{count}} monumentos"
+  },
+  "search": {
+    "title": "Buscar monumentos",
+    "searching": "Buscando...",
+    "results": "{{count}} resultados",
+    "sortBy": "Ordenar:",
+    "nameAZ": "Nome A-Z",
+    "nameZA": "Nome Z-A",
+    "municipalityAZ": "Concello A-Z",
+    "municipalityZA": "Concello Z-A",
+    "show": "Mostrar:",
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "noResults": "Non se atoparon monumentos",
+    "noResultsHint": "Probe a modificar os filtros de busca",
+    "sortAZ": "A-Z",
+    "sortZA": "Z-A"
+  },
+  "filters": {
+    "search": "Buscar",
+    "searchPlaceholder": "Nome do monumento...",
+    "country": "País",
+    "allCountries": "Todos os países",
+    "region": "Rexión",
+    "allRegions": "Todas as rexións",
+    "province": "Provincia",
+    "allProvinces": "Todas as provincias",
+    "municipality": "Concello",
+    "allMunicipalities": "Todos os concellos",
+    "category": "Categoría",
+    "allCategories": "Todas as categorías",
+    "type": "Tipo",
+    "allTypes": "Todos os tipos",
+    "style": "Estilo",
+    "allStyles": "Todos os estilos",
+    "onlyWikipedia": "Só con Wikipedia",
+    "onlyImage": "Só con imaxe",
+    "reset": "Limpar",
+    "filters": "Filtros",
+    "location": "Localización",
+    "classification": "Clasificación",
+    "options": "Opcións",
+    "showFilters": "Mostrar filtros",
+    "hideFilters": "Ocultar filtros",
+    "portugal": {
+      "region": "Distrito",
+      "province": "Distrito",
+      "municipality": "Município"
+    },
+    "france": {
+      "region": "Rexión",
+      "province": "Departamento",
+      "municipality": "Comuna"
+    }
+  },
+  "detail": {
+    "loading": "Cargando monumento...",
+    "error": "Erro",
+    "notFound": "Monumento non atopado",
+    "backToSearch": "Volver buscar",
+    "back": "Volver",
+    "defaultTitle": "Monumento",
+    "description": "Descrición",
+    "history": "Historia",
+    "dating": "Datación",
+    "date": "Data",
+    "construction": "Construción",
+    "period": "Período",
+    "century": "Século",
+    "technicalDetails": "Detalles técnicos",
+    "architect": "Arquitecto",
+    "material": "Material",
+    "height": "Altura",
+    "area": "Superficie",
+    "sources": "Fontes e bibliografía",
+    "location": "Localización",
+    "locationInfo": "Información de localización",
+    "openGoogleMaps": "Abrir en Google Maps",
+    "links": "Ligazóns",
+    "information": "Información",
+    "countryLabel": "País",
+    "regionLabel": "Rexión",
+    "provinceLabel": "Provincia",
+    "comarca": "Comarca",
+    "municipalityLabel": "Concello",
+    "locality": "Localidade",
+    "address": "Enderezo",
+    "bce": "a.C."
+  },
+  "map": {
+    "loading": "Cargando monumentos...",
+    "loadingShort": "Cargando...",
+    "viewDetail": "Ver detalle",
+    "zoomHint": "Fai zoom para ver detalle",
+    "monuments": "monumentos",
+    "monumentsInRegions": "{{count}} monumentos en {{regions}} rexións",
+    "monumentsCount": "{{count}} monumentos",
+    "title": "Mapa do Patrimonio",
+    "legend": {
+      "castles": "Castelos",
+      "churches": "Igrexas",
+      "palaces": "Pazos",
+      "archaeology": "Arqueoloxía",
+      "ethnologic": "Etnolóxico",
+      "others": "Outros"
+    }
+  },
+  "select": {
+    "typeToSeeMore": "Escribe para ver os {{count}} restantes...",
+    "noResults": "Sen resultados",
+    "searchPlaceholder": "Buscar..."
+  },
+  "footer": {
+    "dataSources": "Fontes de datos:",
+    "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Datos abertos reutilizados segundo as súas respectivas licenzas"
+  },
+  "language": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "pt": "Português",
+    "ca": "Català",
+    "eu": "Euskara",
+    "gl": "Galego"
+  }
+}

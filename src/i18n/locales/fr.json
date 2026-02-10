@@ -1,0 +1,153 @@
+{
+  "header": {
+    "title": "Patrimoine Européen",
+    "monuments": "monuments"
+  },
+  "nav": {
+    "home": "Accueil",
+    "search": "Rechercher",
+    "map": "Carte"
+  },
+  "home": {
+    "heroTitle": "Découvrez le Patrimoine Européen",
+    "heroSubtitle": "Explorez plus de {{count}} monuments, bâtiments historiques et sites archéologiques en Espagne, au Portugal et en France.",
+    "exploreMonuments": "Explorer les monuments",
+    "viewOnMap": "Voir sur la carte",
+    "monuments": "Monuments",
+    "withLocation": "Avec localisation",
+    "withWikipedia": "Avec Wikipedia",
+    "images": "Images",
+    "heritageMap": "Carte du Patrimoine",
+    "viewFullMap": "Voir la carte complète",
+    "featuredMonuments": "Monuments remarquables",
+    "loading": "Chargement...",
+    "viewAll": "Voir tout",
+    "exploreByCountry": "Explorer par pays",
+    "exploreByRegion": "Explorer par région",
+    "monumentsCount": "{{count}} monuments"
+  },
+  "search": {
+    "title": "Rechercher des monuments",
+    "searching": "Recherche en cours...",
+    "results": "{{count}} résultats",
+    "sortBy": "Trier :",
+    "nameAZ": "Nom A-Z",
+    "nameZA": "Nom Z-A",
+    "municipalityAZ": "Commune A-Z",
+    "municipalityZA": "Commune Z-A",
+    "show": "Afficher :",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "noResults": "Aucun monument trouvé",
+    "noResultsHint": "Essayez de modifier les filtres de recherche",
+    "sortAZ": "A-Z",
+    "sortZA": "Z-A"
+  },
+  "filters": {
+    "search": "Rechercher",
+    "searchPlaceholder": "Nom du monument...",
+    "country": "Pays",
+    "allCountries": "Tous les pays",
+    "region": "Région",
+    "allRegions": "Toutes les régions",
+    "province": "Province",
+    "allProvinces": "Toutes les provinces",
+    "municipality": "Commune",
+    "allMunicipalities": "Toutes les communes",
+    "category": "Catégorie",
+    "allCategories": "Toutes les catégories",
+    "type": "Type",
+    "allTypes": "Tous les types",
+    "style": "Style",
+    "allStyles": "Tous les styles",
+    "onlyWikipedia": "Avec Wikipedia uniquement",
+    "onlyImage": "Avec image uniquement",
+    "reset": "Effacer",
+    "filters": "Filtres",
+    "location": "Localisation",
+    "classification": "Classification",
+    "options": "Options",
+    "showFilters": "Afficher les filtres",
+    "hideFilters": "Masquer les filtres",
+    "portugal": {
+      "region": "District",
+      "province": "District",
+      "municipality": "Município"
+    },
+    "france": {
+      "region": "Région",
+      "province": "Département",
+      "municipality": "Commune"
+    }
+  },
+  "detail": {
+    "loading": "Chargement du monument...",
+    "error": "Erreur",
+    "notFound": "Monument non trouvé",
+    "backToSearch": "Retour à la recherche",
+    "back": "Retour",
+    "defaultTitle": "Monument",
+    "description": "Description",
+    "history": "Histoire",
+    "dating": "Datation",
+    "date": "Date",
+    "construction": "Construction",
+    "period": "Période",
+    "century": "Siècle",
+    "technicalDetails": "Détails techniques",
+    "architect": "Architecte",
+    "material": "Matériau",
+    "height": "Hauteur",
+    "area": "Superficie",
+    "sources": "Sources et bibliographie",
+    "location": "Localisation",
+    "locationInfo": "Informations de localisation",
+    "openGoogleMaps": "Ouvrir dans Google Maps",
+    "links": "Liens",
+    "information": "Informations",
+    "countryLabel": "Pays",
+    "regionLabel": "Région",
+    "provinceLabel": "Province",
+    "comarca": "Comarque",
+    "municipalityLabel": "Commune",
+    "locality": "Localité",
+    "address": "Adresse",
+    "bce": "av. J.-C."
+  },
+  "map": {
+    "loading": "Chargement des monuments...",
+    "loadingShort": "Chargement...",
+    "viewDetail": "Voir le détail",
+    "zoomHint": "Zoomez pour voir le détail",
+    "monuments": "monuments",
+    "monumentsInRegions": "{{count}} monuments dans {{regions}} régions",
+    "monumentsCount": "{{count}} monuments",
+    "title": "Carte du Patrimoine",
+    "legend": {
+      "castles": "Châteaux",
+      "churches": "Églises",
+      "palaces": "Palais",
+      "archaeology": "Archéologie",
+      "ethnologic": "Ethnologique",
+      "others": "Autres"
+    }
+  },
+  "select": {
+    "typeToSeeMore": "Tapez pour voir les {{count}} restants...",
+    "noResults": "Aucun résultat",
+    "searchPlaceholder": "Rechercher..."
+  },
+  "footer": {
+    "dataSources": "Sources de données :",
+    "license": "Wikidata : CC0 | Wikipedia/Commons : CC BY-SA 3.0 | Données ouvertes réutilisées selon leurs licences respectives"
+  },
+  "language": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "pt": "Português",
+    "ca": "Català",
+    "eu": "Euskara",
+    "gl": "Galego"
+  }
+}

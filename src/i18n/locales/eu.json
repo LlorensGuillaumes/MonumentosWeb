@@ -1,0 +1,153 @@
+{
+  "header": {
+    "title": "Europako Ondarea",
+    "monuments": "monumentu"
+  },
+  "nav": {
+    "home": "Hasiera",
+    "search": "Bilatu",
+    "map": "Mapa"
+  },
+  "home": {
+    "heroTitle": "Ezagutu Europako Ondarea",
+    "heroSubtitle": "Espainako, Portugaleko eta Frantziako {{count}} monumentu, eraikin historiko eta aztarnategi arkeologiko baino gehiago esploratu.",
+    "exploreMonuments": "Monumentuak esploratu",
+    "viewOnMap": "Mapan ikusi",
+    "monuments": "Monumentuak",
+    "withLocation": "Kokapenarekin",
+    "withWikipedia": "Wikipediarekin",
+    "images": "Irudiak",
+    "heritageMap": "Ondarearen Mapa",
+    "viewFullMap": "Mapa osoa ikusi",
+    "featuredMonuments": "Monumentu nabarmenak",
+    "loading": "Kargatzen...",
+    "viewAll": "Denak ikusi",
+    "exploreByCountry": "Herrialdez esploratu",
+    "exploreByRegion": "Eskualdez esploratu",
+    "monumentsCount": "{{count}} monumentu"
+  },
+  "search": {
+    "title": "Monumentuak bilatu",
+    "searching": "Bilatzen...",
+    "results": "{{count}} emaitza",
+    "sortBy": "Ordenatu:",
+    "nameAZ": "Izena A-Z",
+    "nameZA": "Izena Z-A",
+    "municipalityAZ": "Udalerria A-Z",
+    "municipalityZA": "Udalerria Z-A",
+    "show": "Erakutsi:",
+    "previous": "Aurrekoa",
+    "next": "Hurrengoa",
+    "noResults": "Ez da monumenturik aurkitu",
+    "noResultsHint": "Saiatu bilaketa-iragazkiak aldatzen",
+    "sortAZ": "A-Z",
+    "sortZA": "Z-A"
+  },
+  "filters": {
+    "search": "Bilatu",
+    "searchPlaceholder": "Monumentuaren izena...",
+    "country": "Herrialdea",
+    "allCountries": "Herrialde guztiak",
+    "region": "Eskualdea",
+    "allRegions": "Eskualde guztiak",
+    "province": "Probintzia",
+    "allProvinces": "Probintzia guztiak",
+    "municipality": "Udalerria",
+    "allMunicipalities": "Udalerri guztiak",
+    "category": "Kategoria",
+    "allCategories": "Kategoria guztiak",
+    "type": "Mota",
+    "allTypes": "Mota guztiak",
+    "style": "Estiloa",
+    "allStyles": "Estilo guztiak",
+    "onlyWikipedia": "Wikipediarekin soilik",
+    "onlyImage": "Irudiarekin soilik",
+    "reset": "Garbitu",
+    "filters": "Iragazkiak",
+    "location": "Kokapena",
+    "classification": "Sailkapena",
+    "options": "Aukerak",
+    "showFilters": "Iragazkiak erakutsi",
+    "hideFilters": "Iragazkiak ezkutatu",
+    "portugal": {
+      "region": "Barrutia",
+      "province": "Barrutia",
+      "municipality": "Município"
+    },
+    "france": {
+      "region": "Eskualdea",
+      "province": "Departamendua",
+      "municipality": "Comuna"
+    }
+  },
+  "detail": {
+    "loading": "Monumentua kargatzen...",
+    "error": "Errorea",
+    "notFound": "Monumentua ez da aurkitu",
+    "backToSearch": "Bilatzera itzuli",
+    "back": "Itzuli",
+    "defaultTitle": "Monumentua",
+    "description": "Deskribapena",
+    "history": "Historia",
+    "dating": "Datazioa",
+    "date": "Data",
+    "construction": "Eraikuntza",
+    "period": "Aldia",
+    "century": "Mendea",
+    "technicalDetails": "Xehetasun teknikoak",
+    "architect": "Arkitektoa",
+    "material": "Materiala",
+    "height": "Altuera",
+    "area": "Azalera",
+    "sources": "Iturriak eta bibliografia",
+    "location": "Kokapena",
+    "locationInfo": "Kokapenaren informazioa",
+    "openGoogleMaps": "Google Maps-en ireki",
+    "links": "Estekak",
+    "information": "Informazioa",
+    "countryLabel": "Herrialdea",
+    "regionLabel": "Eskualdea",
+    "provinceLabel": "Probintzia",
+    "comarca": "Eskualdea",
+    "municipalityLabel": "Udalerria",
+    "locality": "Herria",
+    "address": "Helbidea",
+    "bce": "K.a."
+  },
+  "map": {
+    "loading": "Monumentuak kargatzen...",
+    "loadingShort": "Kargatzen...",
+    "viewDetail": "Xehetasuna ikusi",
+    "zoomHint": "Zoom egin xehetasunak ikusteko",
+    "monuments": "monumentu",
+    "monumentsInRegions": "{{count}} monumentu {{regions}} eskualdetan",
+    "monumentsCount": "{{count}} monumentu",
+    "title": "Ondarearen Mapa",
+    "legend": {
+      "castles": "Gazteluak",
+      "churches": "Elizak",
+      "palaces": "Jauregiak",
+      "archaeology": "Arkeologia",
+      "ethnologic": "Etnologikoa",
+      "others": "Besteak"
+    }
+  },
+  "select": {
+    "typeToSeeMore": "Idatzi gainerako {{count}}ak ikusteko...",
+    "noResults": "Emaitzarik ez",
+    "searchPlaceholder": "Bilatu..."
+  },
+  "footer": {
+    "dataSources": "Datu-iturriak:",
+    "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Datu irekiak dagozkien lizentzien arabera berrerabiliak"
+  },
+  "language": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "pt": "Português",
+    "ca": "Català",
+    "eu": "Euskara",
+    "gl": "Galego"
+  }
+}

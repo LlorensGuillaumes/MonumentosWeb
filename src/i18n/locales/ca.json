@@ -1,0 +1,153 @@
+{
+  "header": {
+    "title": "Patrimoni Europeu",
+    "monuments": "monuments"
+  },
+  "nav": {
+    "home": "Inici",
+    "search": "Cercar",
+    "map": "Mapa"
+  },
+  "home": {
+    "heroTitle": "Descobreix el Patrimoni Europeu",
+    "heroSubtitle": "Explora més de {{count}} monuments, edificis històrics i jaciments arqueològics d'Espanya, Portugal i França.",
+    "exploreMonuments": "Explorar monuments",
+    "viewOnMap": "Veure al mapa",
+    "monuments": "Monuments",
+    "withLocation": "Amb ubicació",
+    "withWikipedia": "Amb Viquipèdia",
+    "images": "Imatges",
+    "heritageMap": "Mapa del Patrimoni",
+    "viewFullMap": "Veure mapa complet",
+    "featuredMonuments": "Monuments destacats",
+    "loading": "Carregant...",
+    "viewAll": "Veure tots",
+    "exploreByCountry": "Explora per país",
+    "exploreByRegion": "Explora per regió",
+    "monumentsCount": "{{count}} monuments"
+  },
+  "search": {
+    "title": "Cercar monuments",
+    "searching": "Cercant...",
+    "results": "{{count}} resultats",
+    "sortBy": "Ordenar:",
+    "nameAZ": "Nom A-Z",
+    "nameZA": "Nom Z-A",
+    "municipalityAZ": "Municipi A-Z",
+    "municipalityZA": "Municipi Z-A",
+    "show": "Mostrar:",
+    "previous": "Anterior",
+    "next": "Següent",
+    "noResults": "No s'han trobat monuments",
+    "noResultsHint": "Proveu de modificar els filtres de cerca",
+    "sortAZ": "A-Z",
+    "sortZA": "Z-A"
+  },
+  "filters": {
+    "search": "Cercar",
+    "searchPlaceholder": "Nom del monument...",
+    "country": "País",
+    "allCountries": "Tots els països",
+    "region": "Regió",
+    "allRegions": "Totes les regions",
+    "province": "Província",
+    "allProvinces": "Totes les províncies",
+    "municipality": "Municipi",
+    "allMunicipalities": "Tots els municipis",
+    "category": "Categoria",
+    "allCategories": "Totes les categories",
+    "type": "Tipus",
+    "allTypes": "Tots els tipus",
+    "style": "Estil",
+    "allStyles": "Tots els estils",
+    "onlyWikipedia": "Només amb Viquipèdia",
+    "onlyImage": "Només amb imatge",
+    "reset": "Netejar",
+    "filters": "Filtres",
+    "location": "Ubicació",
+    "classification": "Classificació",
+    "options": "Opcions",
+    "showFilters": "Mostrar filtres",
+    "hideFilters": "Amagar filtres",
+    "portugal": {
+      "region": "Districte",
+      "province": "Districte",
+      "municipality": "Município"
+    },
+    "france": {
+      "region": "Regió",
+      "province": "Departament",
+      "municipality": "Comuna"
+    }
+  },
+  "detail": {
+    "loading": "Carregant monument...",
+    "error": "Error",
+    "notFound": "Monument no trobat",
+    "backToSearch": "Tornar a cercar",
+    "back": "Tornar",
+    "defaultTitle": "Monument",
+    "description": "Descripció",
+    "history": "Història",
+    "dating": "Datació",
+    "date": "Data",
+    "construction": "Construcció",
+    "period": "Període",
+    "century": "Segle",
+    "technicalDetails": "Detalls tècnics",
+    "architect": "Arquitecte",
+    "material": "Material",
+    "height": "Alçada",
+    "area": "Superfície",
+    "sources": "Fonts i bibliografia",
+    "location": "Ubicació",
+    "locationInfo": "Informació d'ubicació",
+    "openGoogleMaps": "Obrir a Google Maps",
+    "links": "Enllaços",
+    "information": "Informació",
+    "countryLabel": "País",
+    "regionLabel": "Regió",
+    "provinceLabel": "Província",
+    "comarca": "Comarca",
+    "municipalityLabel": "Municipi",
+    "locality": "Localitat",
+    "address": "Adreça",
+    "bce": "aC"
+  },
+  "map": {
+    "loading": "Carregant monuments...",
+    "loadingShort": "Carregant...",
+    "viewDetail": "Veure detall",
+    "zoomHint": "Feu zoom per veure detall",
+    "monuments": "monuments",
+    "monumentsInRegions": "{{count}} monuments en {{regions}} regions",
+    "monumentsCount": "{{count}} monuments",
+    "title": "Mapa del Patrimoni",
+    "legend": {
+      "castles": "Castells",
+      "churches": "Esglésies",
+      "palaces": "Palaus",
+      "archaeology": "Arqueologia",
+      "ethnologic": "Etnològic",
+      "others": "Altres"
+    }
+  },
+  "select": {
+    "typeToSeeMore": "Escriviu per veure els {{count}} restants...",
+    "noResults": "Sense resultats",
+    "searchPlaceholder": "Cercar..."
+  },
+  "footer": {
+    "dataSources": "Fonts de dades:",
+    "license": "Wikidata: CC0 | Viquipèdia/Commons: CC BY-SA 3.0 | Dades obertes reutilitzades segons les seves respectives llicències"
+  },
+  "language": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "pt": "Português",
+    "ca": "Català",
+    "eu": "Euskara",
+    "gl": "Galego"
+  }
+}
