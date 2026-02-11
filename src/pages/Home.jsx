@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { getMonumentos } from '../services/api';
 import MonumentoCard from '../components/MonumentoCard';
 import Map from '../components/Map';
@@ -9,7 +10,9 @@ import './Home.css';
 
 export default function Home() {
   const { stats } = useApp();
+  const { user } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [destacados, setDestacados] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,6 +48,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CTA Banner for non-logged users */}
+      {!user && (
+        <section className="cta-banner">
+          <div className="cta-content">
+            <h2>{t('home.ctaTitle')}</h2>
+            <p>{t('home.ctaText')}</p>
+            <Link to="/login" className="btn btn-primary btn-lg">{t('home.ctaButton')}</Link>
+          </div>
+        </section>
+      )}
+
       {/* Stats Section */}
       {stats && (
         <section className="stats-section">
@@ -76,7 +90,11 @@ export default function Home() {
       {/* Map Preview */}
       <section className="map-section">
         <h2>{t('home.heritageMap')}</h2>
-        <Map height="400px" filters={{ limit: 2000 }} />
+        <Map
+          height="400px"
+          filters={{ limit: 2000 }}
+          onMarkerClick={!user ? () => navigate('/login') : undefined}
+        />
         <Link to="/mapa" className="btn btn-outline">{t('home.viewFullMap')}</Link>
       </section>
 

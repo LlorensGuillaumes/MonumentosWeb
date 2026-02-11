@@ -10,6 +10,7 @@ import MapPage from './pages/MapPage';
 import Login from './pages/Login';
 import Favoritos from './pages/Favoritos';
 import Admin from './pages/Admin';
+import RequireAuth from './components/RequireAuth';
 import './App.css';
 
 function App() {
@@ -24,12 +25,12 @@ function App() {
             <main className="main-content">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/buscar" element={<Search />} />
-                <Route path="/monumento/:id" element={<Detail />} />
-                <Route path="/mapa" element={<MapPage />} />
+                <Route path="/buscar" element={<RequireAuth><Search /></RequireAuth>} />
+                <Route path="/monumento/:id" element={<RequireAuth><Detail /></RequireAuth>} />
+                <Route path="/mapa" element={<RequireAuth><MapPage /></RequireAuth>} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/favoritos" element={<Favoritos />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/favoritos" element={<RequireAuth><Favoritos /></RequireAuth>} />
+                <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
               </Routes>
             </main>
             <footer className="footer">

@@ -25,7 +25,10 @@
     "viewAll": "Ver todos",
     "exploreByCountry": "Explorar por país",
     "exploreByRegion": "Explorar por região",
-    "monumentsCount": "{{count}} monumentos"
+    "monumentsCount": "{{count}} monumentos",
+    "ctaTitle": "Registe-se gratuitamente",
+    "ctaText": "Crie a sua conta para explorar todos os monumentos, guardar favoritos e aceder ao mapa interativo",
+    "ctaButton": "Criar conta grátis"
   },
   "search": {
     "title": "Pesquisar monumentos",

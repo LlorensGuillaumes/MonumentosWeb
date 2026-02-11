@@ -25,7 +25,10 @@
     "viewAll": "Veure tots",
     "exploreByCountry": "Explora per país",
     "exploreByRegion": "Explora per regió",
-    "monumentsCount": "{{count}} monuments"
+    "monumentsCount": "{{count}} monuments",
+    "ctaTitle": "Registra't gratis",
+    "ctaText": "Crea el teu compte per explorar tots els monuments, guardar favorits i accedir al mapa interactiu",
+    "ctaButton": "Crear compte gratis"
   },
   "search": {
     "title": "Cercar monuments",

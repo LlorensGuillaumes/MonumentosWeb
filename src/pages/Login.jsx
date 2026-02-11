@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
@@ -9,7 +9,9 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 export default function Login() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, login, register, loginWithGoogle, loading } = useAuth();
+  const returnTo = new URLSearchParams(location.search).get('returnTo') || '/';
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,8 +21,8 @@ export default function Login() {
 
   // Si ya está logueado, redirigir
   useEffect(() => {
-    if (user) navigate('/');
-  }, [user, navigate]);
+    if (user) navigate(returnTo, { replace: true });
+  }, [user, navigate, returnTo]);
 
   // Inicializar Google Sign-In
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function Login() {
         googleId: payload.sub,
         idioma_por_defecto: i18n.language?.split('-')[0] || 'es',
       });
-      navigate('/');
+      navigate(returnTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || t('auth.googleError'));
     }
@@ -79,7 +81,7 @@ export default function Login() {
       } else {
         await register(email, password, nombre, idioma);
       }
-      navigate('/');
+      navigate(returnTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || t('auth.genericError'));
     }

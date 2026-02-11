@@ -97,28 +97,30 @@ export default function Header() {
           >
             {t('nav.home')}
           </Link>
-          <Link
-            to="/buscar"
-            className={`nav-link ${location.pathname === '/buscar' ? 'active' : ''}`}
-          >
-            {t('nav.search')}
-          </Link>
-          <Link
-            to="/mapa"
-            className={`nav-link ${location.pathname === '/mapa' ? 'active' : ''}`}
-          >
-            {t('nav.map')}
-          </Link>
           {user && (
-            <Link
-              to="/favoritos"
-              className={`nav-link ${location.pathname === '/favoritos' ? 'active' : ''}`}
-            >
-              {t('nav.favorites')}
-              {favoritoIds.size > 0 && (
-                <span className="fav-badge">{favoritoIds.size}</span>
-              )}
-            </Link>
+            <>
+              <Link
+                to="/buscar"
+                className={`nav-link ${location.pathname === '/buscar' ? 'active' : ''}`}
+              >
+                {t('nav.search')}
+              </Link>
+              <Link
+                to="/mapa"
+                className={`nav-link ${location.pathname === '/mapa' ? 'active' : ''}`}
+              >
+                {t('nav.map')}
+              </Link>
+              <Link
+                to="/favoritos"
+                className={`nav-link ${location.pathname === '/favoritos' ? 'active' : ''}`}
+              >
+                {t('nav.favorites')}
+                {favoritoIds.size > 0 && (
+                  <span className="fav-badge">{favoritoIds.size}</span>
+                )}
+              </Link>
+            </>
           )}
         </nav>
 

@@ -25,7 +25,10 @@
     "viewAll": "Denak ikusi",
     "exploreByCountry": "Herrialdez esploratu",
     "exploreByRegion": "Eskualdez esploratu",
-    "monumentsCount": "{{count}} monumentu"
+    "monumentsCount": "{{count}} monumentu",
+    "ctaTitle": "Erregistratu doan",
+    "ctaText": "Sortu zure kontua monumentu guztiak esploratzeko, gogokoak gordetzeko eta mapa interaktiboa atzitzeko",
+    "ctaButton": "Doan kontua sortu"
   },
   "search": {
     "title": "Monumentuak bilatu",
