@@ -6,7 +6,8 @@
   "nav": {
     "home": "Hasiera",
     "search": "Bilatu",
-    "map": "Mapa"
+    "map": "Mapa",
+    "favorites": "Gogokoak"
   },
   "home": {
     "heroTitle": "Ezagutu Europako Ondarea",
@@ -54,6 +55,7 @@
     "allProvinces": "Probintzia guztiak",
     "municipality": "Udalerria",
     "allMunicipalities": "Udalerri guztiak",
+    "selectFilterFirst": "Hautatu herrialdea, eskualdea edo probintzia",
     "category": "Kategoria",
     "allCategories": "Kategoria guztiak",
     "type": "Mota",
@@ -140,6 +142,58 @@
   "footer": {
     "dataSources": "Datu-iturriak:",
     "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Datu irekiak dagozkien lizentzien arabera berrerabiliak"
+  },
+  "auth": {
+    "loginTitle": "Hasi saioa",
+    "registerTitle": "Kontua sortu",
+    "email": "Email",
+    "emailPlaceholder": "zu@email.com",
+    "password": "Pasahitza",
+    "passwordMin": "Gutxienez 6 karaktere",
+    "name": "Izena",
+    "namePlaceholder": "Zure izena",
+    "defaultLanguage": "Hizkuntza lehenetsia",
+    "loginBtn": "Sartu",
+    "registerBtn": "Kontua sortu",
+    "logout": "Amaitu saioa",
+    "or": "edo",
+    "noAccount": "Ez duzu konturik?",
+    "hasAccount": "Dagoeneko kontu bat duzu?",
+    "registerLink": "Erregistratu",
+    "loginLink": "Hasi saioa",
+    "loading": "Kargatzen...",
+    "googleError": "Errorea Google-rekin saioa hastean",
+    "genericError": "Errorea eskaera prozesatzean",
+    "loginToFav": "Hasi saioa gogokoak gordetzeko"
+  },
+  "favorites": {
+    "title": "Nire Gogokoak",
+    "empty": "Oraindik ez duzu monumentu gogokorik",
+    "explore": "Monumentuak esploratu",
+    "count": "{{count}} monumentu gorde",
+    "add": "Gogokoetara gehitu",
+    "remove": "Gogokoetatik kendu"
+  },
+  "analytics": {
+    "title": "Analitika",
+    "refresh": "Eguneratu",
+    "totalUsers": "Erabiltzaile guztira",
+    "activeToday": "Gaur aktiboak",
+    "activeWeek": "Astean aktiboak",
+    "activeMonth": "Hilean aktiboak",
+    "newWeek": "Astean berriak",
+    "newMonth": "Hilean berriak",
+    "registrations": "Erregistroak",
+    "monthly": "Hilero",
+    "weekly": "Astero",
+    "loginsPerDay": "Eguneko saioak",
+    "days": "egun",
+    "logins": "Saioak",
+    "loginMethod": "Saio-hasteko metodoa",
+    "roleDistribution": "Rolaren banaketa",
+    "topUsers": "Erabiltzaile aktiboenak",
+    "totalLogins": "Saio guztira",
+    "noData": "Daturik ez"
   },
   "language": {
     "es": "Español",

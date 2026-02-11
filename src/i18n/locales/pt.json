@@ -6,7 +6,8 @@
   "nav": {
     "home": "Início",
     "search": "Pesquisar",
-    "map": "Mapa"
+    "map": "Mapa",
+    "favorites": "Favoritos"
   },
   "home": {
     "heroTitle": "Descubra o Património Europeu",
@@ -54,6 +55,7 @@
     "allProvinces": "Todas as províncias",
     "municipality": "Município",
     "allMunicipalities": "Todos os municípios",
+    "selectFilterFirst": "Selecione país, região ou distrito",
     "category": "Categoria",
     "allCategories": "Todas as categorias",
     "type": "Tipo",
@@ -140,6 +142,58 @@
   "footer": {
     "dataSources": "Fontes de dados:",
     "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Dados abertos reutilizados de acordo com as respetivas licenças"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sessão",
+    "registerTitle": "Criar conta",
+    "email": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "password": "Palavra-passe",
+    "passwordMin": "Mínimo 6 caracteres",
+    "name": "Nome",
+    "namePlaceholder": "O seu nome",
+    "defaultLanguage": "Idioma por defeito",
+    "loginBtn": "Entrar",
+    "registerBtn": "Criar conta",
+    "logout": "Sair",
+    "or": "ou",
+    "noAccount": "Não tem conta?",
+    "hasAccount": "Já tem conta?",
+    "registerLink": "Registe-se",
+    "loginLink": "Inicie sessão",
+    "loading": "A carregar...",
+    "googleError": "Erro ao iniciar sessão com Google",
+    "genericError": "Erro ao processar o pedido",
+    "loginToFav": "Inicie sessão para guardar favoritos"
+  },
+  "favorites": {
+    "title": "Os meus Favoritos",
+    "empty": "Ainda não tem monumentos favoritos",
+    "explore": "Explorar monumentos",
+    "count": "{{count}} monumentos guardados",
+    "add": "Adicionar aos favoritos",
+    "remove": "Remover dos favoritos"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "refresh": "Atualizar",
+    "totalUsers": "Total utilizadores",
+    "activeToday": "Ativos hoje",
+    "activeWeek": "Ativos semana",
+    "activeMonth": "Ativos mes",
+    "newWeek": "Novos semana",
+    "newMonth": "Novos mes",
+    "registrations": "Registos",
+    "monthly": "Mensal",
+    "weekly": "Semanal",
+    "loginsPerDay": "Logins por dia",
+    "days": "dias",
+    "logins": "Logins",
+    "loginMethod": "Metodo de login",
+    "roleDistribution": "Distribuicao por papel",
+    "topUsers": "Utilizadores mais ativos",
+    "totalLogins": "Total logins",
+    "noData": "Sem dados"
   },
   "language": {
     "es": "Español",

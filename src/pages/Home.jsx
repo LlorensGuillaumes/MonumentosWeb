@@ -95,43 +95,53 @@ export default function Home() {
         <Link to="/buscar" className="btn btn-outline">{t('home.viewAll')}</Link>
       </section>
 
-      {/* Countries Section */}
-      {stats?.por_pais && stats.por_pais.length > 1 && (
-        <section className="regions-section">
-          <h2>{t('home.exploreByCountry')}</h2>
-          <div className="regions-grid">
-            {stats.por_pais.map(p => (
-              <Link
-                key={p.pais}
-                to={`/buscar?pais=${encodeURIComponent(p.pais)}`}
-                className="region-card"
-              >
-                <span className="region-name">{p.pais}</span>
-                <span className="region-count">{t('home.monumentsCount', { count: p.total.toLocaleString() })}</span>
-              </Link>
+      {/* Regions Section grouped by country */}
+      {stats?.por_region && (() => {
+        const flags = { 'España': '🇪🇸', 'Francia': '🇫🇷', 'Portugal': '🇵🇹' };
+        const countryOrder = ['España', 'Francia', 'Portugal'];
+        const grouped = {};
+        for (const r of stats.por_region) {
+          if (!r.region) continue;
+          const pais = r.pais || 'Otro';
+          if (!grouped[pais]) grouped[pais] = [];
+          grouped[pais].push(r);
+        }
+        for (const pais of Object.keys(grouped)) {
+          grouped[pais].sort((a, b) => b.total - a.total);
+        }
+        const sortedCountries = Object.keys(grouped).sort(
+          (a, b) => (countryOrder.indexOf(a) !== -1 ? countryOrder.indexOf(a) : 99)
+                   - (countryOrder.indexOf(b) !== -1 ? countryOrder.indexOf(b) : 99)
+        );
+        return (
+          <section className="regions-section">
+            <h2>{t('home.exploreByRegion')}</h2>
+            {sortedCountries.map(pais => (
+              <div key={pais} className="country-regions">
+                <h3 className="country-regions-header">
+                  <span className="country-flag">{flags[pais] || '🌍'}</span>
+                  {pais}
+                  <span className="country-regions-count">
+                    {grouped[pais].reduce((s, r) => s + r.total, 0).toLocaleString()} {t('home.monuments').toLowerCase()}
+                  </span>
+                </h3>
+                <div className="regions-grid">
+                  {grouped[pais].map(r => (
+                    <Link
+                      key={`${r.pais}-${r.region}`}
+                      to={`/buscar?region=${encodeURIComponent(r.region)}${r.pais ? `&pais=${encodeURIComponent(r.pais)}` : ''}`}
+                      className="region-card"
+                    >
+                      <span className="region-name">{r.region}</span>
+                      <span className="region-count">{t('home.monumentsCount', { count: r.total.toLocaleString() })}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
-          </div>
-        </section>
-      )}
-
-      {/* Regions Section */}
-      {stats?.por_region && (
-        <section className="regions-section">
-          <h2>{t('home.exploreByRegion')}</h2>
-          <div className="regions-grid">
-            {stats.por_region.map(r => (
-              <Link
-                key={`${r.pais}-${r.region}`}
-                to={`/buscar?region=${encodeURIComponent(r.region)}${r.pais ? `&pais=${encodeURIComponent(r.pais)}` : ''}`}
-                className="region-card"
-              >
-                <span className="region-name">{r.region}</span>
-                <span className="region-count">{t('home.monumentsCount', { count: r.total.toLocaleString() })}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
     </div>
   );
 }

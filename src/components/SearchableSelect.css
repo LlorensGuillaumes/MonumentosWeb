@@ -20,6 +20,16 @@
   border-color: #cbd5e1;
 }
 
+.searchable-select-trigger.disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.searchable-select-trigger.disabled:hover {
+  border-color: #e2e8f0;
+}
+
 .searchable-select-trigger.open {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);

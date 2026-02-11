@@ -6,7 +6,8 @@
   "nav": {
     "home": "Inici",
     "search": "Cercar",
-    "map": "Mapa"
+    "map": "Mapa",
+    "favorites": "Preferits"
   },
   "home": {
     "heroTitle": "Descobreix el Patrimoni Europeu",
@@ -54,6 +55,7 @@
     "allProvinces": "Totes les províncies",
     "municipality": "Municipi",
     "allMunicipalities": "Tots els municipis",
+    "selectFilterFirst": "Selecciona país, regió o província",
     "category": "Categoria",
     "allCategories": "Totes les categories",
     "type": "Tipus",
@@ -140,6 +142,58 @@
   "footer": {
     "dataSources": "Fonts de dades:",
     "license": "Wikidata: CC0 | Viquipèdia/Commons: CC BY-SA 3.0 | Dades obertes reutilitzades segons les seves respectives llicències"
+  },
+  "auth": {
+    "loginTitle": "Inicia sessió",
+    "registerTitle": "Crear compte",
+    "email": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "password": "Contrasenya",
+    "passwordMin": "Mínim 6 caràcters",
+    "name": "Nom",
+    "namePlaceholder": "El teu nom",
+    "defaultLanguage": "Idioma per defecte",
+    "loginBtn": "Entrar",
+    "registerBtn": "Crear compte",
+    "logout": "Tancar sessió",
+    "or": "o",
+    "noAccount": "No tens compte?",
+    "hasAccount": "Ja tens compte?",
+    "registerLink": "Registra't",
+    "loginLink": "Inicia sessió",
+    "loading": "Carregant...",
+    "googleError": "Error en iniciar sessió amb Google",
+    "genericError": "Error en processar la sol·licitud",
+    "loginToFav": "Inicia sessió per guardar preferits"
+  },
+  "favorites": {
+    "title": "Els meus Preferits",
+    "empty": "Encara no tens monuments preferits",
+    "explore": "Explorar monuments",
+    "count": "{{count}} monuments guardats",
+    "add": "Afegir a preferits",
+    "remove": "Treure de preferits"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "refresh": "Actualitzar",
+    "totalUsers": "Total usuaris",
+    "activeToday": "Actius avui",
+    "activeWeek": "Actius setmana",
+    "activeMonth": "Actius mes",
+    "newWeek": "Nous setmana",
+    "newMonth": "Nous mes",
+    "registrations": "Registres",
+    "monthly": "Mensual",
+    "weekly": "Setmanal",
+    "loginsPerDay": "Logins per dia",
+    "days": "dies",
+    "logins": "Logins",
+    "loginMethod": "Metode de login",
+    "roleDistribution": "Distribucio per rol",
+    "topUsers": "Usuaris mes actius",
+    "totalLogins": "Total logins",
+    "noData": "Sense dades"
   },
   "language": {
     "es": "Español",

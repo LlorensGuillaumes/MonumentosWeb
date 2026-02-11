@@ -12,7 +12,7 @@ function matchSearch(text, query) {
 
 const MAX_VISIBLE = 100;
 
-export default function SearchableSelect({ value, onChange, options = [], placeholder = 'Todos' }) {
+export default function SearchableSelect({ value, onChange, options = [], placeholder = 'Todos', disabled = false }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const containerRef = useRef(null);
@@ -66,9 +66,10 @@ export default function SearchableSelect({ value, onChange, options = [], placeh
   }, [onChange]);
 
   const handleTriggerClick = useCallback(() => {
+    if (disabled) return;
     setOpen(prev => !prev);
     if (open) setSearch('');
-  }, [open]);
+  }, [open, disabled]);
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {
@@ -86,7 +87,7 @@ export default function SearchableSelect({ value, onChange, options = [], placeh
   return (
     <div className="searchable-select" ref={containerRef}>
       <div
-        className={`searchable-select-trigger ${open ? 'open' : ''} ${value ? 'has-value' : ''}`}
+        className={`searchable-select-trigger ${open ? 'open' : ''} ${value ? 'has-value' : ''} ${disabled ? 'disabled' : ''}`}
         onClick={handleTriggerClick}
       >
         {open ? (

@@ -22,6 +22,48 @@
   text-decoration: underline;
 }
 
+.detail-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.detail-title-row h1 {
+  flex: 1;
+}
+
+.fav-btn {
+  background: none;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-top: 0.25rem;
+}
+
+.fav-btn:hover {
+  border-color: #e53e3e;
+  background: #fff5f5;
+  transform: scale(1.1);
+}
+
+.fav-btn.fav-active {
+  border-color: #e53e3e;
+  background: #fff5f5;
+}
+
+.fav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr 320px;

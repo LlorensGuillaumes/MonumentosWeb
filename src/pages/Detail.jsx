@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { getMonumento } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import 'leaflet/dist/leaflet.css';
 import './Detail.css';
 
@@ -20,10 +21,13 @@ function formatInception(value, t) {
 export default function Detail() {
   const { id } = useParams();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user, isFavorito, toggleFavorito } = useAuth();
   const [monumento, setMonumento] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [favLoading, setFavLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -72,7 +76,22 @@ export default function Detail() {
       <div className="detail-layout">
         {/* Main content */}
         <main className="detail-main">
-          <h1>{monumento.denominacion}</h1>
+          <div className="detail-title-row">
+            <h1>{monumento.denominacion}</h1>
+            <button
+              className={`fav-btn ${isFavorito(monumento.id) ? 'fav-active' : ''}`}
+              disabled={favLoading}
+              onClick={async () => {
+                if (!user) { navigate('/login'); return; }
+                setFavLoading(true);
+                await toggleFavorito(monumento.id);
+                setFavLoading(false);
+              }}
+              title={user ? (isFavorito(monumento.id) ? t('favorites.remove') : t('favorites.add')) : t('auth.loginToFav')}
+            >
+              {isFavorito(monumento.id) ? '\u2764\uFE0F' : '\u2661'}
+            </button>
+          </div>
 
           {/* Location */}
           <div className="detail-location">

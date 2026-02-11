@@ -6,7 +6,8 @@
   "nav": {
     "home": "Home",
     "search": "Search",
-    "map": "Map"
+    "map": "Map",
+    "favorites": "Favorites"
   },
   "home": {
     "heroTitle": "Discover European Heritage",
@@ -54,6 +55,7 @@
     "allProvinces": "All provinces",
     "municipality": "Municipality",
     "allMunicipalities": "All municipalities",
+    "selectFilterFirst": "Select country, region or province",
     "category": "Category",
     "allCategories": "All categories",
     "type": "Type",
@@ -140,6 +142,58 @@
   "footer": {
     "dataSources": "Data sources:",
     "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Open data reused according to their respective licences"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create account",
+    "email": "Email",
+    "emailPlaceholder": "you@email.com",
+    "password": "Password",
+    "passwordMin": "Minimum 6 characters",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "defaultLanguage": "Default language",
+    "loginBtn": "Sign in",
+    "registerBtn": "Create account",
+    "logout": "Sign out",
+    "or": "or",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "registerLink": "Sign up",
+    "loginLink": "Sign in",
+    "loading": "Loading...",
+    "googleError": "Error signing in with Google",
+    "genericError": "Error processing request",
+    "loginToFav": "Sign in to save favorites"
+  },
+  "favorites": {
+    "title": "My Favorites",
+    "empty": "You don't have any favorite monuments yet",
+    "explore": "Explore monuments",
+    "count": "{{count}} saved monuments",
+    "add": "Add to favorites",
+    "remove": "Remove from favorites"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "refresh": "Refresh",
+    "totalUsers": "Total users",
+    "activeToday": "Active today",
+    "activeWeek": "Active this week",
+    "activeMonth": "Active this month",
+    "newWeek": "New this week",
+    "newMonth": "New this month",
+    "registrations": "Registrations",
+    "monthly": "Monthly",
+    "weekly": "Weekly",
+    "loginsPerDay": "Logins per day",
+    "days": "days",
+    "logins": "Logins",
+    "loginMethod": "Login method",
+    "roleDistribution": "Role distribution",
+    "topUsers": "Most active users",
+    "totalLogins": "Total logins",
+    "noData": "No data"
   },
   "language": {
     "es": "Español",

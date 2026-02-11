@@ -6,7 +6,8 @@
   "nav": {
     "home": "Accueil",
     "search": "Rechercher",
-    "map": "Carte"
+    "map": "Carte",
+    "favorites": "Favoris"
   },
   "home": {
     "heroTitle": "Découvrez le Patrimoine Européen",
@@ -54,6 +55,7 @@
     "allProvinces": "Toutes les provinces",
     "municipality": "Commune",
     "allMunicipalities": "Toutes les communes",
+    "selectFilterFirst": "Sélectionnez pays, région ou département",
     "category": "Catégorie",
     "allCategories": "Toutes les catégories",
     "type": "Type",
@@ -140,6 +142,58 @@
   "footer": {
     "dataSources": "Sources de données :",
     "license": "Wikidata : CC0 | Wikipedia/Commons : CC BY-SA 3.0 | Données ouvertes réutilisées selon leurs licences respectives"
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "registerTitle": "Créer un compte",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@email.com",
+    "password": "Mot de passe",
+    "passwordMin": "Minimum 6 caractères",
+    "name": "Nom",
+    "namePlaceholder": "Votre nom",
+    "defaultLanguage": "Langue par défaut",
+    "loginBtn": "Se connecter",
+    "registerBtn": "Créer un compte",
+    "logout": "Déconnexion",
+    "or": "ou",
+    "noAccount": "Pas de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "registerLink": "Inscrivez-vous",
+    "loginLink": "Connectez-vous",
+    "loading": "Chargement...",
+    "googleError": "Erreur de connexion avec Google",
+    "genericError": "Erreur lors du traitement",
+    "loginToFav": "Connectez-vous pour enregistrer des favoris"
+  },
+  "favorites": {
+    "title": "Mes Favoris",
+    "empty": "Vous n'avez pas encore de monuments favoris",
+    "explore": "Explorer les monuments",
+    "count": "{{count}} monuments enregistrés",
+    "add": "Ajouter aux favoris",
+    "remove": "Retirer des favoris"
+  },
+  "analytics": {
+    "title": "Analytique",
+    "refresh": "Actualiser",
+    "totalUsers": "Total utilisateurs",
+    "activeToday": "Actifs aujourd'hui",
+    "activeWeek": "Actifs semaine",
+    "activeMonth": "Actifs mois",
+    "newWeek": "Nouveaux semaine",
+    "newMonth": "Nouveaux mois",
+    "registrations": "Inscriptions",
+    "monthly": "Mensuel",
+    "weekly": "Hebdomadaire",
+    "loginsPerDay": "Connexions par jour",
+    "days": "jours",
+    "logins": "Connexions",
+    "loginMethod": "Methode de connexion",
+    "roleDistribution": "Distribution par role",
+    "topUsers": "Utilisateurs les plus actifs",
+    "totalLogins": "Total connexions",
+    "noData": "Aucune donnee"
   },
   "language": {
     "es": "Español",

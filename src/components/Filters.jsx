@@ -102,12 +102,15 @@ export default function Filters({ onSearch }) {
     (!filters.region || p.region === filters.region)
   );
 
-  // Municipios: filtrados por país, región y provincia seleccionadas
-  const municipiosFiltrados = (filtros.municipios || []).filter(m =>
-    (!filters.pais || m.pais === filters.pais) &&
-    (!filters.region || m.region === filters.region) &&
-    (!filters.provincia || m.provincia === filters.provincia)
-  );
+  // Municipios: solo disponibles si hay algún filtro geográfico activo
+  const hasGeoFilter = filters.pais || filters.region || filters.provincia;
+  const municipiosFiltrados = hasGeoFilter
+    ? (filtros.municipios || []).filter(m =>
+        (!filters.pais || m.pais === filters.pais) &&
+        (!filters.region || m.region === filters.region) &&
+        (!filters.provincia || m.provincia === filters.provincia)
+      )
+    : [];
 
   return (
     <form className="filters" onSubmit={handleSubmit}>
@@ -160,7 +163,8 @@ export default function Filters({ onSearch }) {
             value={filters.municipio}
             onChange={handleMunicipioChange}
             options={municipiosFiltrados}
-            placeholder={placeholders.municipio}
+            placeholder={hasGeoFilter ? placeholders.municipio : t('filters.selectFilterFirst')}
+            disabled={!hasGeoFilter}
           />
         </div>
       </div>
