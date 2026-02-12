@@ -11,7 +11,7 @@
   },
   "home": {
     "heroTitle": "Ezagutu Europako Ondarea",
-    "heroSubtitle": "Espainako, Portugaleko eta Frantziako {{count}} monumentu, eraikin historiko eta aztarnategi arkeologiko baino gehiago esploratu.",
+    "heroSubtitle": "Espainako, Italiako, Frantziako eta Portugaleko {{count}} monumentu, eraikin historiko eta aztarnategi arkeologiko baino gehiago esploratu.",
     "exploreMonuments": "Monumentuak esploratu",
     "viewOnMap": "Mapan ikusi",
     "monuments": "Monumentuak",
@@ -35,6 +35,7 @@
     "searching": "Bilatzen...",
     "results": "{{count}} emaitza",
     "sortBy": "Ordenatu:",
+    "relevance": "Garrantzia",
     "nameAZ": "Izena A-Z",
     "nameZA": "Izena Z-A",
     "municipalityAZ": "Udalerria A-Z",
@@ -83,6 +84,11 @@
       "region": "Eskualdea",
       "province": "Departamendua",
       "municipality": "Comuna"
+    },
+    "italy": {
+      "region": "Eskualdea",
+      "province": "Probintzia",
+      "municipality": "Udalerria"
     }
   },
   "detail": {
@@ -205,6 +211,7 @@
     "pt": "Português",
     "ca": "Català",
     "eu": "Euskara",
-    "gl": "Galego"
+    "gl": "Galego",
+    "it": "Italiera"
   }
 }

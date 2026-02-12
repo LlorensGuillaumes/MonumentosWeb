@@ -11,7 +11,7 @@
   },
   "home": {
     "heroTitle": "Découvrez le Patrimoine Européen",
-    "heroSubtitle": "Explorez plus de {{count}} monuments, bâtiments historiques et sites archéologiques en Espagne, au Portugal et en France.",
+    "heroSubtitle": "Explorez plus de {{count}} monuments, bâtiments historiques et sites archéologiques en Espagne, en Italie, en France et au Portugal.",
     "exploreMonuments": "Explorer les monuments",
     "viewOnMap": "Voir sur la carte",
     "monuments": "Monuments",
@@ -35,6 +35,7 @@
     "searching": "Recherche en cours...",
     "results": "{{count}} résultats",
     "sortBy": "Trier :",
+    "relevance": "Pertinence",
     "nameAZ": "Nom A-Z",
     "nameZA": "Nom Z-A",
     "municipalityAZ": "Commune A-Z",
@@ -82,6 +83,11 @@
     "france": {
       "region": "Région",
       "province": "Département",
+      "municipality": "Commune"
+    },
+    "italy": {
+      "region": "Région",
+      "province": "Province",
       "municipality": "Commune"
     }
   },
@@ -205,6 +211,7 @@
     "pt": "Português",
     "ca": "Català",
     "eu": "Euskara",
-    "gl": "Galego"
+    "gl": "Galego",
+    "it": "Italiano"
   }
 }

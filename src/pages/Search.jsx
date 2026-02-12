@@ -17,14 +17,14 @@ export default function Search() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(24);
-  const [sort, setSort] = useState('nombre_asc');
+  const [sort, setSort] = useState('relevancia');
 
   // Cargar filtros desde URL al montar
   useEffect(() => {
     const urlFilters = {};
     let urlPage = 1;
     let urlLimit = 24;
-    let urlSort = 'nombre_asc';
+    let urlSort = 'relevancia';
     for (const [key, value] of searchParams.entries()) {
       if (key === 'page') {
         urlPage = parseInt(value) || 1;
@@ -77,7 +77,7 @@ export default function Search() {
     });
     if (pageNum > 1) params.set('page', pageNum);
     if (limit !== 24) params.set('limit', limit);
-    if (sort !== 'nombre_asc') params.set('sort', sort);
+    if (sort !== 'relevancia') params.set('sort', sort);
     setSearchParams(params);
 
     try {
@@ -133,6 +133,7 @@ export default function Search() {
             <label>
               {t('search.sortBy')}
               <select value={sort} onChange={e => { setSort(e.target.value); setPage(1); }}>
+                <option value="relevancia">{t('search.relevance')}</option>
                 <option value="nombre_asc">{t('search.nameAZ')}</option>
                 <option value="nombre_desc">{t('search.nameZA')}</option>
                 <option value="municipio_asc">{t('search.municipalityAZ')}</option>

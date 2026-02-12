@@ -11,7 +11,7 @@
   },
   "home": {
     "heroTitle": "Descobreix el Patrimoni Europeu",
-    "heroSubtitle": "Explora més de {{count}} monuments, edificis històrics i jaciments arqueològics d'Espanya, Portugal i França.",
+    "heroSubtitle": "Explora més de {{count}} monuments, edificis històrics i jaciments arqueològics d'Espanya, Itàlia, França i Portugal.",
     "exploreMonuments": "Explorar monuments",
     "viewOnMap": "Veure al mapa",
     "monuments": "Monuments",
@@ -35,6 +35,7 @@
     "searching": "Cercant...",
     "results": "{{count}} resultats",
     "sortBy": "Ordenar:",
+    "relevance": "Rellevància",
     "nameAZ": "Nom A-Z",
     "nameZA": "Nom Z-A",
     "municipalityAZ": "Municipi A-Z",
@@ -83,6 +84,11 @@
       "region": "Regió",
       "province": "Departament",
       "municipality": "Comuna"
+    },
+    "italy": {
+      "region": "Regió",
+      "province": "Província",
+      "municipality": "Municipi"
     }
   },
   "detail": {
@@ -205,6 +211,7 @@
     "pt": "Português",
     "ca": "Català",
     "eu": "Euskara",
-    "gl": "Galego"
+    "gl": "Galego",
+    "it": "Italià"
   }
 }
