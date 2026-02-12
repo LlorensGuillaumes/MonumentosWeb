@@ -115,8 +115,8 @@ export default function Home() {
 
       {/* Regions Section grouped by country */}
       {stats?.por_region && (() => {
-        const flags = { 'España': '🇪🇸', 'Francia': '🇫🇷', 'Portugal': '🇵🇹' };
-        const countryOrder = ['España', 'Francia', 'Portugal'];
+        const flags = { 'España': '🇪🇸', 'Italia': '🇮🇹', 'Francia': '🇫🇷', 'Portugal': '🇵🇹' };
+        const countryOrder = ['España', 'Italia', 'Francia', 'Portugal'];
         const grouped = {};
         for (const r of stats.por_region) {
           if (!r.region) continue;

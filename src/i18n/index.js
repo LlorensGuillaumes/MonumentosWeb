@@ -9,6 +9,7 @@ import pt from './locales/pt.json';
 import ca from './locales/ca.json';
 import eu from './locales/eu.json';
 import gl from './locales/gl.json';
+import it from './locales/it.json';
 
 i18n
   .use(LanguageDetector)
@@ -22,8 +23,9 @@ i18n
       ca: { translation: ca },
       eu: { translation: eu },
       gl: { translation: gl },
+      it: { translation: it },
     },
-    supportedLngs: ['es', 'en', 'fr', 'pt', 'ca', 'eu', 'gl'],
+    supportedLngs: ['es', 'en', 'fr', 'pt', 'ca', 'eu', 'gl', 'it'],
     fallbackLng: 'es',
     interpolation: {
       escapeValue: false,

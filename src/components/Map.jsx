@@ -61,7 +61,8 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
       case 'Portugal': return { center: [39.5, -8.0], zoom: 7 };
       case 'Francia': return { center: [46.6, 2.2], zoom: 6 };
       case 'España': return { center: [40.4, -3.7], zoom: 6 };
-      default: return { center: [43.0, -2.0], zoom: 5 }; // Vista Europa occidental
+      case 'Italia': return { center: [41.9, 12.5], zoom: 6 };
+      default: return { center: [44.0, 6.0], zoom: 5 }; // Vista Europa occidental
     }
   };
   const { center: defaultCenter, zoom: defaultZoom } = getDefaultView();
