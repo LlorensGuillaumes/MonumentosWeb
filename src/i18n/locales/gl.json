@@ -7,7 +7,8 @@
     "home": "Inicio",
     "search": "Buscar",
     "map": "Mapa",
-    "favorites": "Favoritos"
+    "favorites": "Favoritos",
+    "contact": "Contacto"
   },
   "home": {
     "heroTitle": "Descobre o Patrimonio Europeo",
@@ -205,6 +206,22 @@
     "topUsers": "Usuarios mais activos",
     "totalLogins": "Total logins",
     "noData": "Sen datos"
+  },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Envíanos unha mensaxe e responderémosche canto antes.",
+    "email": "O teu email",
+    "emailPlaceholder": "ti@email.com",
+    "subject": "Asunto",
+    "subjectPlaceholder": "Asunto da mensaxe",
+    "message": "Mensaxe",
+    "messagePlaceholder": "Escribe a túa mensaxe aquí...",
+    "attachments": "Ficheiros adxuntos",
+    "addFile": "Engadir ficheiro",
+    "send": "Enviar mensaxe",
+    "sending": "Enviando...",
+    "success": "Mensaxe enviada correctamente. Responderémosche pronto.",
+    "error": "Erro ao enviar a mensaxe. Téntao de novo."
   },
   "language": {
     "es": "Español",

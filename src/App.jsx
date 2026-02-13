@@ -10,6 +10,7 @@ import MapPage from './pages/MapPage';
 import Login from './pages/Login';
 import Favoritos from './pages/Favoritos';
 import Admin from './pages/Admin';
+import Contact from './pages/Contact';
 import RequireAuth from './components/RequireAuth';
 import './App.css';
 
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/favoritos" element={<RequireAuth><Favoritos /></RequireAuth>} />
                 <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+                <Route path="/contacto" element={<Contact />} />
               </Routes>
             </main>
             <footer className="footer">

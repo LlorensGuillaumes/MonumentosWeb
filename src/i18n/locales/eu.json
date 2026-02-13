@@ -7,7 +7,8 @@
     "home": "Hasiera",
     "search": "Bilatu",
     "map": "Mapa",
-    "favorites": "Gogokoak"
+    "favorites": "Gogokoak",
+    "contact": "Kontaktua"
   },
   "home": {
     "heroTitle": "Ezagutu Europako Ondarea",
@@ -205,6 +206,22 @@
     "topUsers": "Erabiltzaile aktiboenak",
     "totalLogins": "Saio guztira",
     "noData": "Daturik ez"
+  },
+  "contact": {
+    "title": "Kontaktua",
+    "subtitle": "Bidali mezu bat eta ahalik eta lasterren erantzungo dizugu.",
+    "email": "Zure emaila",
+    "emailPlaceholder": "zu@email.com",
+    "subject": "Gaia",
+    "subjectPlaceholder": "Mezuaren gaia",
+    "message": "Mezua",
+    "messagePlaceholder": "Idatzi zure mezua hemen...",
+    "attachments": "Eranskinak",
+    "addFile": "Fitxategia gehitu",
+    "send": "Mezua bidali",
+    "sending": "Bidaltzen...",
+    "success": "Mezua ondo bidali da. Laster erantzungo dizugu.",
+    "error": "Errorea mezua bidaltzean. Saiatu berriro."
   },
   "language": {
     "es": "Español",

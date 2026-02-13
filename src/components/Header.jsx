@@ -81,16 +81,20 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header-content">
-        {user?.rol === 'admin' && (
-          <Link to="/admin" className="admin-btn">Admin</Link>
-        )}
-
         <Link to="/" className="logo">
           <span className="logo-icon">🏛️</span>
           <span className="logo-text">{t('header.title')}</span>
         </Link>
 
         <nav className="nav">
+          {user?.rol === 'admin' && (
+            <Link
+              to="/admin"
+              className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+            >
+              Admin
+            </Link>
+          )}
           <Link
             to="/"
             className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
@@ -122,6 +126,12 @@ export default function Header() {
               </Link>
             </>
           )}
+          <Link
+            to="/contacto"
+            className={`nav-link ${location.pathname === '/contacto' ? 'active' : ''}`}
+          >
+            {t('nav.contact')}
+          </Link>
         </nav>
 
         <div className="header-right">

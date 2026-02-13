@@ -17,26 +17,6 @@
   height: 60px;
 }
 
-.admin-btn {
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  padding: 0.3rem 0.7rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.2s;
-}
-
-.admin-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: white;
-}
-
 .logo {
   display: flex;
   align-items: center;

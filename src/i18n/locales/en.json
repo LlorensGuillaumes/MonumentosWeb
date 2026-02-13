@@ -7,7 +7,8 @@
     "home": "Home",
     "search": "Search",
     "map": "Map",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "contact": "Contact"
   },
   "home": {
     "heroTitle": "Discover European Heritage",
@@ -205,6 +206,22 @@
     "topUsers": "Most active users",
     "totalLogins": "Total logins",
     "noData": "No data"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Send us a message and we'll get back to you as soon as possible.",
+    "email": "Your email",
+    "emailPlaceholder": "you@email.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "Message subject",
+    "message": "Message",
+    "messagePlaceholder": "Write your message here...",
+    "attachments": "Attachments",
+    "addFile": "Add file",
+    "send": "Send message",
+    "sending": "Sending...",
+    "success": "Message sent successfully. We'll reply soon.",
+    "error": "Error sending message. Please try again."
   },
   "language": {
     "es": "Español",
