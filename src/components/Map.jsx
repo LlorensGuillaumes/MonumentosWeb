@@ -273,6 +273,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
                         alt={feature.properties.nombre}
                         className="popup-image"
                         loading="lazy"
+                        onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }}
                       />
                     )}
                     <button

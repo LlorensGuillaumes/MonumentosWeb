@@ -13,6 +13,24 @@
   margin-bottom: 1.5rem;
 }
 
+.breadcrumb .back-btn {
+  background: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.breadcrumb .back-btn:hover {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
 .breadcrumb a {
   color: #3b82f6;
   text-decoration: none;
@@ -296,6 +314,253 @@
 
 .error h2 {
   color: #dc2626;
+}
+
+/* ===== STAR RATINGS ===== */
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star-filled { color: #f59e0b; }
+.star-empty { color: #d1d5db; }
+.star-clickable { cursor: pointer; transition: transform 0.1s; }
+.star-clickable:hover { transform: scale(1.2); }
+
+.ratings-summary {
+  margin-bottom: 1rem;
+}
+
+.ratings-main-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ratings-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a365d;
+}
+
+.ratings-count {
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.ratings-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.ratings-label {
+  min-width: 110px;
+  color: #64748b;
+}
+
+.ratings-small {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.ratings-few {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.ratings-form {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.ratings-form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.ratings-form-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.ratings-form-row > span:first-child {
+  min-width: 110px;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.ratings-more-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.ratings-more-btn:hover { text-decoration: underline; }
+
+.ratings-submit {
+  margin-top: 0.5rem;
+  padding: 0.35rem 1rem;
+  font-size: 0.82rem;
+}
+
+.ratings-msg {
+  margin-left: 0.5rem;
+  font-size: 0.82rem;
+  color: #16a34a;
+}
+
+.ratings-login-hint {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.ratings-login-hint a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.ratings-login-hint a:hover { text-decoration: underline; }
+
+/* ===== USER NOTES ===== */
+.notas-form {
+  margin-bottom: 1rem;
+}
+
+.notas-form-top {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.notas-form-top select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: white;
+}
+
+.notas-form-top input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.notas-form-top input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.notas-form-top .btn {
+  white-space: nowrap;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+.notas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nota-item {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+}
+
+.nota-tipo-horario { border-left: 3px solid #3b82f6; }
+.nota-tipo-precio { border-left: 3px solid #16a34a; }
+.nota-tipo-nota { border-left: 3px solid #94a3b8; }
+
+.nota-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.nota-tipo-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.nota-badge-horario { background: #dbeafe; color: #1e40af; }
+.nota-badge-precio { background: #dcfce7; color: #166534; }
+.nota-badge-nota { background: #f1f5f9; color: #64748b; }
+
+.nota-author {
+  font-size: 0.8rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.nota-rol-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  margin-left: 0.3rem;
+}
+
+.nota-rol-admin { background: #dbeafe; color: #1e40af; }
+.nota-rol-colaborador { background: #fef3c7; color: #92400e; }
+
+.nota-date {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-left: auto;
+}
+
+.nota-delete {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.nota-delete:hover { color: #ef4444; }
+
+.nota-text {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.notas-empty {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 1rem;
 }
 
 @media (max-width: 900px) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl } from '../services/api';
+import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory } from '../services/api';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
 import './Admin.css';
 
@@ -63,6 +63,34 @@ export default function Admin() {
   const [mensajesUnread, setMensajesUnread] = useState(0);
   const [selectedMsg, setSelectedMsg] = useState(null);
   const [selectedMsgLoading, setSelectedMsgLoading] = useState(false);
+
+  // --- Propuestas state ---
+  const [propuestas, setPropuestas] = useState([]);
+  const [propuestasLoading, setPropuestasLoading] = useState(false);
+  const [propuestasTotal, setPropuestasTotal] = useState(0);
+  const [propuestasPage, setPropuestasPage] = useState(1);
+  const [propuestasTotalPages, setPropuestasTotalPages] = useState(1);
+  const [propuestasFilter, setPropuestasFilter] = useState('pendiente');
+  const [propuestasPendientes, setPropuestasPendientes] = useState(0);
+  const [selectedProp, setSelectedProp] = useState(null);
+  const [selectedPropLoading, setSelectedPropLoading] = useState(false);
+  const [propEditData, setPropEditData] = useState({});
+  const [propSaving, setPropSaving] = useState(false);
+  const [propResult, setPropResult] = useState(null);
+  const [wdResults, setWdResults] = useState(null);
+  const [wdSearching, setWdSearching] = useState(false);
+  const [rejectNotes, setRejectNotes] = useState('');
+  const [showRejectModal, setShowRejectModal] = useState(false);
+
+  // --- Social / Publicaciones state ---
+  const [socialMonumentos, setSocialMonumentos] = useState([]);
+  const [socialSearch, setSocialSearch] = useState('');
+  const [socialSearchPais, setSocialSearchPais] = useState('');
+  const [socialLoading, setSocialLoading] = useState(false);
+  const [socialSelected, setSocialSelected] = useState(null);
+  const [socialPlatform, setSocialPlatform] = useState('instagram');
+  const [socialText, setSocialText] = useState('');
+  const [socialCopied, setSocialCopied] = useState('');
 
   const fetchContactos = useCallback(async (p = 1) => {
     setLoading(true);
@@ -438,6 +466,344 @@ export default function Admin() {
     }
   };
 
+  // --- Propuestas handlers ---
+  const fetchPropuestas = useCallback(async (p = 1) => {
+    setPropuestasLoading(true);
+    try {
+      const params = { page: p, limit: 50 };
+      if (propuestasFilter) params.estado = propuestasFilter;
+      const data = await getAdminPropuestas(params);
+      setPropuestas(data.items);
+      setPropuestasTotal(data.total);
+      setPropuestasTotalPages(data.pages);
+      setPropuestasPage(data.page);
+    } catch (err) {
+      console.error('Error cargando propuestas:', err);
+    } finally {
+      setPropuestasLoading(false);
+    }
+  }, [propuestasFilter]);
+
+  const fetchPropuestasCount = useCallback(async () => {
+    try {
+      const data = await getAdminPropuestasCount();
+      setPropuestasPendientes(data.pendientes);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    fetchPropuestasCount();
+  }, [fetchPropuestasCount]);
+
+  useEffect(() => {
+    if (activeSection === 'propuestas') fetchPropuestas(1);
+  }, [activeSection, fetchPropuestas]);
+
+  const openPropuesta = async (prop) => {
+    setSelectedPropLoading(true);
+    setPropResult(null);
+    setWdResults(null);
+    setRejectNotes('');
+    setShowRejectModal(false);
+    try {
+      const detail = await getAdminPropuesta(prop.id);
+      setSelectedProp(detail);
+      setPropEditData({
+        denominacion: detail.denominacion || '',
+        tipo: detail.tipo || '',
+        categoria: detail.categoria || '',
+        provincia: detail.provincia || '',
+        municipio: detail.municipio || '',
+        localidad: detail.localidad || '',
+        comunidad_autonoma: detail.comunidad_autonoma || '',
+        pais: detail.pais || '',
+        descripcion: detail.descripcion || '',
+        estilo: detail.estilo || '',
+        material: detail.material || '',
+        inception: detail.inception || '',
+        arquitecto: detail.arquitecto || '',
+        wikipedia_url: detail.wikipedia_url || '',
+        latitud: detail.latitud || '',
+        longitud: detail.longitud || '',
+      });
+    } catch (err) {
+      console.error('Error cargando propuesta:', err);
+    } finally {
+      setSelectedPropLoading(false);
+    }
+  };
+
+  const closePropuesta = () => {
+    setSelectedProp(null);
+    setWdResults(null);
+  };
+
+  const handlePropSave = async () => {
+    if (!selectedProp) return;
+    setPropSaving(true);
+    try {
+      await updateAdminPropuesta(selectedProp.id, propEditData);
+      setPropResult({ type: 'success', text: 'Cambios guardados' });
+      setSelectedProp(prev => ({ ...prev, ...propEditData }));
+    } catch (err) {
+      setPropResult({ type: 'error', text: err.response?.data?.error || 'Error' });
+    } finally {
+      setPropSaving(false);
+    }
+  };
+
+  const handleAprobar = async () => {
+    if (!selectedProp || !window.confirm('¿Aprobar esta propuesta? Se creará el monumento.')) return;
+    setPropSaving(true);
+    try {
+      // Save any pending edits first
+      await updateAdminPropuesta(selectedProp.id, propEditData);
+      const result = await aprobarPropuesta(selectedProp.id);
+      setPropResult({ type: 'success', text: `Propuesta aprobada. Monumento #${result.bien_id} creado.` });
+      setSelectedProp(prev => ({ ...prev, estado: 'aprobada', bien_id: result.bien_id }));
+      fetchPropuestas(propuestasPage);
+      fetchPropuestasCount();
+    } catch (err) {
+      setPropResult({ type: 'error', text: err.response?.data?.error || 'Error al aprobar' });
+    } finally {
+      setPropSaving(false);
+    }
+  };
+
+  const handleRechazar = async () => {
+    if (!selectedProp) return;
+    setPropSaving(true);
+    try {
+      await rechazarPropuesta(selectedProp.id, rejectNotes);
+      setPropResult({ type: 'success', text: 'Propuesta rechazada.' });
+      setSelectedProp(prev => ({ ...prev, estado: 'rechazada', notas_admin: rejectNotes }));
+      setShowRejectModal(false);
+      fetchPropuestas(propuestasPage);
+      fetchPropuestasCount();
+    } catch (err) {
+      setPropResult({ type: 'error', text: err.response?.data?.error || 'Error al rechazar' });
+    } finally {
+      setPropSaving(false);
+    }
+  };
+
+  const handleWikidataSearch = async () => {
+    if (!propEditData.denominacion) return;
+    setWdSearching(true);
+    setWdResults(null);
+    try {
+      const results = await searchWikidata(propEditData.denominacion, propEditData.pais);
+      setWdResults(results);
+    } catch (err) {
+      console.error('Error buscando Wikidata:', err);
+      setWdResults([]);
+    } finally {
+      setWdSearching(false);
+    }
+  };
+
+  const applyWdResult = (wd) => {
+    setPropEditData(prev => ({
+      ...prev,
+      descripcion: wd.description || prev.descripcion,
+      wikipedia_url: wd.wikipedia_url || prev.wikipedia_url,
+    }));
+    if (wd.lat && wd.lng) {
+      setPropEditData(prev => ({
+        ...prev,
+        latitud: wd.lat,
+        longitud: wd.lng,
+      }));
+    }
+    setWdResults(null);
+  };
+
+  // --- Social / Publicaciones handlers ---
+  const SOCIAL_HASHTAGS = {
+    base: ['#PatrimonioEuropeo', '#heritage', '#culturalheritage', '#monumentos', '#architecture'],
+    'España': ['#spain', '#españa', '#visitspain', '#patrimoniohistorico', '#patrimonioespañol'],
+    'Francia': ['#france', '#patrimoine', '#patrimoinefrance', '#monumentshistoriques'],
+    'Portugal': ['#portugal', '#visitportugal', '#patrimonioportugues'],
+    'Italia': ['#italia', '#bellaitalia', '#patrimonioitaliano', '#borghiitaliani'],
+  };
+
+  const SOCIAL_HASHTAGS_CAT = {
+    castillo: ['#castlesofeurope', '#castle', '#medieval'],
+    iglesia: ['#churchesofeurope', '#church', '#romanesque'],
+    catedral: ['#cathedral', '#gothic', '#churchesofeurope'],
+    palacio: ['#palace', '#baroque', '#royalpalace'],
+    monasterio: ['#monastery', '#medieval', '#romanesque'],
+    ermita: ['#chapel', '#countryside', '#ruralheritage'],
+    torre: ['#tower', '#medieval', '#fortress'],
+    puente: ['#bridge', '#engineering', '#historicbridge'],
+    muralla: ['#citywall', '#medieval', '#fortress'],
+    teatro: ['#theatre', '#performing', '#historictheatre'],
+    arqueologia: ['#archaeology', '#ancienthistory', '#ruins'],
+  };
+
+  const socialGetHashtags = (monumento) => {
+    const tags = [...SOCIAL_HASHTAGS.base];
+    if (monumento.pais && SOCIAL_HASHTAGS[monumento.pais]) {
+      tags.push(...SOCIAL_HASHTAGS[monumento.pais]);
+    }
+    const denom = (monumento.denominacion || '').toLowerCase();
+    const cat = (monumento.categoria || '').toLowerCase();
+    for (const [key, catTags] of Object.entries(SOCIAL_HASHTAGS_CAT)) {
+      if (denom.includes(key) || cat.includes(key)) {
+        tags.push(...catTags);
+        break;
+      }
+    }
+    if (monumento.municipio) tags.push(`#${monumento.municipio.replace(/\s+/g, '')}`);
+    return [...new Set(tags)];
+  };
+
+  const socialGenerateText = (monumento, platform) => {
+    const desc = monumento.wiki_descripcion || monumento.descripcion_completa || monumento.descripcion || '';
+    const webUrl = `${window.location.origin}/monumento/${monumento.id}`;
+
+    if (platform === 'instagram') {
+      const shortDesc = desc.length > 200 ? desc.slice(0, 200).replace(/\s+\S*$/, '') + '...' : desc;
+      const hashtags = socialGetHashtags(monumento);
+      let text = `🏛️ ${monumento.denominacion}\n\n`;
+      text += `📍 ${[monumento.municipio, monumento.provincia, monumento.pais].filter(Boolean).join(', ')}\n\n`;
+      if (shortDesc) text += `${shortDesc}\n\n`;
+      if (monumento.estilo) text += `🎨 Estilo: ${monumento.estilo}\n`;
+      if (monumento.inception) text += `📅 ${monumento.inception}\n`;
+      if (monumento.estilo || monumento.inception) text += '\n';
+      text += `🔗 Mas info: ${webUrl}\n\n`;
+      text += hashtags.join(' ');
+      return text;
+    } else {
+      const longDesc = desc.length > 500 ? desc.slice(0, 500).replace(/\s+\S*$/, '') + '...' : desc;
+      let text = `🏛️ ${monumento.denominacion}\n\n`;
+      text += `📍 ${[monumento.municipio, monumento.provincia].filter(Boolean).join(', ')} (${monumento.pais || ''})\n\n`;
+      if (longDesc) text += `${longDesc}\n\n`;
+      if (monumento.estilo) text += `Estilo: ${monumento.estilo}\n`;
+      if (monumento.inception) text += `Fecha: ${monumento.inception}\n`;
+      if (monumento.arquitecto) text += `Arquitecto: ${monumento.arquitecto}\n`;
+      if (monumento.estilo || monumento.inception || monumento.arquitecto) text += '\n';
+      text += `🔗 Ficha completa: ${webUrl}\n\n`;
+      text += '#PatrimonioEuropeo #Monumentos';
+      return text;
+    }
+  };
+
+  const handleSocialSearch = async () => {
+    if (!socialSearch.trim()) return;
+    setSocialLoading(true);
+    setSocialSelected(null);
+    setSocialText('');
+    try {
+      const params = { q: socialSearch.trim(), limit: 20 };
+      if (socialSearchPais) params.pais = socialSearchPais;
+      const data = await getMonumentos(params);
+      setSocialMonumentos(data.items || []);
+    } catch (err) {
+      console.error('Error buscando monumentos:', err);
+      setSocialMonumentos([]);
+    } finally {
+      setSocialLoading(false);
+    }
+  };
+
+  const handleSocialRandom = async () => {
+    setSocialLoading(true);
+    setSocialSelected(null);
+    setSocialText('');
+    try {
+      // Fetch used IDs from DB (last 90 days)
+      let usedIds = new Set();
+      try {
+        const hist = await getSocialHistory();
+        usedIds = new Set(hist.ids || []);
+      } catch { /* ignore if fails */ }
+
+      const countParams = { limit: 1 };
+      if (socialSearchPais) countParams.pais = socialSearchPais;
+      const countData = await getMonumentos(countParams);
+      const total = countData.total || 0;
+      if (!total) { setSocialLoading(false); return; }
+
+      const topHalf = Math.max(Math.ceil(total / 2), 50);
+      const maxPage = Math.ceil(Math.min(topHalf, total) / 50);
+
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const randomPage = Math.floor(Math.random() * maxPage) + 1;
+        const fetchParams = { limit: 50, page: randomPage };
+        if (socialSearchPais) fetchParams.pais = socialSearchPais;
+        const data = await getMonumentos(fetchParams);
+        const items = data.items || [];
+        const candidates = items.filter(m => m.imagen_url && !usedIds.has(m.id));
+        if (candidates.length > 0) {
+          const pick = candidates[Math.floor(Math.random() * candidates.length)];
+          const detail = await getMonumento(pick.id);
+          // Record in DB
+          try { await addSocialHistory(pick.id, socialPlatform); } catch { /* ignore */ }
+          setSocialSelected(detail);
+          setSocialText(socialGenerateText(detail, socialPlatform));
+          setSocialMonumentos([pick]);
+          return;
+        }
+      }
+      setSocialMonumentos([]);
+    } catch (err) {
+      console.error('Error buscando monumento aleatorio:', err);
+    } finally {
+      setSocialLoading(false);
+    }
+  };
+
+  const handleSocialSelect = async (mon) => {
+    setSocialLoading(true);
+    try {
+      const detail = await getMonumento(mon.id);
+      setSocialSelected(detail);
+      setSocialText(socialGenerateText(detail, socialPlatform));
+    } catch (err) {
+      console.error('Error cargando monumento:', err);
+    } finally {
+      setSocialLoading(false);
+    }
+  };
+
+  const handleSocialPlatformChange = (platform) => {
+    setSocialPlatform(platform);
+    if (socialSelected) {
+      setSocialText(socialGenerateText(socialSelected, platform));
+    }
+  };
+
+  const handleSocialCopyText = async () => {
+    try {
+      await navigator.clipboard.writeText(socialText);
+      setSocialCopied('text');
+      setTimeout(() => setSocialCopied(''), 2000);
+    } catch {
+      setSocialCopied('error');
+      setTimeout(() => setSocialCopied(''), 2000);
+    }
+  };
+
+  const handleSocialCopyImage = async () => {
+    const imgUrl = socialSelected?.imagen_url || socialSelected?.imagenes?.[0]?.url;
+    if (!imgUrl) return;
+    try {
+      const resp = await fetch(imgUrl);
+      const blob = await resp.blob();
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      setSocialCopied('image');
+      setTimeout(() => setSocialCopied(''), 2000);
+    } catch {
+      // Fallback: open image in new tab
+      window.open(imgUrl, '_blank');
+      setSocialCopied('image-url');
+      setTimeout(() => setSocialCopied(''), 2000);
+    }
+  };
+
+  const socialImageUrl = socialSelected?.imagen_url || socialSelected?.imagenes?.[0]?.url || null;
+
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
@@ -466,6 +832,14 @@ export default function Admin() {
             {mensajesUnread > 0 && <span className="admin-nav-badge">{mensajesUnread}</span>}
           </button>
           <button
+            className={`admin-nav-item ${activeSection === 'propuestas' ? 'active' : ''}`}
+            onClick={() => setActiveSection('propuestas')}
+          >
+            <span className="admin-nav-icon">📝</span>
+            Propuestas
+            {propuestasPendientes > 0 && <span className="admin-nav-badge">{propuestasPendientes}</span>}
+          </button>
+          <button
             className={`admin-nav-item ${activeSection === 'analytics' ? 'active' : ''}`}
             onClick={() => setActiveSection('analytics')}
           >
@@ -478,6 +852,13 @@ export default function Admin() {
           >
             <span className="admin-nav-icon">📋</span>
             Tareas
+          </button>
+          <button
+            className={`admin-nav-item ${activeSection === 'publicaciones' ? 'active' : ''}`}
+            onClick={() => setActiveSection('publicaciones')}
+          >
+            <span className="admin-nav-icon">📱</span>
+            Publicaciones
           </button>
         </nav>
       </aside>
@@ -1033,7 +1414,438 @@ export default function Admin() {
             )}
           </>
         )}
+        {activeSection === 'propuestas' && (
+          <>
+            <div className="admin-header">
+              <h1>Propuestas de monumentos</h1>
+              <div className="admin-stats-row">
+                <div className="admin-stat">
+                  <span className="admin-stat-num">{propuestasTotal}</span>
+                  <span className="admin-stat-label">Total</span>
+                </div>
+                <div className="admin-stat">
+                  <span className="admin-stat-num">{propuestasPendientes}</span>
+                  <span className="admin-stat-label">Pendientes</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-filters">
+              <select
+                className="admin-select"
+                value={propuestasFilter}
+                onChange={e => setPropuestasFilter(e.target.value)}
+              >
+                <option value="">Todas</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="aprobada">Aprobadas</option>
+                <option value="rechazada">Rechazadas</option>
+              </select>
+              <span className="admin-result-count">{propuestasTotal} propuesta{propuestasTotal !== 1 ? 's' : ''}</span>
+            </div>
+
+            <div className="admin-table-wrap">
+              {propuestasLoading ? (
+                <div className="admin-loading">Cargando...</div>
+              ) : (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Pais</th>
+                      <th>Municipio</th>
+                      <th>Propuesto por</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {propuestas.map(p => (
+                      <tr
+                        key={p.id}
+                        className={`row-clickable ${selectedProp?.id === p.id ? 'row-active' : ''}`}
+                        onClick={() => openPropuesta(p)}
+                      >
+                        <td className="td-municipio">{p.denominacion}</td>
+                        <td>{p.pais}</td>
+                        <td>{p.municipio || '--'}</td>
+                        <td className="td-email">{p.usuario_nombre || p.usuario_email}</td>
+                        <td className="td-fecha">{new Date(p.created_at).toLocaleDateString()}</td>
+                        <td>
+                          <span className={`prop-status-badge prop-status-${p.estado}`}>
+                            {p.estado}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {propuestas.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="admin-empty">No hay propuestas</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {propuestasTotalPages > 1 && (
+              <div className="admin-pagination">
+                <button disabled={propuestasPage <= 1} onClick={() => fetchPropuestas(propuestasPage - 1)}>Anterior</button>
+                <span>Pagina {propuestasPage} de {propuestasTotalPages}</span>
+                <button disabled={propuestasPage >= propuestasTotalPages} onClick={() => fetchPropuestas(propuestasPage + 1)}>Siguiente</button>
+              </div>
+            )}
+          </>
+        )}
+
+        {activeSection === 'publicaciones' && (
+          <>
+            <div className="admin-header">
+              <h1>Publicaciones para redes sociales</h1>
+            </div>
+
+            <div className="social-search-bar">
+              <input
+                type="text"
+                className="admin-search"
+                placeholder="Buscar monumento..."
+                value={socialSearch}
+                onChange={e => setSocialSearch(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleSocialSearch(); }}
+              />
+              <select
+                className="admin-select"
+                value={socialSearchPais}
+                onChange={e => setSocialSearchPais(e.target.value)}
+              >
+                <option value="">Todos los paises</option>
+                <option value="España">España</option>
+                <option value="Francia">Francia</option>
+                <option value="Portugal">Portugal</option>
+                <option value="Italia">Italia</option>
+              </select>
+              <button className="detail-save-btn" style={{ marginTop: 0 }} onClick={handleSocialSearch} disabled={socialLoading || !socialSearch.trim()}>
+                {socialLoading ? 'Buscando...' : 'Buscar'}
+              </button>
+              <button className="social-random-btn" onClick={handleSocialRandom} disabled={socialLoading}>
+                🎲 Aleatorio
+              </button>
+            </div>
+
+            <div className="social-content">
+              {/* Left: results list */}
+              <div className="social-results">
+                {socialMonumentos.length === 0 && !socialLoading && (
+                  <p className="no-data" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                    {socialSearch ? 'Sin resultados' : 'Busca un monumento para generar una publicacion'}
+                  </p>
+                )}
+                {socialLoading && !socialSelected && (
+                  <div className="admin-loading">Buscando...</div>
+                )}
+                {socialMonumentos.map(m => (
+                  <div
+                    key={m.id}
+                    className={`social-result-card ${socialSelected?.id === m.id ? 'active' : ''}`}
+                    onClick={() => handleSocialSelect(m)}
+                  >
+                    <div className="social-result-img">
+                      {m.imagen_url ? (
+                        <img src={m.imagen_url} alt="" onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                      ) : (
+                        <img src="/no-image.svg" alt="" />
+                      )}
+                    </div>
+                    <div className="social-result-info">
+                      <strong>{m.denominacion}</strong>
+                      <span>{[m.municipio, m.provincia].filter(Boolean).join(', ')}</span>
+                      <span className="social-result-pais">{m.pais}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right: post generator */}
+              <div className="social-generator">
+                {!socialSelected ? (
+                  <div className="social-placeholder">
+                    <span>Selecciona un monumento de la lista para generar la publicacion</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="social-tabs">
+                      <button
+                        className={`social-tab ${socialPlatform === 'instagram' ? 'active' : ''}`}
+                        onClick={() => handleSocialPlatformChange('instagram')}
+                      >
+                        Instagram
+                      </button>
+                      <button
+                        className={`social-tab ${socialPlatform === 'facebook' ? 'active' : ''}`}
+                        onClick={() => handleSocialPlatformChange('facebook')}
+                      >
+                        Facebook
+                      </button>
+                    </div>
+
+                    <div className="social-preview-area">
+                      {socialImageUrl && (
+                        <div className="social-image-preview">
+                          <img src={socialImageUrl} alt={socialSelected.denominacion} onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                          <div className="social-image-actions">
+                            <button className="social-copy-btn" onClick={handleSocialCopyImage} title="Copiar imagen o abrir en nueva pestaña">
+                              {socialCopied === 'image' ? '✓ Imagen copiada' : socialCopied === 'image-url' ? '↗ Abierta en pestaña' : 'Copiar imagen'}
+                            </button>
+                            <a href={socialImageUrl} download target="_blank" rel="noopener noreferrer" className="social-download-btn">
+                              Descargar
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="social-text-area">
+                        <textarea
+                          value={socialText}
+                          onChange={e => setSocialText(e.target.value)}
+                          rows={14}
+                        />
+                        <div className="social-text-meta">
+                          <span className={socialText.length > 2200 && socialPlatform === 'instagram' ? 'social-char-over' : ''}>
+                            {socialText.length} caracteres
+                            {socialPlatform === 'instagram' && ' / 2.200 max'}
+                          </span>
+                          <div className="social-text-actions">
+                            <button
+                              className="social-regen-btn"
+                              onClick={() => setSocialText(socialGenerateText(socialSelected, socialPlatform))}
+                              title="Regenerar texto original"
+                            >
+                              Regenerar
+                            </button>
+                            <button
+                              className={`social-copy-btn ${socialCopied === 'text' ? 'copied' : ''}`}
+                              onClick={handleSocialCopyText}
+                            >
+                              {socialCopied === 'text' ? '✓ Copiado!' : 'Copiar texto'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Modal detalle propuesta */}
+      {selectedProp && (
+        <div className="modal-overlay" onClick={closePropuesta}>
+          <div className="modal-content prop-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{selectedProp.denominacion}</h2>
+              <button className="detail-close" onClick={closePropuesta}>&times;</button>
+            </div>
+            <div className="modal-body prop-modal-body">
+              {selectedPropLoading ? (
+                <div className="admin-loading">Cargando...</div>
+              ) : (
+                <>
+                  <div className="prop-meta-bar">
+                    <span className={`prop-status-badge prop-status-${selectedProp.estado}`}>
+                      {selectedProp.estado}
+                    </span>
+                    <span className="prop-meta-user">
+                      Propuesto por: {selectedProp.usuario_nombre || selectedProp.usuario_email}
+                    </span>
+                    <span className="prop-meta-date">
+                      {new Date(selectedProp.created_at).toLocaleString()}
+                    </span>
+                  </div>
+
+                  {/* Editable fields */}
+                  <div className="prop-edit-grid">
+                    <label className="detail-field prop-field-wide">
+                      <span>Nombre</span>
+                      <input type="text" value={propEditData.denominacion} onChange={e => setPropEditData(d => ({ ...d, denominacion: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Pais</span>
+                      <input type="text" value={propEditData.pais} onChange={e => setPropEditData(d => ({ ...d, pais: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Region</span>
+                      <input type="text" value={propEditData.comunidad_autonoma} onChange={e => setPropEditData(d => ({ ...d, comunidad_autonoma: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Provincia</span>
+                      <input type="text" value={propEditData.provincia} onChange={e => setPropEditData(d => ({ ...d, provincia: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Municipio</span>
+                      <input type="text" value={propEditData.municipio} onChange={e => setPropEditData(d => ({ ...d, municipio: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Localidad</span>
+                      <input type="text" value={propEditData.localidad} onChange={e => setPropEditData(d => ({ ...d, localidad: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Categoria</span>
+                      <input type="text" value={propEditData.categoria} onChange={e => setPropEditData(d => ({ ...d, categoria: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Tipo</span>
+                      <input type="text" value={propEditData.tipo} onChange={e => setPropEditData(d => ({ ...d, tipo: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Estilo</span>
+                      <input type="text" value={propEditData.estilo} onChange={e => setPropEditData(d => ({ ...d, estilo: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Material</span>
+                      <input type="text" value={propEditData.material} onChange={e => setPropEditData(d => ({ ...d, material: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Epoca</span>
+                      <input type="text" value={propEditData.inception} onChange={e => setPropEditData(d => ({ ...d, inception: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Arquitecto</span>
+                      <input type="text" value={propEditData.arquitecto} onChange={e => setPropEditData(d => ({ ...d, arquitecto: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Latitud</span>
+                      <input type="number" step="any" value={propEditData.latitud} onChange={e => setPropEditData(d => ({ ...d, latitud: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field">
+                      <span>Longitud</span>
+                      <input type="number" step="any" value={propEditData.longitud} onChange={e => setPropEditData(d => ({ ...d, longitud: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field prop-field-wide">
+                      <span>Wikipedia URL</span>
+                      <input type="url" value={propEditData.wikipedia_url} onChange={e => setPropEditData(d => ({ ...d, wikipedia_url: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                    <label className="detail-field prop-field-wide">
+                      <span>Descripcion</span>
+                      <textarea rows={3} value={propEditData.descripcion} onChange={e => setPropEditData(d => ({ ...d, descripcion: e.target.value }))} disabled={selectedProp.estado !== 'pendiente'} />
+                    </label>
+                  </div>
+
+                  {/* Images gallery */}
+                  {selectedProp.imagenes?.length > 0 && (
+                    <div className="prop-images-section">
+                      <h4>Imagenes ({selectedProp.imagenes.length})</h4>
+                      <div className="prop-images-grid">
+                        {selectedProp.imagenes.map(img => (
+                          <div key={img.id} className="prop-image-item">
+                            {img.url ? (
+                              <img src={img.url} alt={img.nombre} onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                            ) : (
+                              <img src={getPropuestaImagenUrl(selectedProp.id, img.id)} alt={img.nombre} onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                            )}
+                            <span className="prop-image-name">{img.nombre}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Wikidata search */}
+                  {selectedProp.estado === 'pendiente' && (
+                    <div className="prop-wikidata-section">
+                      <button
+                        className="prop-wikidata-btn"
+                        onClick={handleWikidataSearch}
+                        disabled={wdSearching || !propEditData.denominacion}
+                      >
+                        {wdSearching ? 'Buscando...' : 'Buscar en Wikidata'}
+                      </button>
+
+                      {wdResults && (
+                        <div className="prop-wikidata-results">
+                          {wdResults.length === 0 ? (
+                            <p className="no-data">Sin resultados en Wikidata</p>
+                          ) : (
+                            wdResults.map(wd => (
+                              <div key={wd.qid} className="prop-wd-item" onClick={() => applyWdResult(wd)}>
+                                <div className="prop-wd-info">
+                                  <strong>{wd.label}</strong>
+                                  <span className="prop-wd-qid">{wd.qid}</span>
+                                  {wd.description && <p>{wd.description}</p>}
+                                  {wd.wikipedia_url && <small>{wd.wikipedia_url}</small>}
+                                </div>
+                                {wd.image && (
+                                  <img src={wd.image} alt="" className="prop-wd-thumb" onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                                )}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {propResult && (
+                    <div className={propResult.type === 'success' ? 'profile-success' : 'profile-error'}>
+                      {propResult.text}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="modal-footer">
+              {selectedProp.estado === 'pendiente' && (
+                <>
+                  <button className="detail-save-btn" onClick={handlePropSave} disabled={propSaving}>
+                    {propSaving ? 'Guardando...' : 'Guardar cambios'}
+                  </button>
+                  <button className="prop-approve-btn" onClick={handleAprobar} disabled={propSaving}>
+                    Aprobar
+                  </button>
+                  <button className="btn-cancel-email" onClick={() => setShowRejectModal(true)} disabled={propSaving}>
+                    Rechazar
+                  </button>
+                </>
+              )}
+              {selectedProp.estado === 'aprobada' && selectedProp.bien_id && (
+                <a href={`/monumento/${selectedProp.bien_id}`} className="detail-save-btn" target="_blank" rel="noopener noreferrer">
+                  Ver monumento #{selectedProp.bien_id}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal rechazar propuesta */}
+      {showRejectModal && (
+        <div className="modal-overlay" onClick={() => setShowRejectModal(false)}>
+          <div className="modal-content" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Rechazar propuesta</h2>
+              <button className="detail-close" onClick={() => setShowRejectModal(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <label className="detail-field">
+                <span>Motivo del rechazo (visible para el usuario)</span>
+                <textarea
+                  rows={4}
+                  value={rejectNotes}
+                  onChange={e => setRejectNotes(e.target.value)}
+                  placeholder="Explica por que se rechaza esta propuesta..."
+                />
+              </label>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-cancel-email" onClick={handleRechazar} disabled={propSaving}>
+                {propSaving ? 'Procesando...' : 'Confirmar rechazo'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal detalle mensaje */}
       {selectedMsg && (

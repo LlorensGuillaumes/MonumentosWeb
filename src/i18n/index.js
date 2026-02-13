@@ -27,6 +27,7 @@ i18n
     },
     supportedLngs: ['es', 'en', 'fr', 'pt', 'ca', 'eu', 'gl', 'it'],
     fallbackLng: 'es',
+    logLevel: 'error',
     interpolation: {
       escapeValue: false,
     },

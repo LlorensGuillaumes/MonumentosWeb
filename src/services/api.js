@@ -152,7 +152,7 @@ export const sendEmails = ({ contacto_ids, asunto, cuerpo, gmail_user, gmail_pas
   archivos.forEach(file => formData.append('archivos', file));
   return api.post('/email/send', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
-    timeout: 60000,
+    timeout: 120000,
   }).then(r => r.data);
 };
 
@@ -181,6 +181,95 @@ export const deleteMensaje = (id) =>
 
 export const getMensajeArchivoUrl = (mensajeId, archivoId) =>
   `${API_BASE}/admin/mensajes/${mensajeId}/archivos/${archivoId}`;
+
+// ============== PROPUESTAS ==============
+
+export const submitPropuesta = (formData) =>
+  api.post('/propuestas', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+  }).then(r => r.data);
+
+export const getMisPropuestas = (params = {}) =>
+  api.get('/propuestas/mis', { params }).then(r => r.data);
+
+export const getAdminPropuestas = (params = {}) =>
+  api.get('/admin/propuestas', { params }).then(r => r.data);
+
+export const getAdminPropuestasCount = () =>
+  api.get('/admin/propuestas/count').then(r => r.data);
+
+export const getAdminPropuesta = (id) =>
+  api.get(`/admin/propuestas/${id}`).then(r => r.data);
+
+export const updateAdminPropuesta = (id, data) =>
+  api.patch(`/admin/propuestas/${id}`, data).then(r => r.data);
+
+export const aprobarPropuesta = (id) =>
+  api.post(`/admin/propuestas/${id}/aprobar`).then(r => r.data);
+
+export const rechazarPropuesta = (id, notas) =>
+  api.post(`/admin/propuestas/${id}/rechazar`, { notas }).then(r => r.data);
+
+export const searchWikidata = (q, pais) =>
+  api.get('/admin/wikidata/search', { params: { q, pais } }).then(r => r.data);
+
+export const getPropuestaImagenUrl = (propId, imgId) =>
+  `${API_BASE}/admin/propuestas/${propId}/imagenes/${imgId}`;
+
+// ============== NOTAS MONUMENTO ==============
+
+export const getNotasMonumento = (bienId) =>
+  api.get(`/monumentos/${bienId}/notas`).then(r => r.data);
+
+export const addNotaMonumento = (bienId, tipo, texto) =>
+  api.post(`/monumentos/${bienId}/notas`, { tipo, texto }).then(r => r.data);
+
+export const deleteNotaMonumento = (bienId, notaId) =>
+  api.delete(`/monumentos/${bienId}/notas/${notaId}`).then(r => r.data);
+
+// ============== VALORACIONES ==============
+
+export const getValoraciones = (bienId) =>
+  api.get(`/monumentos/${bienId}/valoraciones`).then(r => r.data);
+
+export const addValoracion = (bienId, data) =>
+  api.post(`/monumentos/${bienId}/valoraciones`, data).then(r => r.data);
+
+// ============== BÚSQUEDA POR RADIO ==============
+
+export const getMonumentosRadio = (params = {}) =>
+  api.get('/monumentos/radio', { params }).then(r => r.data);
+
+// ============== RUTAS ==============
+
+export const createRuta = (data) =>
+  api.post('/rutas', data).then(r => r.data);
+
+export const getRutas = () =>
+  api.get('/rutas').then(r => r.data);
+
+export const getRuta = (id) =>
+  api.get(`/rutas/${id}`).then(r => r.data);
+
+export const deleteRuta = (id) =>
+  api.delete(`/rutas/${id}`).then(r => r.data);
+
+export const optimizarRuta = (paradas) =>
+  api.post('/rutas/optimizar', { paradas }).then(r => r.data);
+
+export const getRutaPdfUrl = (id) => {
+  const token = localStorage.getItem('auth_token');
+  return `${API_BASE}/rutas/${id}/pdf?token=${token}`;
+};
+
+// ============== SOCIAL HISTORY ==============
+
+export const getSocialHistory = () =>
+  api.get('/admin/social-history').then(r => r.data);
+
+export const addSocialHistory = (bien_id, platform) =>
+  api.post('/admin/social-history', { bien_id, platform }).then(r => r.data);
 
 // ============== CONTACTO ==============
 

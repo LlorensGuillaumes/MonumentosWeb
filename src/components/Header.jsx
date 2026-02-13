@@ -124,6 +124,18 @@ export default function Header() {
                   <span className="fav-badge">{favoritoIds.size}</span>
                 )}
               </Link>
+              <Link
+                to="/rutas"
+                className={`nav-link ${location.pathname === '/rutas' ? 'active' : ''}`}
+              >
+                {t('nav.routes')}
+              </Link>
+              <Link
+                to="/proponer"
+                className={`nav-link ${location.pathname === '/proponer' ? 'active' : ''}`}
+              >
+                {t('nav.propose')}
+              </Link>
             </>
           )}
           <Link
@@ -169,6 +181,12 @@ export default function Header() {
                   </button>
                   <Link to="/favoritos" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
                     {t('nav.favorites')} ({favoritoIds.size})
+                  </Link>
+                  <Link to="/mis-rutas" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
+                    {t('nav.myRoutes')}
+                  </Link>
+                  <Link to="/mis-propuestas" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
+                    {t('nav.myProposals')}
                   </Link>
                   <button className="user-dropdown-item" onClick={handleLogout}>
                     {t('auth.logout')}

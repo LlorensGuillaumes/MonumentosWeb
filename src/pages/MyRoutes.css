@@ -1,0 +1,126 @@
+.my-routes {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.my-routes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.my-routes-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1a365d;
+}
+
+.premium-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.premium-icon {
+  font-size: 1.5rem;
+}
+
+.premium-banner strong {
+  color: #92400e;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.premium-banner p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #78350f;
+}
+
+.my-routes-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+}
+
+.my-routes-empty p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.my-routes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.my-route-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.15s;
+}
+
+.my-route-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.my-route-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  color: #1a365d;
+}
+
+.my-route-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.my-route-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-danger {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .my-route-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .my-route-actions {
+    width: 100%;
+  }
+  .my-route-actions .btn {
+    flex: 1;
+  }
+}

@@ -138,12 +138,17 @@ export function AuthProvider({ children }) {
     return favoritoIds.has(bienId);
   }, [favoritoIds]);
 
+  const isPremium = user
+    ? user.rol === 'admin' || (user.premium && (!user.premium_hasta || new Date(user.premium_hasta) > new Date()))
+    : false;
+
   return (
     <AuthContext.Provider
       value={{
         user,
         loading,
         favoritoIds,
+        isPremium,
         login,
         register,
         loginWithGoogle,

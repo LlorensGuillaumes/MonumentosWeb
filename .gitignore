@@ -30,5 +30,8 @@ dist-ssr
 # Claude
 .claude/
 
+# Marketing
+marketing-redes-sociales.md
+
 # Windows artifacts
 nul

@@ -11,6 +11,10 @@ import Login from './pages/Login';
 import Favoritos from './pages/Favoritos';
 import Admin from './pages/Admin';
 import Contact from './pages/Contact';
+import ProposalForm from './pages/ProposalForm';
+import MyProposals from './pages/MyProposals';
+import RoutePlanner from './pages/RoutePlanner';
+import MyRoutes from './pages/MyRoutes';
 import RequireAuth from './components/RequireAuth';
 import './App.css';
 
@@ -32,6 +36,10 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/favoritos" element={<RequireAuth><Favoritos /></RequireAuth>} />
                 <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+                <Route path="/proponer" element={<RequireAuth><ProposalForm /></RequireAuth>} />
+                <Route path="/mis-propuestas" element={<RequireAuth><MyProposals /></RequireAuth>} />
+                <Route path="/rutas" element={<RequireAuth><RoutePlanner /></RequireAuth>} />
+                <Route path="/mis-rutas" element={<RequireAuth><MyRoutes /></RequireAuth>} />
                 <Route path="/contacto" element={<Contact />} />
               </Routes>
             </main>

@@ -24,7 +24,7 @@ export default function MonumentoCard({ monumento }) {
     <Link to={`/monumento/${monumento.id}`} className="monumento-card">
       <div className="card-image">
         {monumento.imagen_url ? (
-          <img src={monumento.imagen_url} alt={monumento.denominacion} loading="lazy" />
+          <img src={monumento.imagen_url} alt={monumento.denominacion} loading="lazy" onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
         ) : (
           <div className="card-placeholder">
             <span className="placeholder-icon">{icon}</span>
