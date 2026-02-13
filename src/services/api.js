@@ -162,6 +162,26 @@ export const getEmailStatus = () =>
 export const cancelEmail = () =>
   api.post('/email/cancel').then(r => r.data);
 
+// ============== ADMIN: MENSAJES ==============
+
+export const getMensajes = (params = {}) =>
+  api.get('/admin/mensajes', { params }).then(r => r.data);
+
+export const getMensajesCount = () =>
+  api.get('/admin/mensajes/count').then(r => r.data);
+
+export const getMensaje = (id) =>
+  api.get(`/admin/mensajes/${id}`).then(r => r.data);
+
+export const updateMensaje = (id, data) =>
+  api.patch(`/admin/mensajes/${id}`, data).then(r => r.data);
+
+export const deleteMensaje = (id) =>
+  api.delete(`/admin/mensajes/${id}`).then(r => r.data);
+
+export const getMensajeArchivoUrl = (mensajeId, archivoId) =>
+  `${API_BASE}/admin/mensajes/${mensajeId}/archivos/${archivoId}`;
+
 // ============== CONTACTO ==============
 
 export const sendContact = ({ email, asunto, mensaje, archivos = [] }) => {

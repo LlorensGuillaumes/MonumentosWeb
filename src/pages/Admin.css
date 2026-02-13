@@ -1130,3 +1130,191 @@
 .email-file-remove:hover {
   color: #e53e3e;
 }
+
+/* ============== MENSAJES SECTION ============== */
+
+/* Unread row */
+.row-msg-unread {
+  background: #fffff0;
+}
+
+.row-msg-unread:hover {
+  background: #fefce8 !important;
+}
+
+/* Replied row */
+.row-msg-replied {
+  opacity: 0.7;
+}
+
+/* Status dot */
+.td-msg-status {
+  text-align: center;
+  width: 36px;
+}
+
+.msg-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  background: #3182ce;
+  border-radius: 50%;
+}
+
+.msg-replied-icon {
+  color: #38a169;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Bold subject for unread */
+.td-msg-subject-unread {
+  font-weight: 700;
+  color: #1a202c;
+}
+
+/* Attachment icon */
+.msg-attach-icon {
+  margin-left: 0.4rem;
+  font-size: 0.8rem;
+}
+
+/* Reply button in table */
+.msg-reply-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  color: #718096;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: all 0.15s;
+}
+
+.msg-reply-btn:hover {
+  background: #edf2f7;
+  color: #2b6cb0;
+}
+
+/* Nav badge */
+.admin-nav-badge {
+  background: #e53e3e;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  margin-left: auto;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Message modal */
+.msg-modal {
+  max-width: 650px;
+}
+
+.msg-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #f7fafc;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.msg-meta-from a {
+  color: #2b6cb0;
+  text-decoration: none;
+}
+
+.msg-meta-from a:hover {
+  text-decoration: underline;
+}
+
+.msg-meta-date {
+  color: #a0aec0;
+  font-size: 0.8rem;
+}
+
+.msg-body {
+  padding: 0.75rem 0;
+  font-size: 0.9rem;
+  color: #2d3748;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  min-height: 80px;
+}
+
+/* Attachments in message detail */
+.msg-attachments {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.75rem;
+}
+
+.msg-attachments h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.82rem;
+  color: #718096;
+  font-weight: 600;
+}
+
+.msg-attachment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.7rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  color: #2b6cb0;
+  text-decoration: none;
+  font-size: 0.82rem;
+  margin-right: 0.4rem;
+  margin-bottom: 0.4rem;
+  transition: all 0.15s;
+}
+
+.msg-attachment-link:hover {
+  background: #ebf8ff;
+  border-color: #90cdf4;
+}
+
+.msg-attachment-size {
+  color: #a0aec0;
+  font-size: 0.72rem;
+}
+
+/* Toggle replied button */
+.msg-toggle-replied {
+  padding: 0.4rem 1rem;
+  background: #edf2f7;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.825rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.msg-toggle-replied:hover {
+  background: #e2e8f0;
+}
+
+.msg-toggle-replied.active {
+  background: #f0fff4;
+  color: #276749;
+  border-color: #c6f6d5;
+}
+
+/* Reply main button in modal */
+.msg-reply-main-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  margin-top: 0;
+}

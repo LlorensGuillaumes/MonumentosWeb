@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol } from '../services/api';
+import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl } from '../services/api';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
 import './Admin.css';
 
@@ -52,6 +52,17 @@ export default function Admin() {
   const [usuariosSearchTimeout, setUsuariosSearchTimeout] = useState(null);
   const [usuariosRolFilter, setUsuariosRolFilter] = useState('');
   const [usuariosSearchApplied, setUsuariosSearchApplied] = useState('');
+
+  // --- Mensajes state ---
+  const [mensajes, setMensajes] = useState([]);
+  const [mensajesLoading, setMensajesLoading] = useState(false);
+  const [mensajesTotal, setMensajesTotal] = useState(0);
+  const [mensajesPage, setMensajesPage] = useState(1);
+  const [mensajesTotalPages, setMensajesTotalPages] = useState(1);
+  const [mensajesFilter, setMensajesFilter] = useState('');
+  const [mensajesUnread, setMensajesUnread] = useState(0);
+  const [selectedMsg, setSelectedMsg] = useState(null);
+  const [selectedMsgLoading, setSelectedMsgLoading] = useState(false);
 
   const fetchContactos = useCallback(async (p = 1) => {
     setLoading(true);
@@ -342,6 +353,81 @@ export default function Admin() {
     }, 400));
   };
 
+  // --- Mensajes handlers ---
+  const fetchMensajes = useCallback(async (p = 1) => {
+    setMensajesLoading(true);
+    try {
+      const params = { page: p, limit: 50 };
+      if (mensajesFilter === 'no_leido') params.leido = 'false';
+      if (mensajesFilter === 'leido') params.leido = 'true';
+      const data = await getMensajes(params);
+      setMensajes(data.items);
+      setMensajesTotal(data.total);
+      setMensajesTotalPages(data.total_pages);
+      setMensajesPage(data.page);
+    } catch (err) {
+      console.error('Error cargando mensajes:', err);
+    } finally {
+      setMensajesLoading(false);
+    }
+  }, [mensajesFilter]);
+
+  const fetchMensajesUnread = useCallback(async () => {
+    try {
+      const data = await getMensajesCount();
+      setMensajesUnread(data.unread);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    fetchMensajesUnread();
+  }, [fetchMensajesUnread]);
+
+  useEffect(() => {
+    if (activeSection === 'mensajes') {
+      fetchMensajes(1);
+    }
+  }, [activeSection, fetchMensajes]);
+
+  const openMsg = async (msg) => {
+    setSelectedMsgLoading(true);
+    try {
+      const detail = await getMensaje(msg.id);
+      setSelectedMsg(detail);
+      if (!msg.leido) {
+        setMensajes(prev => prev.map(m => m.id === msg.id ? { ...m, leido: true } : m));
+        setMensajesUnread(prev => Math.max(0, prev - 1));
+      }
+    } catch (err) {
+      console.error('Error cargando mensaje:', err);
+    } finally {
+      setSelectedMsgLoading(false);
+    }
+  };
+
+  const closeMsg = () => setSelectedMsg(null);
+
+  const handleDeleteMsg = async (id) => {
+    if (!window.confirm('¿Eliminar este mensaje?')) return;
+    try {
+      await deleteMensaje(id);
+      setMensajes(prev => prev.filter(m => m.id !== id));
+      setMensajesTotal(prev => prev - 1);
+      if (selectedMsg?.id === id) setSelectedMsg(null);
+      fetchMensajesUnread();
+    } catch (err) {
+      console.error('Error eliminando mensaje:', err);
+    }
+  };
+
+  const handleToggleRespondido = async (msg) => {
+    try {
+      await updateMensaje(msg.id, { respondido: !msg.respondido });
+      setMensajes(prev => prev.map(m => m.id === msg.id ? { ...m, respondido: !m.respondido } : m));
+      if (selectedMsg?.id === msg.id) setSelectedMsg(prev => ({ ...prev, respondido: !prev.respondido }));
+    } catch {}
+  };
+
   const handleChangeRol = async (userId, newRol) => {
     if (!window.confirm(`¿Cambiar rol de este usuario a "${newRol}"?`)) return;
     try {
@@ -370,6 +456,14 @@ export default function Admin() {
           >
             <span className="admin-nav-icon">👥</span>
             Usuarios
+          </button>
+          <button
+            className={`admin-nav-item ${activeSection === 'mensajes' ? 'active' : ''}`}
+            onClick={() => setActiveSection('mensajes')}
+          >
+            <span className="admin-nav-icon">✉️</span>
+            Mensajes
+            {mensajesUnread > 0 && <span className="admin-nav-badge">{mensajesUnread}</span>}
           </button>
           <button
             className={`admin-nav-item ${activeSection === 'analytics' ? 'active' : ''}`}
@@ -841,7 +935,158 @@ export default function Admin() {
             </div>
           </>
         )}
+
+        {activeSection === 'mensajes' && (
+          <>
+            <div className="admin-header">
+              <h1>Mensajes de contacto</h1>
+              <div className="admin-stats-row">
+                <div className="admin-stat">
+                  <span className="admin-stat-num">{mensajesTotal}</span>
+                  <span className="admin-stat-label">Total</span>
+                </div>
+                <div className="admin-stat">
+                  <span className="admin-stat-num">{mensajesUnread}</span>
+                  <span className="admin-stat-label">Sin leer</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-filters">
+              <select
+                className="admin-select"
+                value={mensajesFilter}
+                onChange={e => setMensajesFilter(e.target.value)}
+              >
+                <option value="">Todos</option>
+                <option value="no_leido">Sin leer</option>
+                <option value="leido">Leidos</option>
+              </select>
+              <span className="admin-result-count">{mensajesTotal} mensaje{mensajesTotal !== 1 ? 's' : ''}</span>
+            </div>
+
+            <div className="admin-table-wrap">
+              {mensajesLoading ? (
+                <div className="admin-loading">Cargando...</div>
+              ) : (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 36 }}></th>
+                      <th>De</th>
+                      <th>Asunto</th>
+                      <th>Fecha</th>
+                      <th style={{ width: 30 }}></th>
+                      <th style={{ width: 30 }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mensajes.map(m => (
+                      <tr
+                        key={m.id}
+                        className={`row-clickable ${!m.leido ? 'row-msg-unread' : ''} ${m.respondido ? 'row-msg-replied' : ''} ${selectedMsg?.id === m.id ? 'row-active' : ''}`}
+                        onClick={() => openMsg(m)}
+                      >
+                        <td className="td-msg-status">
+                          {!m.leido && <span className="msg-dot" title="Sin leer" />}
+                          {m.respondido && <span className="msg-replied-icon" title="Respondido">↩</span>}
+                        </td>
+                        <td className="td-email">{m.email}</td>
+                        <td className={!m.leido ? 'td-msg-subject-unread' : ''}>
+                          {m.asunto}
+                          {m.num_archivos > 0 && <span className="msg-attach-icon" title={`${m.num_archivos} adjunto(s)`}>📎</span>}
+                        </td>
+                        <td className="td-fecha">{new Date(m.created_at).toLocaleString()}</td>
+                        <td>
+                          <a
+                            href={`mailto:${m.email}?subject=Re: ${encodeURIComponent(m.asunto)}`}
+                            className="msg-reply-btn"
+                            title="Responder"
+                            onClick={e => e.stopPropagation()}
+                          >↩</a>
+                        </td>
+                        <td>
+                          <button
+                            className="tarea-delete-btn"
+                            title="Eliminar"
+                            onClick={e => { e.stopPropagation(); handleDeleteMsg(m.id); }}
+                          >&times;</button>
+                        </td>
+                      </tr>
+                    ))}
+                    {mensajes.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="admin-empty">No hay mensajes</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {mensajesTotalPages > 1 && (
+              <div className="admin-pagination">
+                <button disabled={mensajesPage <= 1} onClick={() => fetchMensajes(mensajesPage - 1)}>Anterior</button>
+                <span>Pagina {mensajesPage} de {mensajesTotalPages}</span>
+                <button disabled={mensajesPage >= mensajesTotalPages} onClick={() => fetchMensajes(mensajesPage + 1)}>Siguiente</button>
+              </div>
+            )}
+          </>
+        )}
       </div>
+
+      {/* Modal detalle mensaje */}
+      {selectedMsg && (
+        <div className="modal-overlay" onClick={closeMsg}>
+          <div className="modal-content msg-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{selectedMsg.asunto}</h2>
+              <button className="detail-close" onClick={closeMsg}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div className="msg-meta">
+                <span className="msg-meta-from">
+                  <strong>De:</strong> <a href={`mailto:${selectedMsg.email}`}>{selectedMsg.email}</a>
+                </span>
+                <span className="msg-meta-date">{new Date(selectedMsg.created_at).toLocaleString()}</span>
+              </div>
+              <div className="msg-body">{selectedMsg.mensaje}</div>
+
+              {selectedMsg.archivos?.length > 0 && (
+                <div className="msg-attachments">
+                  <h4>Adjuntos ({selectedMsg.archivos.length})</h4>
+                  {selectedMsg.archivos.map(a => (
+                    <a
+                      key={a.id}
+                      href={getMensajeArchivoUrl(selectedMsg.id, a.id)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="msg-attachment-link"
+                    >
+                      📎 {a.nombre} <span className="msg-attachment-size">({(a.tamano / 1024).toFixed(0)} KB)</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button
+                className={`msg-toggle-replied ${selectedMsg.respondido ? 'active' : ''}`}
+                onClick={() => handleToggleRespondido(selectedMsg)}
+              >
+                {selectedMsg.respondido ? '✓ Respondido' : 'Marcar respondido'}
+              </button>
+              <a
+                href={`mailto:${selectedMsg.email}?subject=Re: ${encodeURIComponent(selectedMsg.asunto)}`}
+                className="detail-save-btn msg-reply-main-btn"
+              >
+                Responder
+              </a>
+              <button className="btn-cancel-email" onClick={() => handleDeleteMsg(selectedMsg.id)}>Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {emailModal && (
         <div className="modal-overlay" onClick={closeEmailModal}>
