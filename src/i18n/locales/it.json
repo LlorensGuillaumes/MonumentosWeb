@@ -122,7 +122,9 @@
     "municipalityLabel": "Comune",
     "locality": "Località",
     "address": "Indirizzo",
-    "bce": "a.C."
+    "bce": "a.C.",
+    "loadingWikipedia": "Caricamento da Wikipedia...",
+    "sourceWikipedia": "Fonte: Wikipedia"
   },
   "map": {
     "loading": "Caricamento monumenti...",

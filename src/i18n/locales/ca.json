@@ -123,7 +123,9 @@
     "municipalityLabel": "Municipi",
     "locality": "Localitat",
     "address": "Adreça",
-    "bce": "aC"
+    "bce": "aC",
+    "loadingWikipedia": "Carregant de Viquipèdia...",
+    "sourceWikipedia": "Font: Viquipèdia"
   },
   "map": {
     "loading": "Carregant monuments...",

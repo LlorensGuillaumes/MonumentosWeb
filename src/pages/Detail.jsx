@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { getMonumento } from '../services/api';
+import { getMonumento, getWikipediaExtract } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import 'leaflet/dist/leaflet.css';
 import './Detail.css';
@@ -28,14 +28,29 @@ export default function Detail() {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [favLoading, setFavLoading] = useState(false);
+  const [wikiExtract, setWikiExtract] = useState(null);
+  const [wikiLoading, setWikiLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+    setWikiExtract(null);
     getMonumento(id)
       .then(setMonumento)
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (!monumento) return;
+    const needsWikipedia = !monumento.descripcion_completa
+      && (!monumento.wiki_descripcion || monumento.wiki_descripcion.length < 150)
+      && monumento.wikipedia_url;
+    if (!needsWikipedia) return;
+    setWikiLoading(true);
+    getWikipediaExtract(monumento.id)
+      .then(data => { if (data?.extract) setWikiExtract(data.extract); })
+      .finally(() => setWikiLoading(false));
+  }, [monumento]);
 
   if (loading) {
     return (
@@ -144,12 +159,30 @@ export default function Detail() {
           )}
 
           {/* Description */}
-          {(monumento.wiki_descripcion || monumento.descripcion_completa) && (
+          {(monumento.descripcion_completa || monumento.wiki_descripcion || wikiExtract) ? (
             <section className="detail-section">
               <h2>{t('detail.description')}</h2>
-              <p>{monumento.descripcion_completa || monumento.wiki_descripcion}</p>
+              {monumento.descripcion_completa ? (
+                <p>{monumento.descripcion_completa}</p>
+              ) : wikiExtract ? (
+                <>
+                  <p>{wikiExtract}</p>
+                  <p className="wiki-attribution">
+                    <a href={monumento.wikipedia_url} target="_blank" rel="noopener noreferrer">
+                      {t('detail.sourceWikipedia')}
+                    </a>
+                  </p>
+                </>
+              ) : monumento.wiki_descripcion ? (
+                <p>{monumento.wiki_descripcion}</p>
+              ) : null}
             </section>
-          )}
+          ) : wikiLoading ? (
+            <section className="detail-section">
+              <h2>{t('detail.description')}</h2>
+              <p className="wiki-loading">{t('detail.loadingWikipedia')}</p>
+            </section>
+          ) : null}
 
           {/* History */}
           {monumento.sintesis_historica && (

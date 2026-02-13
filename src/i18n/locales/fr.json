@@ -123,7 +123,9 @@
     "municipalityLabel": "Commune",
     "locality": "Localité",
     "address": "Adresse",
-    "bce": "av. J.-C."
+    "bce": "av. J.-C.",
+    "loadingWikipedia": "Chargement depuis Wikipédia...",
+    "sourceWikipedia": "Source : Wikipédia"
   },
   "map": {
     "loading": "Chargement des monuments...",

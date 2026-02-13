@@ -123,7 +123,9 @@
     "municipalityLabel": "Udalerria",
     "locality": "Herria",
     "address": "Helbidea",
-    "bce": "K.a."
+    "bce": "K.a.",
+    "loadingWikipedia": "Wikipedia-tik kargatzen...",
+    "sourceWikipedia": "Iturria: Wikipedia"
   },
   "map": {
     "loading": "Monumentuak kargatzen...",

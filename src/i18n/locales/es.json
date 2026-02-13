@@ -123,7 +123,9 @@
     "municipalityLabel": "Municipio",
     "locality": "Localidad",
     "address": "Dirección",
-    "bce": "a.C."
+    "bce": "a.C.",
+    "loadingWikipedia": "Obteniendo descripción de Wikipedia...",
+    "sourceWikipedia": "Fuente: Wikipedia"
   },
   "map": {
     "loading": "Cargando monumentos...",

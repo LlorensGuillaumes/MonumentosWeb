@@ -50,6 +50,11 @@ export const getCCAAResumen = (params = {}) =>
 export const getMunicipios = (params = {}) =>
   api.get('/municipios', { params }).then(r => r.data);
 
+// ============== WIKIPEDIA ==============
+
+export const getWikipediaExtract = (id) =>
+  api.get(`/monumentos/${id}/wikipedia`).then(r => r.data).catch(() => null);
+
 // ============== AUTH ==============
 
 export const authRegister = (data) =>

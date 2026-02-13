@@ -123,7 +123,9 @@
     "municipalityLabel": "Município",
     "locality": "Localidade",
     "address": "Morada",
-    "bce": "a.C."
+    "bce": "a.C.",
+    "loadingWikipedia": "A carregar do Wikipédia...",
+    "sourceWikipedia": "Fonte: Wikipédia"
   },
   "map": {
     "loading": "A carregar monumentos...",

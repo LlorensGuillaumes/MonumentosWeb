@@ -266,6 +266,27 @@
   font-weight: 500;
 }
 
+/* Wikipedia attribution */
+.wiki-attribution {
+  margin-top: 0.75rem !important;
+  font-size: 0.85rem;
+  color: #64748b !important;
+}
+
+.wiki-attribution a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.wiki-attribution a:hover {
+  text-decoration: underline;
+}
+
+.wiki-loading {
+  color: #94a3b8 !important;
+  font-style: italic;
+}
+
 /* Loading/Error */
 .loading,
 .error {
