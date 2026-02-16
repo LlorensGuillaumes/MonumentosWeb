@@ -3,6 +3,11 @@ import { getAdminSettings, updateAdminSettings } from '../services/api';
 
 const DEFAULT_SETTINGS = {
   trial_days: 30,
+  trial_enabled: true,
+  price_basic_monthly: 1.99,
+  price_basic_yearly: 12.99,
+  price_premium_monthly: 2.99,
+  price_premium_yearly: 19.99,
   monument_of_day_mode: 'auto', // auto | manual
   monument_of_day_id: '',
   max_user_photos: 5,
@@ -14,7 +19,6 @@ const DEFAULT_SETTINGS = {
   autocomplete_enabled: true,
   shareable_routes_enabled: true,
   newsletter_enabled: true,
-  trial_enabled: true,
 };
 
 export default function AdminSettings() {
@@ -75,6 +79,46 @@ export default function AdminSettings() {
               max="365"
               value={settings.trial_days}
               onChange={e => handleChange('trial_days', parseInt(e.target.value) || 30)}
+            />
+          </label>
+          <label className="settings-field">
+            <span>Viajero - Precio mensual (€)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={settings.price_basic_monthly}
+              onChange={e => handleChange('price_basic_monthly', parseFloat(e.target.value) || 0)}
+            />
+          </label>
+          <label className="settings-field">
+            <span>Viajero - Precio anual (€)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={settings.price_basic_yearly}
+              onChange={e => handleChange('price_basic_yearly', parseFloat(e.target.value) || 0)}
+            />
+          </label>
+          <label className="settings-field">
+            <span>Premium - Precio mensual (€)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={settings.price_premium_monthly}
+              onChange={e => handleChange('price_premium_monthly', parseFloat(e.target.value) || 0)}
+            />
+          </label>
+          <label className="settings-field">
+            <span>Premium - Precio anual (€)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={settings.price_premium_yearly}
+              onChange={e => handleChange('price_premium_yearly', parseFloat(e.target.value) || 0)}
             />
           </label>
         </div>

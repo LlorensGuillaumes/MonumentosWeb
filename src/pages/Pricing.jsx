@@ -1,53 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../context/AuthContext';
-import { activateTrial } from '../services/api';
+import { activateTrial, getAdminSettings } from '../services/api';
 import './Pricing.css';
 
-const PLANS = [
-  {
-    id: 'free',
-    icon: '🏛️',
-    features: [
-      'pricing.features.search',
-      'pricing.features.favorites',
-      'pricing.features.map',
-      'pricing.features.share',
-      'pricing.features.compare',
-    ],
-  },
-  {
-    id: 'basic',
-    popular: true,
-    icon: '🗺️',
-    priceMonthly: 4.99,
-    priceYearly: 3.99,
-    features: [
-      'pricing.features.allFree',
-      'pricing.features.routes5',
-      'pricing.features.gpxKml',
-      'pricing.features.ratings',
-      'pricing.features.notes',
-      'pricing.features.proposals',
-    ],
-  },
-  {
-    id: 'premium',
-    icon: '👑',
-    priceMonthly: 9.99,
-    priceYearly: 7.99,
-    features: [
-      'pricing.features.allBasic',
-      'pricing.features.routesUnlimited',
-      'pricing.features.pdf',
-      'pricing.features.optimize',
-      'pricing.features.priority',
-      'pricing.features.earlyAccess',
-    ],
-  },
-];
+const PLAN_FEATURES = {
+  free: [
+    'pricing.features.search',
+    'pricing.features.favorites',
+    'pricing.features.map',
+    'pricing.features.share',
+    'pricing.features.compare',
+  ],
+  basic: [
+    'pricing.features.allFree',
+    'pricing.features.routes5',
+    'pricing.features.gpxKml',
+    'pricing.features.ratings',
+    'pricing.features.notes',
+    'pricing.features.proposals',
+  ],
+  premium: [
+    'pricing.features.allBasic',
+    'pricing.features.routesUnlimited',
+    'pricing.features.pdf',
+    'pricing.features.optimize',
+    'pricing.features.priority',
+    'pricing.features.earlyAccess',
+  ],
+};
+
+const DEFAULT_PRICES = {
+  price_basic_monthly: 1.99,
+  price_basic_yearly: 12.99,
+  price_premium_monthly: 2.99,
+  price_premium_yearly: 19.99,
+};
+
+function buildPlans(prices) {
+  return [
+    { id: 'free', icon: '🏛️', features: PLAN_FEATURES.free },
+    { id: 'basic', popular: true, icon: '🗺️', priceMonthly: prices.price_basic_monthly, priceYearly: prices.price_basic_yearly, features: PLAN_FEATURES.basic },
+    { id: 'premium', icon: '👑', priceMonthly: prices.price_premium_monthly, priceYearly: prices.price_premium_yearly, features: PLAN_FEATURES.premium },
+  ];
+}
 
 const COMPARISON_FEATURES = [
   { key: 'search', free: true, basic: true, premium: true },
@@ -74,6 +72,22 @@ export default function Pricing() {
   const [yearly, setYearly] = useState(true);
   const [trialActivating, setTrialActivating] = useState(false);
   const [trialMsg, setTrialMsg] = useState('');
+  const [prices, setPrices] = useState(DEFAULT_PRICES);
+
+  useEffect(() => {
+    getAdminSettings()
+      .then(data => {
+        const p = {};
+        if (data.price_basic_monthly != null) p.price_basic_monthly = data.price_basic_monthly;
+        if (data.price_basic_yearly != null) p.price_basic_yearly = data.price_basic_yearly;
+        if (data.price_premium_monthly != null) p.price_premium_monthly = data.price_premium_monthly;
+        if (data.price_premium_yearly != null) p.price_premium_yearly = data.price_premium_yearly;
+        if (Object.keys(p).length) setPrices(prev => ({ ...prev, ...p }));
+      })
+      .catch(() => {});
+  }, []);
+
+  const plans = buildPlans(prices);
 
   const handleActivateTrial = async () => {
     setTrialActivating(true);
@@ -115,7 +129,7 @@ export default function Pricing() {
       </div>
 
       <div className="pricing-grid">
-        {PLANS.map(plan => (
+        {plans.map(plan => (
           <div key={plan.id} className={`pricing-card ${plan.popular ? 'popular' : ''}`}>
             {plan.popular && <div className="popular-badge">{t('pricing.popular')}</div>}
             <div className="plan-icon">{plan.icon}</div>
