@@ -1841,6 +1841,29 @@
   background: #38a169;
 }
 
+.social-used-btn {
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 2px solid #dd6b20;
+  border-radius: 6px;
+  background: white;
+  color: #dd6b20;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.social-used-btn:hover {
+  background: #dd6b20;
+  color: white;
+}
+
+.social-used-btn.used {
+  background: #38a169;
+  border-color: #38a169;
+  color: white;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .social-content {

@@ -738,8 +738,6 @@ export default function Admin() {
         if (candidates.length > 0) {
           const pick = candidates[Math.floor(Math.random() * candidates.length)];
           const detail = await getMonumento(pick.id);
-          // Record in DB
-          try { await addSocialHistory(pick.id, socialPlatform); } catch { /* ignore */ }
           setSocialSelected(detail);
           setSocialText(socialGenerateText(detail, socialPlatform));
           setSocialMonumentos([pick]);
@@ -799,6 +797,17 @@ export default function Admin() {
       window.open(imgUrl, '_blank');
       setSocialCopied('image-url');
       setTimeout(() => setSocialCopied(''), 2000);
+    }
+  };
+
+  const handleSocialMarkUsed = async () => {
+    if (!socialSelected) return;
+    try {
+      await addSocialHistory(socialSelected.id, socialPlatform);
+      setSocialCopied('used');
+      setTimeout(() => setSocialCopied(''), 2500);
+    } catch {
+      console.error('Error marcando como usado');
     }
   };
 
@@ -1627,6 +1636,13 @@ export default function Admin() {
                               onClick={handleSocialCopyText}
                             >
                               {socialCopied === 'text' ? '✓ Copiado!' : 'Copiar texto'}
+                            </button>
+                            <button
+                              className={`social-used-btn ${socialCopied === 'used' ? 'used' : ''}`}
+                              onClick={handleSocialMarkUsed}
+                              title="Marcar como publicado para no repetir"
+                            >
+                              {socialCopied === 'used' ? '✓ Marcado!' : 'Se usa'}
                             </button>
                           </div>
                         </div>
