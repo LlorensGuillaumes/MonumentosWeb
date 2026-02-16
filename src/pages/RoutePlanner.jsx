@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMapEvents 
 import { getMonumentosRadio, getMonumentos, getMonumento, optimizarRuta, createRuta, getRutaPdfUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import PremiumCTA from '../components/PremiumCTA';
+import MunicipioAutocomplete from '../components/MunicipioAutocomplete';
 import 'leaflet/dist/leaflet.css';
 import './RoutePlanner.css';
 
@@ -358,12 +359,18 @@ export default function RoutePlanner() {
               <div className="route-filters">
                 <label>
                   <span>{t('filters.municipality')}</span>
-                  <input
-                    type="text"
-                    placeholder={t('routes.municipalityPlaceholder')}
+                  <MunicipioAutocomplete
                     value={searchMunicipio}
-                    onChange={e => setSearchMunicipio(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                    onChange={setSearchMunicipio}
+                    onSelect={(mun) => {
+                      setSearchMunicipio(mun);
+                      // Auto-search when selecting from dropdown
+                      setTimeout(() => {
+                        document.querySelector('.route-step .btn-primary.btn-block')?.click();
+                      }, 50);
+                    }}
+                    placeholder={t('routes.municipalityPlaceholder')}
+                    pais={filterPais}
                   />
                 </label>
               </div>
