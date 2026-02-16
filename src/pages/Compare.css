@@ -1,0 +1,208 @@
+.compare-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.compare-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.compare-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1a365d;
+}
+
+.compare-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+.compare-empty p {
+  margin-bottom: 1rem;
+}
+
+.compare-table-wrapper {
+  overflow-x: auto;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.compare-label-col {
+  width: 140px;
+  min-width: 120px;
+}
+
+.compare-monument-col {
+  min-width: 220px;
+  max-width: 320px;
+}
+
+.compare-monument-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  position: relative;
+}
+
+.compare-monument-header img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.compare-monument-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1a365d;
+  text-decoration: none;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.compare-monument-name:hover {
+  color: #3b82f6;
+}
+
+.compare-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compare-remove:hover {
+  background: #ef4444;
+}
+
+.compare-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.compare-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.compare-label {
+  font-weight: 600;
+  color: #64748b;
+  padding: 0.6rem 0.75rem;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.compare-value {
+  padding: 0.6rem 0.75rem;
+  color: #1a365d;
+  vertical-align: top;
+}
+
+.compare-desc {
+  font-size: 0.82rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* Floating compare bar */
+.compare-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1a365d;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.compare-bar-items {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.compare-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.compare-bar-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-bar-item button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.compare-bar-item button:hover {
+  color: white;
+}
+
+.compare-bar-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.compare-bar .btn {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .compare-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .compare-bar-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

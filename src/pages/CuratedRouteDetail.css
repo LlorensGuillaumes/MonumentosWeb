@@ -1,0 +1,337 @@
+.curated-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+/* Header */
+.curated-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.curated-detail-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.curated-detail-header h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.8rem;
+  color: var(--text-primary);
+}
+
+.curated-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.curated-detail-country {
+  font-size: 0.82rem;
+  background: var(--bg-secondary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  color: var(--text-secondary);
+}
+
+.curated-detail-period {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.curated-detail-stops {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* Description */
+.curated-detail-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+  text-align: justify;
+}
+
+/* Highlights */
+.curated-detail-highlights {
+  margin-bottom: 1.5rem;
+}
+
+.curated-detail-highlights h3 {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.5rem;
+}
+
+.curated-detail-highlight-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.curated-detail-highlight {
+  font-size: 0.82rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Map */
+.curated-detail-map-section {
+  margin-bottom: 2rem;
+}
+
+.curated-detail-map-section h2 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.curated-detail-map {
+  height: 450px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.curated-detail-map-loading,
+.curated-detail-map-empty {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+/* Actions */
+.curated-detail-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Monuments section */
+.curated-detail-monuments {
+  margin-bottom: 2rem;
+}
+
+.curated-detail-monuments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.curated-detail-monuments-header h2 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.curated-view-toggle {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.view-toggle-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.35rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-toggle-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* Grid view */
+.curated-monuments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.curated-monument-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.curated-monument-card:hover {
+  box-shadow: 0 4px 12px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.curated-monument-img {
+  height: 140px;
+  overflow: hidden;
+}
+
+.curated-monument-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.curated-monument-info {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.curated-monument-info strong {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.curated-monument-info > span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.curated-monument-style {
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* List view */
+.curated-monuments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.curated-monument-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s;
+}
+
+.curated-monument-row:hover {
+  border-color: var(--accent);
+}
+
+.curated-monument-num {
+  min-width: 28px;
+  height: 28px;
+  background: var(--bg-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.curated-monument-row img {
+  width: 60px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.curated-monument-row-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.curated-monument-row-info strong {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.curated-monument-row-info span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.curated-monument-tag {
+  font-size: 0.7rem;
+  background: var(--bg-secondary);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Error */
+.curated-detail-error {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .curated-detail-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .curated-detail-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .curated-detail-map {
+    height: 300px;
+  }
+
+  .curated-monuments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .curated-monument-row-info strong {
+    white-space: normal;
+  }
+}

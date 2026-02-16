@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { getMonumento, getWikipediaExtract, getValoraciones, addValoracion, getNotasMonumento, addNotaMonumento, deleteNotaMonumento } from '../services/api';
+import { getMonumento, getMonumentos, getMonumentosRadio, getWikipediaExtract, getValoraciones, addValoracion, getNotasMonumento, addNotaMonumento, deleteNotaMonumento } from '../services/api';
+import PhotoUpload from '../components/PhotoUpload';
 import { useAuth } from '../context/AuthContext';
+import { DetailSkeleton } from '../components/Skeleton';
 import 'leaflet/dist/leaflet.css';
 import './Detail.css';
 
@@ -54,6 +57,12 @@ export default function Detail() {
   const [ratingSubmitting, setRatingSubmitting] = useState(false);
   const [ratingMsg, setRatingMsg] = useState('');
 
+  // Share
+  const [copied, setCopied] = useState(false);
+
+  // Related monuments
+  const [relatedMonuments, setRelatedMonuments] = useState([]);
+
   // Notes state
   const [notas, setNotas] = useState([]);
   const [notaText, setNotaText] = useState('');
@@ -88,6 +97,29 @@ export default function Detail() {
       }
     }).catch(() => {});
     getNotasMonumento(monumento.id).then(setNotas).catch(() => {});
+  }, [monumento]);
+
+  // Load related monuments
+  useEffect(() => {
+    if (!monumento) return;
+    setRelatedMonuments([]);
+    const fetchRelated = async () => {
+      try {
+        let items = [];
+        if (monumento.estilo) {
+          const data = await getMonumentos({ estilo: monumento.estilo, limit: 5 });
+          items = data.items || [];
+        } else if (monumento.categoria && monumento.comunidad_autonoma) {
+          const data = await getMonumentos({ categoria: monumento.categoria, region: monumento.comunidad_autonoma, limit: 5 });
+          items = data.items || [];
+        } else if (monumento.latitud && monumento.longitud) {
+          const data = await getMonumentosRadio({ lat: monumento.latitud, lng: monumento.longitud, km: 30, limit: 5 });
+          items = data.items || [];
+        }
+        setRelatedMonuments(items.filter(m => m.id !== monumento.id).slice(0, 4));
+      } catch { /* ignore */ }
+    };
+    fetchRelated();
   }, [monumento]);
 
   const handleSubmitRating = async () => {
@@ -139,11 +171,7 @@ export default function Detail() {
   }, [monumento]);
 
   if (loading) {
-    return (
-      <div className="detail-page">
-        <div className="loading">{t('detail.loading')}</div>
-      </div>
-    );
+    return <DetailSkeleton />;
   }
 
   if (error || !monumento) {
@@ -164,8 +192,40 @@ export default function Detail() {
     ...(monumento.imagenes || []),
   ];
 
+  const metaDesc = [monumento.categoria, monumento.municipio, monumento.provincia, monumento.comunidad_autonoma].filter(Boolean).join(', ');
+
   return (
     <div className="detail-page">
+      <Helmet>
+        <title>{monumento.denominacion} - Patrimonio Europeo</title>
+        <meta name="description" content={`${monumento.denominacion} - ${metaDesc}`} />
+        <meta property="og:title" content={monumento.denominacion} />
+        <meta property="og:description" content={metaDesc} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={window.location.href} />
+        {monumento.imagen_url && <meta property="og:image" content={monumento.imagen_url} />}
+        <meta name="twitter:card" content={monumento.imagen_url ? 'summary_large_image' : 'summary'} />
+        <meta name="twitter:title" content={monumento.denominacion} />
+        <meta name="twitter:description" content={metaDesc} />
+        {monumento.imagen_url && <meta name="twitter:image" content={monumento.imagen_url} />}
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'LandmarkOrHistoricalBuilding',
+          name: monumento.denominacion,
+          description: monumento.descripcion_completa || monumento.wiki_descripcion || metaDesc,
+          ...(monumento.imagen_url && { image: monumento.imagen_url }),
+          ...(hasLocation && { geo: { '@type': 'GeoCoordinates', latitude: monumento.latitud, longitude: monumento.longitud } }),
+          address: {
+            '@type': 'PostalAddress',
+            ...(monumento.municipio && { addressLocality: monumento.municipio }),
+            ...(monumento.provincia && { addressRegion: monumento.provincia }),
+            ...(monumento.pais && { addressCountry: monumento.pais }),
+          },
+          ...(monumento.wikipedia_url && { sameAs: monumento.wikipedia_url }),
+          ...(monumento.inception && { foundingDate: monumento.inception }),
+          ...(monumento.arquitecto && { founder: { '@type': 'Person', name: monumento.arquitecto } }),
+        })}</script>
+      </Helmet>
       <nav className="breadcrumb">
         <button className="back-btn" onClick={() => navigate(-1)} title={t('detail.back')}>
           ← {t('detail.back')}
@@ -195,6 +255,52 @@ export default function Detail() {
               title={user ? (isFavorito(monumento.id) ? t('favorites.remove') : t('favorites.add')) : t('auth.loginToFav')}
             >
               {isFavorito(monumento.id) ? '\u2764\uFE0F' : '\u2661'}
+            </button>
+          </div>
+
+          {/* Share */}
+          <div className="detail-share">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(monumento.denominacion + ' - ' + window.location.href)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="share-btn share-whatsapp"
+              title="WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(monumento.denominacion)}&url=${encodeURIComponent(window.location.href)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="share-btn share-twitter"
+              title="X / Twitter"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="share-btn share-facebook"
+              title="Facebook"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <button
+              className="share-btn share-copy"
+              title={t('detail.copyLink')}
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+            >
+              {copied ? (
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              )}
             </button>
           </div>
 
@@ -240,6 +346,7 @@ export default function Detail() {
                       key={i}
                       src={img.url}
                       alt={img.titulo || `Imagen ${i + 1}`}
+                      loading="lazy"
                       className={selectedImage === img.url ? 'active' : ''}
                       onClick={() => setSelectedImage(img.url)}
                       onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }}
@@ -249,6 +356,9 @@ export default function Detail() {
               )}
             </section>
           )}
+
+          {/* User Photos */}
+          <PhotoUpload bienId={monumento.id} />
 
           {/* Description */}
           {(monumento.descripcion_completa || monumento.wiki_descripcion || wikiExtract) ? (
@@ -319,148 +429,171 @@ export default function Detail() {
             </section>
           )}
 
-          {/* Ratings */}
-          <section className="detail-section">
-            <h2>{t('detail.ratings')}</h2>
-            {ratings && ratings.total >= 3 ? (
-              <div className="ratings-summary">
-                <div className="ratings-main-score">
-                  <span className="ratings-number">{ratings.media_general}</span>
-                  <StarRating value={Math.round(ratings.media_general)} readonly size="1.1rem" />
-                  <span className="ratings-count">{ratings.total} {t('detail.ratingsCount')}</span>
-                </div>
-                {ratings.total_conservacion >= 3 && (
-                  <div className="ratings-detail-row">
-                    <span className="ratings-label">{t('detail.ratingsConservation')}</span>
-                    <StarRating value={Math.round(ratings.media_conservacion)} readonly size="0.9rem" />
-                    <span className="ratings-small">{ratings.media_conservacion}</span>
-                  </div>
-                )}
-                {ratings.total_accesibilidad >= 3 && (
-                  <div className="ratings-detail-row">
-                    <span className="ratings-label">{t('detail.ratingsAccessibility')}</span>
-                    <StarRating value={Math.round(ratings.media_accesibilidad)} readonly size="0.9rem" />
-                    <span className="ratings-small">{ratings.media_accesibilidad}</span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="ratings-few">{t('detail.ratingsNotEnough')}</p>
-            )}
-
-            {user ? (
-              <div className="ratings-form">
-                <span className="ratings-form-label">{t('detail.ratingsYours')}</span>
-                <div className="ratings-form-row">
-                  <span>{t('detail.ratingsGeneral')}</span>
-                  <StarRating
-                    value={userRating.general}
-                    onChange={v => setUserRating(prev => ({ ...prev, general: v }))}
-                    size="1.4rem"
-                  />
-                </div>
-                {!showExtraRatings ? (
-                  <button className="ratings-more-btn" onClick={() => setShowExtraRatings(true)}>
-                    {t('detail.ratingsMore')}
-                  </button>
-                ) : (
-                  <>
-                    <div className="ratings-form-row">
-                      <span>{t('detail.ratingsConservation')}</span>
-                      <StarRating
-                        value={userRating.conservacion}
-                        onChange={v => setUserRating(prev => ({ ...prev, conservacion: v }))}
-                        size="1.2rem"
-                      />
+          {/* Related monuments */}
+          {relatedMonuments.length > 0 && (
+            <section className="detail-section">
+              <h2>{t('detail.relatedMonuments')}</h2>
+              <div className="related-grid">
+                {relatedMonuments.map(rm => (
+                  <Link key={rm.id} to={`/monumento/${rm.id}`} className="related-card">
+                    <img
+                      src={rm.imagen_url || '/no-image.svg'}
+                      alt=""
+                      loading="lazy"
+                      onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }}
+                    />
+                    <div className="related-card-info">
+                      <strong>{rm.denominacion}</strong>
+                      <span>{rm.municipio}</span>
                     </div>
-                    <div className="ratings-form-row">
-                      <span>{t('detail.ratingsAccessibility')}</span>
-                      <StarRating
-                        value={userRating.accesibilidad}
-                        onChange={v => setUserRating(prev => ({ ...prev, accesibilidad: v }))}
-                        size="1.2rem"
-                      />
-                    </div>
-                  </>
-                )}
-                <button
-                  className="btn btn-primary ratings-submit"
-                  onClick={handleSubmitRating}
-                  disabled={!userRating.general || ratingSubmitting}
-                >
-                  {ratingSubmitting ? t('detail.ratingsSaving') : t('detail.ratingsSave')}
-                </button>
-                {ratingMsg && <span className="ratings-msg">{ratingMsg}</span>}
+                  </Link>
+                ))}
               </div>
-            ) : (
-              <p className="ratings-login-hint">
-                <Link to="/login">{t('detail.ratingsLoginHint')}</Link>
-              </p>
-            )}
-          </section>
+            </section>
+          )}
 
-          {/* User notes */}
-          <section className="detail-section">
-            <h2>{t('detail.userNotes')}</h2>
-            {user && (
-              <div className="notas-form">
-                <div className="notas-form-top">
-                  <select value={notaTipo} onChange={e => setNotaTipo(e.target.value)}>
-                    <option value="nota">{t('detail.notaTypeNota')}</option>
-                    <option value="horario">{t('detail.notaTypeHorario')}</option>
-                    <option value="precio">{t('detail.notaTypePrecio')}</option>
-                  </select>
-                  <input
-                    type="text"
-                    placeholder={
-                      notaTipo === 'horario' ? t('detail.notaPlaceholderHorario') :
-                      notaTipo === 'precio' ? t('detail.notaPlaceholderPrecio') :
-                      t('detail.notaPlaceholderNota')
-                    }
-                    value={notaText}
-                    onChange={e => setNotaText(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter' && notaText.trim()) handleSubmitNota(); }}
-                  />
+          {/* Ratings - hide if no ratings and no user */}
+          {(ratings?.total > 0 || user) && (
+            <section className="detail-section">
+              <h2>{t('detail.ratings')}</h2>
+              {ratings && ratings.total >= 3 ? (
+                <div className="ratings-summary">
+                  <div className="ratings-main-score">
+                    <span className="ratings-number">{ratings.media_general}</span>
+                    <StarRating value={Math.round(ratings.media_general)} readonly size="1.1rem" />
+                    <span className="ratings-count">{ratings.total} {t('detail.ratingsCount')}</span>
+                  </div>
+                  {ratings.total_conservacion >= 3 && (
+                    <div className="ratings-detail-row">
+                      <span className="ratings-label">{t('detail.ratingsConservation')}</span>
+                      <StarRating value={Math.round(ratings.media_conservacion)} readonly size="0.9rem" />
+                      <span className="ratings-small">{ratings.media_conservacion}</span>
+                    </div>
+                  )}
+                  {ratings.total_accesibilidad >= 3 && (
+                    <div className="ratings-detail-row">
+                      <span className="ratings-label">{t('detail.ratingsAccessibility')}</span>
+                      <StarRating value={Math.round(ratings.media_accesibilidad)} readonly size="0.9rem" />
+                      <span className="ratings-small">{ratings.media_accesibilidad}</span>
+                    </div>
+                  )}
+                </div>
+              ) : user ? (
+                <p className="section-cta">{t('detail.beFirstToRate')}</p>
+              ) : null}
+
+              {user && (
+                <div className="ratings-form">
+                  <span className="ratings-form-label">{t('detail.ratingsYours')}</span>
+                  <div className="ratings-form-row">
+                    <span>{t('detail.ratingsGeneral')}</span>
+                    <StarRating
+                      value={userRating.general}
+                      onChange={v => setUserRating(prev => ({ ...prev, general: v }))}
+                      size="1.4rem"
+                    />
+                  </div>
+                  {!showExtraRatings ? (
+                    <button className="ratings-more-btn" onClick={() => setShowExtraRatings(true)}>
+                      {t('detail.ratingsMore')}
+                    </button>
+                  ) : (
+                    <>
+                      <div className="ratings-form-row">
+                        <span>{t('detail.ratingsConservation')}</span>
+                        <StarRating
+                          value={userRating.conservacion}
+                          onChange={v => setUserRating(prev => ({ ...prev, conservacion: v }))}
+                          size="1.2rem"
+                        />
+                      </div>
+                      <div className="ratings-form-row">
+                        <span>{t('detail.ratingsAccessibility')}</span>
+                        <StarRating
+                          value={userRating.accesibilidad}
+                          onChange={v => setUserRating(prev => ({ ...prev, accesibilidad: v }))}
+                          size="1.2rem"
+                        />
+                      </div>
+                    </>
+                  )}
                   <button
-                    className="btn btn-primary"
-                    onClick={handleSubmitNota}
-                    disabled={!notaText.trim() || notaSubmitting}
+                    className="btn btn-primary ratings-submit"
+                    onClick={handleSubmitRating}
+                    disabled={!userRating.general || ratingSubmitting}
                   >
-                    {t('detail.notaSubmit')}
+                    {ratingSubmitting ? t('detail.ratingsSaving') : t('detail.ratingsSave')}
                   </button>
+                  {ratingMsg && <span className="ratings-msg">{ratingMsg}</span>}
                 </div>
-              </div>
-            )}
-            <div className="notas-list">
-              {notas.map(n => (
-                <div key={n.id} className={`nota-item nota-tipo-${n.tipo}`}>
-                  <div className="nota-header">
-                    <span className={`nota-tipo-badge nota-badge-${n.tipo}`}>
-                      {n.tipo === 'horario' ? t('detail.notaTypeHorario') :
-                       n.tipo === 'precio' ? t('detail.notaTypePrecio') :
-                       t('detail.notaTypeNota')}
-                    </span>
-                    <span className="nota-author">
-                      {n.usuario_nombre || n.usuario_email}
-                      {(n.usuario_rol === 'admin' || n.usuario_rol === 'colaborador') && (
-                        <span className={`nota-rol-badge nota-rol-${n.usuario_rol}`}>
-                          {n.usuario_rol}
-                        </span>
-                      )}
-                    </span>
-                    <span className="nota-date">{new Date(n.created_at).toLocaleDateString()}</span>
-                    {user && (user.id === n.usuario_id || user.rol === 'admin') && (
-                      <button className="nota-delete" onClick={() => handleDeleteNota(n.id)}>&times;</button>
-                    )}
-                  </div>
-                  <p className="nota-text">{n.texto}</p>
-                </div>
-              ))}
-              {notas.length === 0 && (
-                <p className="notas-empty">{t('detail.notasEmpty')}</p>
               )}
-            </div>
-          </section>
+            </section>
+          )}
+
+          {/* User notes - hide if no notes and no user */}
+          {(notas.length > 0 || user) && (
+            <section className="detail-section">
+              <h2>{t('detail.userNotes')}</h2>
+              {user && (
+                <div className="notas-form">
+                  {notas.length === 0 && (
+                    <p className="section-cta">{t('detail.beFirstNote')}</p>
+                  )}
+                  <div className="notas-form-top">
+                    <select value={notaTipo} onChange={e => setNotaTipo(e.target.value)}>
+                      <option value="nota">{t('detail.notaTypeNota')}</option>
+                      <option value="horario">{t('detail.notaTypeHorario')}</option>
+                      <option value="precio">{t('detail.notaTypePrecio')}</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder={
+                        notaTipo === 'horario' ? t('detail.notaPlaceholderHorario') :
+                        notaTipo === 'precio' ? t('detail.notaPlaceholderPrecio') :
+                        t('detail.notaPlaceholderNota')
+                      }
+                      value={notaText}
+                      onChange={e => setNotaText(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && notaText.trim()) handleSubmitNota(); }}
+                    />
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleSubmitNota}
+                      disabled={!notaText.trim() || notaSubmitting}
+                    >
+                      {t('detail.notaSubmit')}
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className="notas-list">
+                {notas.map(n => (
+                  <div key={n.id} className={`nota-item nota-tipo-${n.tipo}`}>
+                    <div className="nota-header">
+                      <span className={`nota-tipo-badge nota-badge-${n.tipo}`}>
+                        {n.tipo === 'horario' ? t('detail.notaTypeHorario') :
+                         n.tipo === 'precio' ? t('detail.notaTypePrecio') :
+                         t('detail.notaTypeNota')}
+                      </span>
+                      <span className="nota-author">
+                        {n.usuario_nombre || n.usuario_email}
+                        {(n.usuario_rol === 'admin' || n.usuario_rol === 'colaborador') && (
+                          <span className={`nota-rol-badge nota-rol-${n.usuario_rol}`}>
+                            {n.usuario_rol}
+                          </span>
+                        )}
+                      </span>
+                      <span className="nota-date">{new Date(n.created_at).toLocaleDateString()}</span>
+                      {user && (user.id === n.usuario_id || user.rol === 'admin') && (
+                        <button className="nota-delete" onClick={() => handleDeleteNota(n.id)}>&times;</button>
+                      )}
+                    </div>
+                    <p className="nota-text">{n.texto}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </main>
 
         {/* Sidebar */}

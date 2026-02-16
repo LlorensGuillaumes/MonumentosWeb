@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import SearchableSelect from './SearchableSelect';
+import SearchAutocomplete from './SearchAutocomplete';
 import './Filters.css';
 
 export default function Filters({ onSearch }) {
@@ -120,13 +121,13 @@ export default function Filters({ onSearch }) {
   return (
     <form className="filters" onSubmit={handleSubmit}>
       <div className="filters-row">
-        <div className="filter-group">
+        <div className="filter-group filter-group-search">
           <label>{t('filters.search')}</label>
-          <input
-            type="text"
-            placeholder={t('filters.searchPlaceholder')}
+          <SearchAutocomplete
             value={filters.q}
-            onChange={(e) => handleChange('q', e.target.value)}
+            onChange={(v) => handleChange('q', v)}
+            onSearch={onSearch}
+            placeholder={t('filters.searchPlaceholder')}
           />
         </div>
 

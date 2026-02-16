@@ -237,6 +237,138 @@
   color: #64748b;
 }
 
+/* Features */
+.features-section {
+  margin: 3rem 0;
+}
+
+.features-section h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1a365d;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.feature-card {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.feature-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #1a365d;
+}
+
+.feature-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* Testimonials */
+.testimonials-section {
+  margin: 3rem 0;
+}
+
+.testimonials-section h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1a365d;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.testimonial-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.testimonial-text {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #334155;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.testimonial-text::before {
+  content: "\201C";
+  font-size: 1.5rem;
+  color: #3b82f6;
+  font-style: normal;
+  margin-right: 0.2rem;
+}
+
+.testimonial-author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: auto;
+}
+
+.testimonial-author strong {
+  font-size: 0.88rem;
+  color: #1a365d;
+}
+
+.testimonial-author span {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+/* Pricing preview */
+.pricing-preview {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+  border-radius: 16px;
+  margin: 3rem 0;
+}
+
+.pricing-preview h2 {
+  margin: 0 0 0.75rem;
+  color: #1a365d;
+  font-size: 1.6rem;
+}
+
+.pricing-preview p {
+  margin: 0 auto 1.5rem;
+  color: #64748b;
+  max-width: 450px;
+  line-height: 1.5;
+}
+
 @media (max-width: 768px) {
   .hero {
     padding: 2rem 1rem;
@@ -260,5 +392,13 @@
 
   .monumentos-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
   }
 }

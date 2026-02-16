@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import './LanguageSelector.css';
 
 const LANGUAGES = [
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'pt', label: 'Português', flag: '🇵🇹' },
-  { code: 'ca', label: 'Català', flag: '🏳️' },
-  { code: 'eu', label: 'Euskara', flag: '🏳️' },
-  { code: 'gl', label: 'Galego', flag: '🏳️' },
+  { code: 'es', label: 'Español' },
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'pt', label: 'Português' },
+  { code: 'ca', label: 'Català' },
+  { code: 'eu', label: 'Euskara' },
+  { code: 'gl', label: 'Galego' },
+  { code: 'it', label: 'Italiano' },
 ];
 
 export default function LanguageSelector() {
@@ -35,9 +36,9 @@ export default function LanguageSelector() {
       value={lang}
       onChange={handleChange}
     >
-      {LANGUAGES.map(({ code, label, flag }) => (
+      {LANGUAGES.map(({ code, label }) => (
         <option key={code} value={code}>
-          {flag} {label}
+          {label}
         </option>
       ))}
     </select>

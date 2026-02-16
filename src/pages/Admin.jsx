@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory } from '../services/api';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
+import AdminSettings from '../components/AdminSettings';
 import './Admin.css';
 
 const ITEMS_PER_PAGE = 50;
@@ -868,6 +869,13 @@ export default function Admin() {
           >
             <span className="admin-nav-icon">📱</span>
             Publicaciones
+          </button>
+          <button
+            className={`admin-nav-item ${activeSection === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveSection('settings')}
+          >
+            <span className="admin-nav-icon">⚙️</span>
+            Configuración
           </button>
         </nav>
       </aside>
@@ -2039,6 +2047,8 @@ export default function Admin() {
           </div>
         </div>
       )}
+
+      {activeSection === 'settings' && <AdminSettings />}
     </div>
   );
 }

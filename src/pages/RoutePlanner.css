@@ -270,6 +270,15 @@
   gap: 0.5rem;
 }
 
+.route-export-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.route-export-row .btn {
+  flex: 1;
+}
+
 .route-save-form {
   display: flex;
   flex-direction: column;

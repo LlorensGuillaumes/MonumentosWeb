@@ -91,6 +91,12 @@ export const removeFavorito = (bienId) =>
 export const changePassword = (data) =>
   api.put('/auth/me/password', data).then(r => r.data);
 
+export const forgotPassword = (email) =>
+  api.post('/auth/forgot-password', { email }).then(r => r.data);
+
+export const resetPassword = (token, password) =>
+  api.post('/auth/reset-password', { token, password }).then(r => r.data);
+
 // ============== ADMIN: USUARIOS ==============
 
 export const getUsuarios = (params = {}) =>
@@ -262,6 +268,84 @@ export const getRutaPdfUrl = (id) => {
   const token = localStorage.getItem('auth_token');
   return `${API_BASE}/rutas/${id}/pdf?token=${token}`;
 };
+
+// ============== ADMIN SETTINGS ==============
+
+export const getAdminSettings = () =>
+  api.get('/admin/settings').then(r => r.data).catch(() => {
+    // Fallback to localStorage if backend not ready
+    const stored = localStorage.getItem('admin_settings');
+    return stored ? JSON.parse(stored) : {};
+  });
+
+export const updateAdminSettings = (settings) =>
+  api.put('/admin/settings', settings).then(r => r.data).catch(() => {
+    // Fallback to localStorage
+    const current = JSON.parse(localStorage.getItem('admin_settings') || '{}');
+    const updated = { ...current, ...settings };
+    localStorage.setItem('admin_settings', JSON.stringify(updated));
+    return updated;
+  });
+
+// ============== MONUMENT OF THE DAY ==============
+
+export const getMonumentOfDay = () =>
+  api.get('/monument-of-day').then(r => r.data).catch(() => null);
+
+// ============== USER PHOTOS ==============
+
+export const getMonumentoPhotos = (bienId) =>
+  api.get(`/monumentos/${bienId}/photos`).then(r => r.data);
+
+export const uploadMonumentoPhoto = (bienId, file, caption = '') => {
+  const formData = new FormData();
+  formData.append('foto', file);
+  if (caption) formData.append('descripcion', caption);
+  return api.post(`/monumentos/${bienId}/photos`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 30000,
+  }).then(r => r.data);
+};
+
+export const deleteMonumentoPhoto = (bienId, photoId) =>
+  api.delete(`/monumentos/${bienId}/photos/${photoId}`).then(r => r.data);
+
+// ============== TRAVEL DIARY ==============
+
+export const getDiaryEntries = (params = {}) =>
+  api.get('/diary', { params }).then(r => r.data);
+
+export const addDiaryEntry = (data) =>
+  api.post('/diary', data).then(r => r.data);
+
+export const updateDiaryEntry = (id, data) =>
+  api.put(`/diary/${id}`, data).then(r => r.data);
+
+export const deleteDiaryEntry = (id) =>
+  api.delete(`/diary/${id}`).then(r => r.data);
+
+// ============== PREMIUM TRIAL ==============
+
+export const activateTrial = () =>
+  api.post('/auth/activate-trial').then(r => r.data);
+
+// ============== SHAREABLE ROUTES ==============
+
+export const getPublicRuta = (shareId) =>
+  api.get(`/rutas/public/${shareId}`).then(r => r.data);
+
+export const shareRuta = (id) =>
+  api.post(`/rutas/${id}/share`).then(r => r.data);
+
+// ============== USER STATS ==============
+
+export const getUserStats = () =>
+  api.get('/auth/stats').then(r => r.data);
+
+// ============== AUTOCOMPLETE ==============
+
+export const getAutocomplete = (q) =>
+  api.get('/autocomplete', { params: { q } }).then(r => r.data);
 
 // ============== SOCIAL HISTORY ==============
 

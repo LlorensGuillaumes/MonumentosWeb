@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import LanguageSelector from './LanguageSelector';
+import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
 import './Header.css';
 
 export default function Header() {
@@ -139,6 +141,18 @@ export default function Header() {
             </>
           )}
           <Link
+            to="/rutas-curadas"
+            className={`nav-link ${location.pathname.startsWith('/rutas-curadas') ? 'active' : ''}`}
+          >
+            {t('nav.curatedRoutes')}
+          </Link>
+          <Link
+            to="/precios"
+            className={`nav-link ${location.pathname === '/precios' ? 'active' : ''}`}
+          >
+            {t('nav.pricing')}
+          </Link>
+          <Link
             to="/contacto"
             className={`nav-link ${location.pathname === '/contacto' ? 'active' : ''}`}
           >
@@ -147,6 +161,8 @@ export default function Header() {
         </nav>
 
         <div className="header-right">
+          <ThemeToggle />
+          <NotificationBell />
           <LanguageSelector />
 
           {stats && (
@@ -176,14 +192,20 @@ export default function Header() {
                     <small>{user.email}</small>
                   </div>
                   <hr />
-                  <button className="user-dropdown-item" onClick={openProfile}>
-                    Mi perfil
-                  </button>
+                  <Link to="/perfil" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
+                    {t('profile.title')}
+                  </Link>
                   <Link to="/favoritos" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
                     {t('nav.favorites')} ({favoritoIds.size})
                   </Link>
                   <Link to="/mis-rutas" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
                     {t('nav.myRoutes')}
+                  </Link>
+                  <Link to="/diario" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
+                    {t('nav.diary')}
+                  </Link>
+                  <Link to="/mis-estadisticas" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
+                    {t('nav.myStats')}
                   </Link>
                   <Link to="/mis-propuestas" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
                     {t('nav.myProposals')}

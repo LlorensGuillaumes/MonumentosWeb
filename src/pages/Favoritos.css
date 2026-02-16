@@ -9,9 +9,16 @@
   margin-bottom: 1rem;
 }
 
+.favoritos-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
 .favoritos-count {
   color: #718096;
-  margin-bottom: 1.5rem;
+  margin: 0;
 }
 
 .favoritos-grid {

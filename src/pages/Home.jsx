@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { getMonumentos } from '../services/api';
 import MonumentoCard from '../components/MonumentoCard';
 import Map from '../components/Map';
+import NewsletterForm from '../components/NewsletterForm';
+import MonumentOfDay from '../components/MonumentOfDay';
+import NearbyMonuments from '../components/NearbyMonuments';
 import './Home.css';
 
 export default function Home() {
@@ -30,6 +34,10 @@ export default function Home() {
 
   return (
     <div className="home">
+      <Helmet>
+        <title>{t('home.heroTitle')} - Patrimonio Europeo</title>
+        <meta name="description" content={t('home.heroSubtitle', { count: stats?.total?.toLocaleString() || '100,000' })} />
+      </Helmet>
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
@@ -87,6 +95,39 @@ export default function Home() {
         </section>
       )}
 
+      {/* Features Section */}
+      <section className="features-section">
+        <h2>{t('home.whyUseTitle')}</h2>
+        <div className="features-grid">
+          <div className="feature-card">
+            <span className="feature-icon">&#128270;</span>
+            <h3>{t('home.feature1Title')}</h3>
+            <p>{t('home.feature1Desc')}</p>
+          </div>
+          <div className="feature-card">
+            <span className="feature-icon">&#128506;</span>
+            <h3>{t('home.feature2Title')}</h3>
+            <p>{t('home.feature2Desc')}</p>
+          </div>
+          <div className="feature-card">
+            <span className="feature-icon">&#128247;</span>
+            <h3>{t('home.feature3Title')}</h3>
+            <p>{t('home.feature3Desc')}</p>
+          </div>
+          <div className="feature-card">
+            <span className="feature-icon">&#127760;</span>
+            <h3>{t('home.feature4Title')}</h3>
+            <p>{t('home.feature4Desc')}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Monument of the Day */}
+      <MonumentOfDay />
+
+      {/* Nearby Monuments */}
+      <NearbyMonuments />
+
       {/* Map Preview */}
       <section className="map-section">
         <h2>{t('home.heritageMap')}</h2>
@@ -112,6 +153,34 @@ export default function Home() {
         )}
         <Link to="/buscar" className="btn btn-outline">{t('home.viewAll')}</Link>
       </section>
+
+      {/* Testimonials */}
+      <section className="testimonials-section">
+        <h2>{t('home.testimonialsTitle')}</h2>
+        <div className="testimonials-grid">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="testimonial-card">
+              <p className="testimonial-text">{t(`home.testimonial${i}`)}</p>
+              <div className="testimonial-author">
+                <strong>{t(`home.testimonial${i}Author`)}</strong>
+                <span>{t(`home.testimonial${i}Role`)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <NewsletterForm variant="home" />
+
+      {/* Pricing preview for non-logged users */}
+      {!user && (
+        <section className="pricing-preview">
+          <h2>{t('home.pricingPreviewTitle')}</h2>
+          <p>{t('home.pricingPreviewDesc')}</p>
+          <Link to="/precios" className="btn btn-primary btn-lg">{t('home.pricingPreviewCTA')}</Link>
+        </section>
+      )}
 
       {/* Regions Section grouped by country */}
       {stats?.por_region && (() => {

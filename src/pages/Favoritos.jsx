@@ -6,6 +6,24 @@ import { getFavoritos } from '../services/api';
 import MonumentoCard from '../components/MonumentoCard';
 import './Favoritos.css';
 
+function exportFavoritesCSV(items) {
+  const header = 'Nombre,Municipio,Provincia,Region,Pais,Categoria,Estilo,Latitud,Longitud';
+  const esc = (s) => `"${(s || '').replace(/"/g, '""')}"`;
+  const rows = items.map(m =>
+    [m.denominacion, m.municipio, m.provincia, m.comunidad_autonoma, m.pais, m.categoria, m.estilo, m.latitud, m.longitud].map(esc).join(',')
+  );
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'favoritos.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export default function Favoritos() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -45,9 +63,14 @@ export default function Favoritos() {
 
       {!loading && data && data.items.length > 0 && (
         <>
-          <p className="favoritos-count">
-            {t('favorites.count', { count: data.total })}
-          </p>
+          <div className="favoritos-toolbar">
+            <p className="favoritos-count">
+              {t('favorites.count', { count: data.total })}
+            </p>
+            <button className="btn btn-outline btn-sm" onClick={() => exportFavoritesCSV(data.items)}>
+              {t('favorites.exportCSV')}
+            </button>
+          </div>
           <div className="favoritos-grid">
             {data.items.map((item) => (
               <MonumentoCard key={item.id} monumento={item} />

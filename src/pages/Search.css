@@ -78,47 +78,18 @@
   100% { background-position: -200% 0; }
 }
 
-/* Pagination */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
+/* Infinite scroll */
+.scroll-sentinel {
+  min-height: 1px;
+  margin-top: 1rem;
+}
+
+.scroll-progress {
+  text-align: center;
   padding: 1rem 0;
-}
-
-.page-numbers {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.page-btn {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.page-btn:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-}
-
-.page-btn.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
-}
-
-.page-info {
   font-size: 0.85rem;
-  color: #64748b;
-  white-space: nowrap;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 /* No results */
@@ -162,14 +133,4 @@
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 
-  .pagination {
-    flex-wrap: wrap;
-  }
-
-  .page-numbers {
-    order: -1;
-    width: 100%;
-    justify-content: center;
-    margin-bottom: 0.5rem;
-  }
 }

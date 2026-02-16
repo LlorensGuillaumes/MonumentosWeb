@@ -1,3 +1,41 @@
+:root {
+  --bg-primary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-secondary: #f1f5f9;
+  --text-primary: #1a365d;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --shadow-lg: rgba(0, 0, 0, 0.1);
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --btn-secondary-bg: #e2e8f0;
+  --btn-secondary-text: #475569;
+  --footer-bg: #1e293b;
+  --footer-text: #94a3b8;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-card: #1e293b;
+  --bg-secondary: #334155;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --border-hover: #475569;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-lg: rgba(0, 0, 0, 0.4);
+  --accent: #60a5fa;
+  --accent-hover: #3b82f6;
+  --btn-secondary-bg: #334155;
+  --btn-secondary-text: #cbd5e1;
+  --footer-bg: #020617;
+  --footer-text: #64748b;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -6,8 +44,8 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background: #f8fafc;
-  color: #1a365d;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   line-height: 1.5;
 }
 
@@ -22,16 +60,16 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #1a365d;
+  color: var(--text-primary);
   line-height: 1.2;
 }
 
 a {
-  color: #3b82f6;
+  color: var(--accent);
 }
 
 a:hover {
-  color: #2563eb;
+  color: var(--accent-hover);
 }
 
 /* Buttons */
@@ -48,43 +86,48 @@ a:hover {
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--accent);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2563eb;
+  background: var(--accent-hover);
   color: white;
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
 }
 
 .btn-secondary:hover {
-  background: #cbd5e1;
+  background: var(--border-hover);
 }
 
 .btn-outline {
   background: transparent;
-  border: 2px solid #3b82f6;
-  color: #3b82f6;
+  border: 2px solid var(--accent);
+  color: var(--accent);
 }
 
 .btn-outline:hover {
-  background: #3b82f6;
+  background: var(--accent);
   color: white;
 }
 
 /* Footer */
 .footer {
-  background: #1e293b;
-  color: #94a3b8;
+  background: var(--footer-bg);
+  color: var(--footer-text);
   padding: 1.5rem 2rem;
   text-align: center;
   font-size: 0.8rem;
   margin-top: 2rem;
+}
+
+.footer-newsletter {
+  max-width: 400px;
+  margin: 0 auto 1.25rem;
 }
 
 .footer-sources {
@@ -102,7 +145,7 @@ a:hover {
 }
 
 .footer-sources a {
-  color: #94a3b8;
+  color: var(--footer-text);
   text-decoration: none;
 }
 
@@ -113,7 +156,7 @@ a:hover {
 .footer-license {
   margin: 0;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 /* Responsive utilities */

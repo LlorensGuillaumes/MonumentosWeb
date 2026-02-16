@@ -4,11 +4,50 @@ import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMapEvents } from 'react-leaflet';
 import { getMonumentosRadio, getMonumentos, getMonumento, optimizarRuta, createRuta, getRutaPdfUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import PremiumCTA from '../components/PremiumCTA';
 import 'leaflet/dist/leaflet.css';
 import './RoutePlanner.css';
 
 const MAX_STOPS = 25;
 const RADIUS_OPTIONS = [10, 25, 50, 100];
+
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function generateGPX(name, waypoints, trackCoords) {
+  const escXml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const wpts = waypoints.map(w =>
+    `  <wpt lat="${w.latitud}" lon="${w.longitud}">\n    <name>${escXml(w.denominacion || '')}</name>\n    <desc>${escXml([w.municipio, w.provincia].filter(Boolean).join(', '))}</desc>\n  </wpt>`
+  ).join('\n');
+  let trk = '';
+  if (trackCoords && trackCoords.length > 1) {
+    const pts = trackCoords.map(([lat, lng]) => `      <trkpt lat="${lat}" lon="${lng}" />`).join('\n');
+    trk = `\n  <trk>\n    <name>${escXml(name)}</name>\n    <trkseg>\n${pts}\n    </trkseg>\n  </trk>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="PatrimonioEuropeo"\n  xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>${escXml(name)}</name></metadata>\n${wpts}${trk}\n</gpx>`;
+}
+
+function generateKML(name, waypoints, trackCoords) {
+  const escXml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const placemarks = waypoints.map(w =>
+    `    <Placemark>\n      <name>${escXml(w.denominacion || '')}</name>\n      <description>${escXml([w.municipio, w.provincia].filter(Boolean).join(', '))}</description>\n      <Point><coordinates>${w.longitud},${w.latitud},0</coordinates></Point>\n    </Placemark>`
+  ).join('\n');
+  let line = '';
+  if (trackCoords && trackCoords.length > 1) {
+    const coords = trackCoords.map(([lat, lng]) => `${lng},${lat},0`).join(' ');
+    line = `\n    <Placemark>\n      <name>${escXml(name)}</name>\n      <LineString><coordinates>${coords}</coordinates></LineString>\n    </Placemark>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n    <name>${escXml(name)}</name>\n${placemarks}${line}\n  </Document>\n</kml>`;
+}
 
 function MapClickHandler({ onClick }) {
   useMapEvents({
@@ -396,6 +435,7 @@ export default function RoutePlanner() {
                       <img
                         src={m.imagen_url || '/no-image.svg'}
                         alt=""
+                        loading="lazy"
                         onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }}
                       />
                     </div>
@@ -417,15 +457,7 @@ export default function RoutePlanner() {
             <div className="route-step">
               <h3>{searchMode === 'radio' ? t('routes.step4') : t('routes.step4').replace('4.', '3.')}</h3>
 
-              {!isPremium && (
-                <div className="premium-banner">
-                  <span className="premium-icon">&#11088;</span>
-                  <div>
-                    <strong>{t('routes.premiumNeeded')}</strong>
-                    <p>{t('routes.premiumNeededDesc')}</p>
-                  </div>
-                </div>
-              )}
+              {!isPremium && <PremiumCTA />}
 
               <button
                 className="btn btn-primary btn-block"
@@ -461,6 +493,26 @@ export default function RoutePlanner() {
                 >
                   {t('routes.openGoogleMaps')}
                 </a>
+                <div className="route-export-row">
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => {
+                      const name = routeName.trim() || 'Ruta';
+                      downloadFile(generateGPX(name, selectedMonuments, routeGeometry), `${name}.gpx`, 'application/gpx+xml');
+                    }}
+                  >
+                    {t('routes.exportGPX')}
+                  </button>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => {
+                      const name = routeName.trim() || 'Ruta';
+                      downloadFile(generateKML(name, selectedMonuments, routeGeometry), `${name}.kml`, 'application/vnd.google-earth.kml+xml');
+                    }}
+                  >
+                    {t('routes.exportKML')}
+                  </button>
+                </div>
 
                 {savedRuta ? (
                   <a

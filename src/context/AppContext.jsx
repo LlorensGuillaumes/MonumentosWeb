@@ -3,6 +3,8 @@ import { getStats, getFiltros } from '../services/api';
 
 const AppContext = createContext(null);
 
+const MAX_COMPARE = 3;
+
 const initialState = {
   stats: null,
   filtros: null,
@@ -20,6 +22,7 @@ const initialState = {
     solo_imagen: false,
   },
   mapBounds: null,
+  compareList: [],
   loading: false,
   error: null,
 };
@@ -45,6 +48,14 @@ function reducer(state, action) {
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
+    case 'ADD_COMPARE':
+      if (state.compareList.find(m => m.id === action.payload.id) || state.compareList.length >= MAX_COMPARE)
+        return state;
+      return { ...state, compareList: [...state.compareList, action.payload] };
+    case 'REMOVE_COMPARE':
+      return { ...state, compareList: state.compareList.filter(m => m.id !== action.payload) };
+    case 'CLEAR_COMPARE':
+      return { ...state, compareList: [] };
     default:
       return state;
   }
@@ -81,6 +92,10 @@ export function AppProvider({ children }) {
     dispatch({ type: 'SET_MAP_BOUNDS', payload: bounds });
   };
 
+  const addToCompare = (monumento) => dispatch({ type: 'ADD_COMPARE', payload: monumento });
+  const removeFromCompare = (id) => dispatch({ type: 'REMOVE_COMPARE', payload: id });
+  const clearCompare = () => dispatch({ type: 'CLEAR_COMPARE' });
+
   // Recargar filtros dinámicos según país/región/provincia
   const reloadFiltros = useCallback(async (pais, region, provincia) => {
     try {
@@ -104,6 +119,9 @@ export function AppProvider({ children }) {
         resetFilters,
         setMapBounds,
         reloadFiltros,
+        addToCompare,
+        removeFromCompare,
+        clearCompare,
       }}
     >
       {children}
