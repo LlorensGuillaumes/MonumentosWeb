@@ -69,6 +69,99 @@
   text-align: center;
 }
 
+/* Nav icon links (heart, envelope) */
+.nav-icon-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.nav-icon-link svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.nav-icon-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.nav-icon-link.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Nav dropdown (Rutas) */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-btn {
+  color: rgba(255, 255, 255, 0.85);
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  font-weight: 500;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.nav-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.nav-dropdown-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.dropdown-arrow {
+  font-size: 0.7em;
+  margin-left: 0.1rem;
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.3rem;
+  background: var(--bg-card, #fff);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px var(--shadow-lg, rgba(0,0,0,0.15));
+  min-width: 180px;
+  z-index: 1001;
+  overflow: hidden;
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.nav-dropdown-menu a {
+  display: block;
+  padding: 0.6rem 1rem;
+  color: var(--text-secondary, #4a5568);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.nav-dropdown-menu a:hover {
+  background: var(--bg-secondary, #f7fafc);
+  color: var(--text-primary, #1a202c);
+}
+
 .header-right {
   display: flex;
   align-items: center;
@@ -370,5 +463,35 @@
   .nav-link {
     padding: 0.4rem 0.6rem;
     font-size: 0.85rem;
+  }
+
+  .nav-icon-link {
+    padding: 0.4rem;
+  }
+
+  .nav-dropdown-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .nav-dropdown-menu {
+    position: static;
+    box-shadow: none;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    min-width: auto;
+    margin-top: 0.2rem;
+  }
+
+  .nav-dropdown-menu a {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .nav-dropdown-menu a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
   }
 }

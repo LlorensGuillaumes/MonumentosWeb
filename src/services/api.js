@@ -105,6 +105,9 @@ export const getUsuarios = (params = {}) =>
 export const updateUsuarioRol = (id, rol) =>
   api.patch(`/admin/usuarios/${id}/rol`, { rol }).then(r => r.data);
 
+export const updateUsuarioPremium = (id, data) =>
+  api.patch(`/admin/usuarios/${id}/premium`, data).then(r => r.data);
+
 // ============== ADMIN: CONTACTOS ==============
 
 export const getContactos = (params = {}) =>

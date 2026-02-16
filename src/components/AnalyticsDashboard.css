@@ -77,6 +77,22 @@
   color: #276749;
 }
 
+.kpi-card.kpi-premium {
+  border-left: 3px solid #d69e2e;
+}
+
+.kpi-card.kpi-premium .kpi-value {
+  color: #b7791f;
+}
+
+.kpi-card.kpi-expired {
+  border-left: 3px solid #e53e3e;
+}
+
+.kpi-card.kpi-expired .kpi-value {
+  color: #c53030;
+}
+
 .kpi-label {
   font-size: 0.72rem;
   color: #718096;

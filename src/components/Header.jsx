@@ -15,17 +15,22 @@ export default function Header() {
   const { user, logout, favoritoIds, updateProfile, changePassword } = useAuth();
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [rutasOpen, setRutasOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({});
   const [profileMsg, setProfileMsg] = useState(null);
   const [profileSaving, setProfileSaving] = useState(false);
   const menuRef = useRef(null);
+  const rutasRef = useRef(null);
 
-  // Cerrar menú al hacer clic fuera
+  // Cerrar menús al hacer clic fuera
   useEffect(() => {
     function handleClick(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
+      }
+      if (rutasRef.current && !rutasRef.current.contains(e.target)) {
+        setRutasOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClick);
@@ -103,7 +108,7 @@ export default function Header() {
           >
             {t('nav.home')}
           </Link>
-          {user && (
+          {user ? (
             <>
               <Link
                 to="/buscar"
@@ -117,47 +122,60 @@ export default function Header() {
               >
                 {t('nav.map')}
               </Link>
+              <div className="nav-dropdown" ref={rutasRef}>
+                <button
+                  className={`nav-dropdown-btn ${location.pathname === '/rutas' || location.pathname.startsWith('/rutas-curadas') ? 'active' : ''}`}
+                  onClick={() => setRutasOpen(!rutasOpen)}
+                >
+                  {t('nav.routes')} <span className="dropdown-arrow">&#9662;</span>
+                </button>
+                {rutasOpen && (
+                  <div className="nav-dropdown-menu">
+                    <Link to="/rutas" onClick={() => setRutasOpen(false)}>{t('nav.myRoutes')}</Link>
+                    <Link to="/rutas-curadas" onClick={() => setRutasOpen(false)}>{t('nav.curatedRoutes')}</Link>
+                  </div>
+                )}
+              </div>
               <Link
                 to="/favoritos"
-                className={`nav-link ${location.pathname === '/favoritos' ? 'active' : ''}`}
+                className={`nav-icon-link ${location.pathname === '/favoritos' ? 'active' : ''}`}
+                title={t('nav.favorites')}
               >
-                {t('nav.favorites')}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 {favoritoIds.size > 0 && (
                   <span className="fav-badge">{favoritoIds.size}</span>
                 )}
               </Link>
               <Link
-                to="/rutas"
-                className={`nav-link ${location.pathname === '/rutas' ? 'active' : ''}`}
+                to="/contacto"
+                className={`nav-icon-link ${location.pathname === '/contacto' ? 'active' : ''}`}
+                title={t('nav.contact')}
               >
-                {t('nav.routes')}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/rutas-curadas"
+                className={`nav-link ${location.pathname.startsWith('/rutas-curadas') ? 'active' : ''}`}
+              >
+                {t('nav.curatedRoutes')}
               </Link>
               <Link
-                to="/proponer"
-                className={`nav-link ${location.pathname === '/proponer' ? 'active' : ''}`}
+                to="/precios"
+                className={`nav-link ${location.pathname === '/precios' ? 'active' : ''}`}
               >
-                {t('nav.propose')}
+                {t('nav.pricing')}
+              </Link>
+              <Link
+                to="/contacto"
+                className={`nav-link ${location.pathname === '/contacto' ? 'active' : ''}`}
+              >
+                {t('nav.contact')}
               </Link>
             </>
           )}
-          <Link
-            to="/rutas-curadas"
-            className={`nav-link ${location.pathname.startsWith('/rutas-curadas') ? 'active' : ''}`}
-          >
-            {t('nav.curatedRoutes')}
-          </Link>
-          <Link
-            to="/precios"
-            className={`nav-link ${location.pathname === '/precios' ? 'active' : ''}`}
-          >
-            {t('nav.pricing')}
-          </Link>
-          <Link
-            to="/contacto"
-            className={`nav-link ${location.pathname === '/contacto' ? 'active' : ''}`}
-          >
-            {t('nav.contact')}
-          </Link>
         </nav>
 
         <div className="header-right">
@@ -210,6 +228,14 @@ export default function Header() {
                   <Link to="/mis-propuestas" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
                     {t('nav.myProposals')}
                   </Link>
+                  <hr />
+                  <Link to="/proponer" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
+                    {t('nav.propose')}
+                  </Link>
+                  <Link to="/precios" className="user-dropdown-item" onClick={() => setMenuOpen(false)}>
+                    {t('nav.pricing')}
+                  </Link>
+                  <hr />
                   <button className="user-dropdown-item" onClick={handleLogout}>
                     {t('auth.logout')}
                   </button>

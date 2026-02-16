@@ -101,6 +101,22 @@ export default function AnalyticsDashboard() {
           <span className="kpi-value">{summary.nuevos_mes}</span>
           <span className="kpi-label">{t('analytics.newMonth', 'Nuevos mes')}</span>
         </div>
+        {summary.premium_activos !== undefined && (
+          <>
+            <div className="kpi-card kpi-premium">
+              <span className="kpi-value">{summary.premium_activos}</span>
+              <span className="kpi-label">{t('analytics.premiumActive', 'Premium activos')}</span>
+            </div>
+            <div className="kpi-card kpi-expired">
+              <span className="kpi-value">{summary.premium_expirados}</span>
+              <span className="kpi-label">{t('analytics.premiumExpired', 'Premium expirados')}</span>
+            </div>
+            <div className="kpi-card">
+              <span className="kpi-value">{summary.premium_free}</span>
+              <span className="kpi-label">{t('analytics.premiumFree', 'Usuarios Free')}</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Charts Grid */}
@@ -175,6 +191,35 @@ export default function AnalyticsDashboard() {
             </PieChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Premium distribution pie */}
+        {summary.premium_activos !== undefined && (
+          <div className="analytics-chart-card chart-small">
+            <h3>{t('analytics.premiumDistribution', 'Distribucion Premium')}</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: t('analytics.premiumActive', 'Activos'), value: Number(summary.premium_activos) },
+                    { name: t('analytics.premiumExpired', 'Expirados'), value: Number(summary.premium_expirados) },
+                    { name: t('analytics.premiumFree', 'Free'), value: Number(summary.premium_free) },
+                  ].filter(d => d.value > 0)}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  <Cell fill="#48bb78" />
+                  <Cell fill="#e53e3e" />
+                  <Cell fill="#a0aec0" />
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {/* Top users */}
         <div className="analytics-chart-card chart-wide">

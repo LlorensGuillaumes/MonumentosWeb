@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory } from '../services/api';
+import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, updateUsuarioPremium, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory } from '../services/api';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
 import AdminSettings from '../components/AdminSettings';
 import './Admin.css';
@@ -52,6 +52,7 @@ export default function Admin() {
   const [usuariosSearch, setUsuariosSearch] = useState('');
   const [usuariosSearchTimeout, setUsuariosSearchTimeout] = useState(null);
   const [usuariosRolFilter, setUsuariosRolFilter] = useState('');
+  const [usuariosPremiumFilter, setUsuariosPremiumFilter] = useState('');
   const [usuariosSearchApplied, setUsuariosSearchApplied] = useState('');
 
   // --- Mensajes state ---
@@ -358,6 +359,7 @@ export default function Admin() {
       const params = { page: p, limit: 50 };
       if (usuariosSearchApplied) params.search = usuariosSearchApplied;
       if (usuariosRolFilter) params.rol = usuariosRolFilter;
+      if (usuariosPremiumFilter) params.premium = usuariosPremiumFilter;
       const data = await getUsuarios(params);
       setUsuarios(data.items);
       setUsuariosTotalPages(data.pages);
@@ -368,7 +370,7 @@ export default function Admin() {
     } finally {
       setUsuariosLoading(false);
     }
-  }, [usuariosSearchApplied, usuariosRolFilter]);
+  }, [usuariosSearchApplied, usuariosRolFilter, usuariosPremiumFilter]);
 
   useEffect(() => {
     if (activeSection === 'usuarios') fetchUsuarios(1);
@@ -464,6 +466,33 @@ export default function Admin() {
       setUsuarios(prev => prev.map(u => u.id === userId ? { ...u, rol: updated.rol } : u));
     } catch (err) {
       alert(err.response?.data?.error || 'Error al cambiar rol');
+    }
+  };
+
+  const getPremiumStatus = (u) => {
+    if (!u.premium) return 'free';
+    if (!u.premium_hasta || new Date(u.premium_hasta) > new Date()) return 'active';
+    return 'expired';
+  };
+
+  const handleTogglePremium = async (user) => {
+    const status = getPremiumStatus(user);
+    const newPremium = status !== 'active';
+    const label = newPremium ? 'activar Premium' : 'desactivar Premium';
+    if (!window.confirm(`¿Seguro que quieres ${label} para ${user.email}?`)) return;
+    try {
+      const data = { premium: newPremium };
+      if (newPremium) {
+        const hasta = new Date();
+        hasta.setFullYear(hasta.getFullYear() + 1);
+        data.premium_hasta = hasta.toISOString();
+      } else {
+        data.premium_hasta = null;
+      }
+      await updateUsuarioPremium(user.id, data);
+      fetchUsuarios(usuariosPage);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error al cambiar premium');
     }
   };
 
@@ -1180,6 +1209,16 @@ export default function Admin() {
                 <option value="admin">Admin</option>
                 <option value="colaborador">Colaborador</option>
               </select>
+              <select
+                className="admin-select"
+                value={usuariosPremiumFilter}
+                onChange={(e) => setUsuariosPremiumFilter(e.target.value)}
+              >
+                <option value="">Todos (premium)</option>
+                <option value="active">Premium activo</option>
+                <option value="expired">Premium expirado</option>
+                <option value="free">Free</option>
+              </select>
               <span className="admin-result-count">{usuariosTotal} usuario{usuariosTotal !== 1 ? 's' : ''}</span>
             </div>
 
@@ -1194,6 +1233,8 @@ export default function Admin() {
                       <th>Nombre</th>
                       <th>Rol</th>
                       <th>Auth</th>
+                      <th>Premium</th>
+                      <th>Hasta</th>
                       <th>Registro</th>
                       <th>Ultimo login</th>
                       <th>Logins</th>
@@ -1225,6 +1266,16 @@ export default function Admin() {
                             <span className="auth-badge auth-email">Email</span>
                           )}
                         </td>
+                        <td>
+                          <span
+                            className={`premium-badge ${getPremiumStatus(u)}`}
+                            onClick={() => handleTogglePremium(u)}
+                            title="Click para cambiar estado premium"
+                          >
+                            {getPremiumStatus(u) === 'active' ? 'Activo' : getPremiumStatus(u) === 'expired' ? 'Expirado' : 'Free'}
+                          </span>
+                        </td>
+                        <td className="td-fecha">{u.premium_hasta ? new Date(u.premium_hasta).toLocaleDateString() : '--'}</td>
                         <td className="td-fecha">{u.created_at ? new Date(u.created_at).toLocaleDateString() : '--'}</td>
                         <td className="td-fecha">{u.last_login ? new Date(u.last_login).toLocaleDateString() : '--'}</td>
                         <td className="td-login-count">{u.total_logins || 0}</td>
@@ -1235,7 +1286,7 @@ export default function Admin() {
                     ))}
                     {usuarios.length === 0 && (
                       <tr>
-                        <td colSpan="10" className="admin-empty">No se encontraron usuarios</td>
+                        <td colSpan="12" className="admin-empty">No se encontraron usuarios</td>
                       </tr>
                     )}
                   </tbody>
