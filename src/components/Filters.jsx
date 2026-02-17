@@ -8,6 +8,10 @@ export default function Filters({ onSearch }) {
   const { filters, filtros, setFilter, resetFilters, reloadFiltros } = useApp();
   const { t } = useTranslation();
 
+  // Traduce las opciones de filtro manteniendo el value original (español/BD)
+  const translateOptions = (options, i18nPrefix) =>
+    options?.map(o => ({ ...o, label: t(`${i18nPrefix}.${o.value}`, o.value) })) || [];
+
   const handleChange = (key, value) => {
     setFilter(key, value);
   };
@@ -18,8 +22,6 @@ export default function Filters({ onSearch }) {
     setFilter('region', '');
     setFilter('provincia', '');
     setFilter('municipio', '');
-    setFilter('categoria', '');
-    setFilter('tipo', '');
     setFilter('estilo', '');
     setFilter('clasificacion', '');
     setFilter('tipo_monumento', '');
@@ -32,8 +34,6 @@ export default function Filters({ onSearch }) {
     setFilter('region', value);
     setFilter('provincia', '');
     setFilter('municipio', '');
-    setFilter('categoria', '');
-    setFilter('tipo', '');
     setFilter('estilo', '');
     setFilter('clasificacion', '');
     setFilter('tipo_monumento', '');
@@ -45,8 +45,6 @@ export default function Filters({ onSearch }) {
   const handleProvinciaChange = async (value) => {
     setFilter('provincia', value);
     setFilter('municipio', '');
-    setFilter('categoria', '');
-    setFilter('tipo', '');
     setFilter('estilo', '');
     setFilter('clasificacion', '');
     setFilter('tipo_monumento', '');
@@ -168,7 +166,7 @@ export default function Filters({ onSearch }) {
             <SearchableSelect
               value={filters.pais}
               onChange={handlePaisChange}
-              options={filtros.paises}
+              options={translateOptions(filtros.paises, 'filters.countries')}
               placeholder={t('filters.allCountries')}
             />
           </div>
@@ -208,36 +206,6 @@ export default function Filters({ onSearch }) {
 
       <div className="filters-row">
         <div className="filter-group">
-          <label>{t('filters.category')}</label>
-          <SearchableSelect
-            value={filters.categoria}
-            onChange={(v) => handleChange('categoria', v)}
-            options={filtros.categorias}
-            placeholder={t('filters.allCategories')}
-          />
-        </div>
-
-        <div className="filter-group">
-          <label>{t('filters.type')}</label>
-          <SearchableSelect
-            value={filters.tipo}
-            onChange={(v) => handleChange('tipo', v)}
-            options={filtros.tipos}
-            placeholder={t('filters.allTypes')}
-          />
-        </div>
-
-        <div className="filter-group">
-          <label>{t('filters.style')}</label>
-          <SearchableSelect
-            value={filters.estilo}
-            onChange={(v) => handleChange('estilo', v)}
-            options={filtros.estilos}
-            placeholder={t('filters.allStyles')}
-          />
-        </div>
-
-        <div className="filter-group">
           <label>{t('filters.classification')}</label>
           <SearchableSelect
             value={filters.clasificacion}
@@ -253,7 +221,7 @@ export default function Filters({ onSearch }) {
             <SearchableSelect
               value={filters.tipo_monumento}
               onChange={handleTipoMonumentoChange}
-              options={filtros.tipos_monumento}
+              options={translateOptions(filtros.tipos_monumento, 'filters.monumentTypes')}
               placeholder={t('filters.allMonumentTypes')}
             />
           </div>
@@ -265,11 +233,21 @@ export default function Filters({ onSearch }) {
             <SearchableSelect
               value={filters.periodo}
               onChange={(v) => handleChange('periodo', v)}
-              options={filtros.periodos}
+              options={translateOptions(filtros.periodos, 'filters.periods')}
               placeholder={t('filters.allPeriods')}
             />
           </div>
         )}
+
+        <div className="filter-group">
+          <label>{t('filters.style')}</label>
+          <SearchableSelect
+            value={filters.estilo}
+            onChange={(v) => handleChange('estilo', v)}
+            options={filtros.estilos}
+            placeholder={t('filters.allStyles')}
+          />
+        </div>
 
         <div className="filter-group filter-checkbox">
           <label>

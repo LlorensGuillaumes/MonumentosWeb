@@ -171,7 +171,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
   boundsRef.current = currentBounds;
 
   // Detectar si hay filtros de contenido activos (no geográficos)
-  const hasContentFilters = filters.clasificacion || filters.categoria || filters.tipo || filters.estilo ||
+  const hasContentFilters = filters.clasificacion || filters.estilo ||
     filters.tipo_monumento || filters.periodo || filters.q;
 
   // Cargar inicial y recargar al cambiar filtros

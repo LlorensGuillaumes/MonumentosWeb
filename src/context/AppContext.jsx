@@ -13,8 +13,6 @@ const initialState = {
     region: '',
     provincia: '',
     municipio: '',
-    categoria: '',
-    tipo: '',
     estilo: '',
     tipo_monumento: '',
     periodo: '',
