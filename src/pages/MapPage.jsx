@@ -8,12 +8,13 @@ import './MapPage.css';
 
 const QUICK_CATEGORIES = [
   { value: '', label: 'filters.allCategories' },
-  { value: 'Monumento', label: 'map.legend.others' },
-  { value: 'Arquitectura religiosa', label: 'map.legend.churches' },
-  { value: 'Arquitectura militar', label: 'map.legend.castles' },
-  { value: 'Arquitectura civil', label: 'map.legend.palaces' },
-  { value: 'Yacimiento arqueológico', label: 'map.legend.archaeology' },
-  { value: 'Patrimonio etnológico', label: 'map.legend.ethnologic' },
+  { value: 'religiosa', label: 'map.legend.churches' },
+  { value: 'militar', label: 'map.legend.castles' },
+  { value: 'civil', label: 'map.legend.palaces' },
+  { value: 'arqueologica', label: 'map.legend.archaeology' },
+  { value: 'etnologica', label: 'map.legend.ethnologic' },
+  { value: 'infraestructura', label: 'map.legend.infrastructure' },
+  { value: 'otros', label: 'map.legend.others' },
 ];
 
 export default function MapPage() {
@@ -41,8 +42,8 @@ export default function MapPage() {
         {QUICK_CATEGORIES.map(cat => (
           <button
             key={cat.value}
-            className={`map-chip ${filters.categoria === cat.value ? 'active' : ''}`}
-            onClick={() => setFilter('categoria', cat.value)}
+            className={`map-chip ${filters.clasificacion === cat.value ? 'active' : ''}`}
+            onClick={() => setFilter('clasificacion', cat.value)}
           >
             {t(cat.label)}
           </button>

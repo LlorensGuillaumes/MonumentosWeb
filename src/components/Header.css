@@ -98,6 +98,14 @@
   color: white;
 }
 
+.nav-icon-link.has-favs {
+  color: #f56565;
+}
+
+.nav-icon-link.has-favs:hover {
+  color: #fc8181;
+}
+
 /* Nav dropdown (Rutas) */
 .nav-dropdown {
   position: relative;

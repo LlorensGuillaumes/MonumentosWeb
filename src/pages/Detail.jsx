@@ -320,8 +320,14 @@ export default function Detail() {
             {monumento.tipo && (
               <span className="tag tag-type">{monumento.tipo}</span>
             )}
+            {monumento.tipo_monumento && (
+              <span className="tag tag-monument-type">{monumento.tipo_monumento}</span>
+            )}
             {monumento.estilo && (
               <span className="tag tag-style">{monumento.estilo}</span>
+            )}
+            {monumento.periodo && (
+              <span className="tag tag-period">{monumento.periodo}</span>
             )}
             {monumento.heritage_label && (
               <span className="tag tag-heritage">{monumento.heritage_label}</span>

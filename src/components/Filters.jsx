@@ -21,6 +21,9 @@ export default function Filters({ onSearch }) {
     setFilter('categoria', '');
     setFilter('tipo', '');
     setFilter('estilo', '');
+    setFilter('clasificacion', '');
+    setFilter('tipo_monumento', '');
+    setFilter('periodo', '');
     await reloadFiltros(value, '', '');
   };
 
@@ -32,6 +35,9 @@ export default function Filters({ onSearch }) {
     setFilter('categoria', '');
     setFilter('tipo', '');
     setFilter('estilo', '');
+    setFilter('clasificacion', '');
+    setFilter('tipo_monumento', '');
+    setFilter('periodo', '');
     await reloadFiltros(filters.pais, value, '');
   };
 
@@ -42,12 +48,37 @@ export default function Filters({ onSearch }) {
     setFilter('categoria', '');
     setFilter('tipo', '');
     setFilter('estilo', '');
+    setFilter('clasificacion', '');
+    setFilter('tipo_monumento', '');
+    setFilter('periodo', '');
     await reloadFiltros(filters.pais, filters.region, value);
   };
 
   // Cuando cambia municipio
   const handleMunicipioChange = (value) => {
     setFilter('municipio', value);
+  };
+
+  // Opciones de clasificación (mapean a grupos de tipo_monumento en el backend)
+  const clasificacionOptions = [
+    { value: 'religiosa', label: t('filters.classifications.religious') },
+    { value: 'militar', label: t('filters.classifications.military') },
+    { value: 'civil', label: t('filters.classifications.civil') },
+    { value: 'arqueologica', label: t('filters.classifications.archaeological') },
+    { value: 'etnologica', label: t('filters.classifications.ethnological') },
+    { value: 'infraestructura', label: t('filters.classifications.infrastructure') },
+    { value: 'otros', label: t('filters.classifications.others') },
+  ];
+
+  // Clasificación y tipo_monumento son mutuamente excluyentes
+  const handleClasificacionChange = (value) => {
+    setFilter('clasificacion', value);
+    if (value) setFilter('tipo_monumento', '');
+  };
+
+  const handleTipoMonumentoChange = (value) => {
+    setFilter('tipo_monumento', value);
+    if (value) setFilter('clasificacion', '');
   };
 
   const handleSubmit = (e) => {
@@ -205,6 +236,40 @@ export default function Filters({ onSearch }) {
             placeholder={t('filters.allStyles')}
           />
         </div>
+
+        <div className="filter-group">
+          <label>{t('filters.classification')}</label>
+          <SearchableSelect
+            value={filters.clasificacion}
+            onChange={handleClasificacionChange}
+            options={clasificacionOptions}
+            placeholder={t('filters.allClassifications')}
+          />
+        </div>
+
+        {filtros.tipos_monumento?.length > 0 && (
+          <div className="filter-group">
+            <label>{t('filters.monumentType')}</label>
+            <SearchableSelect
+              value={filters.tipo_monumento}
+              onChange={handleTipoMonumentoChange}
+              options={filtros.tipos_monumento}
+              placeholder={t('filters.allMonumentTypes')}
+            />
+          </div>
+        )}
+
+        {filtros.periodos?.length > 0 && (
+          <div className="filter-group">
+            <label>{t('filters.period')}</label>
+            <SearchableSelect
+              value={filters.periodo}
+              onChange={(v) => handleChange('periodo', v)}
+              options={filtros.periodos}
+              placeholder={t('filters.allPeriods')}
+            />
+          </div>
+        )}
 
         <div className="filter-group filter-checkbox">
           <label>

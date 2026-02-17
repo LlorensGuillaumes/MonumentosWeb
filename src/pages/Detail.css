@@ -52,12 +52,13 @@
 
 .fav-btn {
   background: none;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border-color);
   border-radius: 50%;
   width: 44px;
   height: 44px;
   min-width: 44px;
   font-size: 1.4rem;
+  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -68,13 +69,13 @@
 
 .fav-btn:hover {
   border-color: #e53e3e;
-  background: #fff5f5;
+  background: rgba(229, 62, 62, 0.1);
   transform: scale(1.1);
 }
 
 .fav-btn.fav-active {
   border-color: #e53e3e;
-  background: #fff5f5;
+  background: rgba(229, 62, 62, 0.1);
 }
 
 .fav-btn:disabled {
@@ -130,6 +131,16 @@
 .tag-style {
   background: #fef3c7;
   color: #92400e;
+}
+
+.tag-monument-type {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.tag-period {
+  background: #f3e8ff;
+  color: #6b21a8;
 }
 
 .tag-heritage {
@@ -288,6 +299,8 @@
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 0;
 }
 
 .btn-block {

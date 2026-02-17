@@ -1,46 +1,87 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { MapContainer, TileLayer, useMap, useMapEvents, CircleMarker, Popup, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, CircleMarker, Popup, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useApp } from '../context/AppContext';
 import { getGeoJSON, getCCAAResumen } from '../services/api';
 import 'leaflet/dist/leaflet.css';
 import './Map.css';
 
-// Colores por categoría
-const getCategoryColor = (categoria, tipo) => {
-  const cat = (categoria || '').toLowerCase();
-  const t = (tipo || '').toLowerCase();
+// Colores por clasificación normalizada (usa tipo_monumento del backend)
+const TIPO_TO_COLOR = {
+  // Religiosa → rosa
+  'Iglesia / Ermita': '#be185d',
+  'Catedral': '#be185d',
+  'Monasterio / Convento': '#be185d',
+  'Arte religioso': '#be185d',
+  'Mezquita / Sinagoga': '#be185d',
+  'Cruz / Crucero': '#be185d',
+  // Militar → violeta
+  'Castillo / Fortaleza': '#7c3aed',
+  'Torre': '#7c3aed',
+  'Muralla': '#7c3aed',
+  // Civil → azul
+  'Edificio civil': '#0369a1',
+  'Palacio': '#0369a1',
+  'Casa señorial / Mansión': '#0369a1',
+  'Teatro': '#0369a1',
+  'Museo': '#0369a1',
+  'Monumento conmemorativo': '#0369a1',
+  // Arqueológica → marrón
+  'Yacimiento arqueológico': '#92400e',
+  'Megalítico': '#92400e',
+  // Etnológica → verde
+  'Arquitectura rural': '#065f46',
+  'Molino': '#065f46',
+  'Patrimonio industrial': '#065f46',
+  // Infraestructura → gris
+  'Puente': '#475569',
+  'Acueducto': '#475569',
+  'Fuente': '#475569',
+  'Faro': '#475569',
+  'Obra hidráulica': '#475569',
+  'Plaza de toros': '#475569',
+  'Cementerio': '#475569',
+  'Balneario / Termas': '#475569',
+};
 
-  if (cat.includes('arqueol')) return '#92400e';
-  if (cat.includes('etnol')) return '#065f46';
-  if (cat.includes('obra civil')) return '#475569';
-  if (t.includes('castillo') || t.includes('fortaleza') || t.includes('torre')) return '#7c3aed';
-  if (t.includes('iglesia') || t.includes('catedral') || t.includes('ermita') || cat.includes('religio')) return '#be185d';
-  if (t.includes('palacio') || t.includes('casa')) return '#0369a1';
-  if (t.includes('puente')) return '#475569';
+const getCategoryColor = (tipoMonumento, categoria) => {
+  if (tipoMonumento && TIPO_TO_COLOR[tipoMonumento]) return TIPO_TO_COLOR[tipoMonumento];
+  // Fallback para monumentos sin tipo_monumento asignado
+  const cat = (categoria || '').toLowerCase();
+  if (cat.includes('arqueol') || cat.includes('archeol')) return '#92400e';
+  if (cat.includes('etnol') || cat.includes('ethnol')) return '#065f46';
+  if (cat.includes('militar') || cat.includes('military')) return '#7c3aed';
+  if (cat.includes('religio') || cat.includes('cultu')) return '#be185d';
+  if (cat.includes('civil')) return '#0369a1';
   return '#3b82f6';
 };
 
-// Componente para manejar eventos del mapa
-function MapEvents({ onBoundsChange, onZoomEnd }) {
-  const map = useMapEvents({
-    moveend: () => {
+// Componente para manejar eventos del mapa (usa refs para evitar closures obsoletas)
+function MapEvents({ onBoundsChange }) {
+  const callbackRef = useRef(onBoundsChange);
+  callbackRef.current = onBoundsChange;
+
+  const map = useMap();
+
+  useEffect(() => {
+    const handler = () => {
       const bounds = map.getBounds();
       const zoom = map.getZoom();
-      onBoundsChange?.({
+      callbackRef.current?.({
         minLon: bounds.getWest(),
         minLat: bounds.getSouth(),
         maxLon: bounds.getEast(),
         maxLat: bounds.getNorth(),
         zoom,
       });
-    },
-    zoomend: () => {
-      onZoomEnd?.(map.getZoom());
-    },
-  });
+    };
+    map.on('moveend', handler);
+    return () => map.off('moveend', handler);
+  }, [map]);
+
   return null;
 }
 
@@ -54,6 +95,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
   const navigate = useNavigate();
   const loadingRef = useRef(false);
   const { t } = useTranslation();
+  const { mapBounds: savedMapBounds, setMapBounds } = useApp();
 
   // Centro según país seleccionado en filtros
   const getDefaultView = () => {
@@ -65,7 +107,15 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
       default: return { center: [44.0, 6.0], zoom: 5 }; // Vista Europa occidental
     }
   };
-  const { center: defaultCenter, zoom: defaultZoom } = getDefaultView();
+
+  // Restaurar posición guardada si existe, si no usar la por defecto
+  const getInitialView = () => {
+    if (savedMapBounds?.center) {
+      return { center: savedMapBounds.center, zoom: savedMapBounds.zoom || 6 };
+    }
+    return getDefaultView();
+  };
+  const { center: defaultCenter, zoom: defaultZoom } = getInitialView();
 
   const loadMarkers = useCallback(async (bbox, currentZoom) => {
     if (loadingRef.current) return;
@@ -114,19 +164,37 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
     }
   }, [filters.pais]);
 
-  // Cargar inicial
+  // Refs para acceder al estado actual dentro de efectos sin añadirlos como dependencia
+  const viewModeRef = useRef(viewMode);
+  viewModeRef.current = viewMode;
+  const boundsRef = useRef(currentBounds);
+  boundsRef.current = currentBounds;
+
+  // Detectar si hay filtros de contenido activos (no geográficos)
+  const hasContentFilters = filters.clasificacion || filters.categoria || filters.tipo || filters.estilo ||
+    filters.tipo_monumento || filters.periodo || filters.q;
+
+  // Cargar inicial y recargar al cambiar filtros
   useEffect(() => {
+    // Bounds por defecto cuando no tenemos bounds reales del mapa
+    const fallbackBounds = { minLon: -18.5, minLat: 27, maxLon: 25, maxLat: 52, zoom: defaultZoom };
+    const effectiveBounds = boundsRef.current || fallbackBounds;
+
     if (showCCAASummary) {
-      loadCCAAResumen();
-      setViewMode('ccaa');
+      if (viewModeRef.current === 'detail') {
+        // Ya en detalle: recargar marcadores con los nuevos filtros
+        loadMarkers(effectiveBounds, effectiveBounds.zoom || zoom);
+      } else if (hasContentFilters) {
+        // Filtro de contenido aplicado en vista CCAA: cambiar a detalle automáticamente
+        setViewMode('detail');
+        loadMarkers(effectiveBounds, effectiveBounds.zoom || zoom);
+      } else {
+        // Sin filtros de contenido: vista CCAA normal
+        loadCCAAResumen();
+        setViewMode('ccaa');
+      }
     } else {
-      // Cargar datos iniciales (Europa occidental)
-      loadMarkers({
-        minLon: -18.5,
-        minLat: 27,
-        maxLon: 10,
-        maxLat: 52,
-      }, defaultZoom);
+      loadMarkers(fallbackBounds, defaultZoom);
       setViewMode('detail');
     }
   }, [filters, showCCAASummary, loadCCAAResumen]);
@@ -135,18 +203,24 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
     setCurrentBounds(newBounds);
     setZoom(newBounds.zoom);
 
+    // Persistir posición en contexto para restaurar al volver de detalle
+    setMapBounds({
+      ...newBounds,
+      center: [(newBounds.minLat + newBounds.maxLat) / 2, (newBounds.minLon + newBounds.maxLon) / 2],
+    });
+
     // Cambiar de vista CCAA a detalle cuando el zoom es alto
     if (showCCAASummary && newBounds.zoom >= 7 && viewMode === 'ccaa') {
       setViewMode('detail');
       loadMarkers(newBounds, newBounds.zoom);
-    } else if (showCCAASummary && newBounds.zoom < 7 && viewMode === 'detail') {
-      // Volver a vista CCAA cuando zoom bajo
+    } else if (showCCAASummary && newBounds.zoom < 7 && viewMode === 'detail' && !hasContentFilters) {
+      // Volver a vista CCAA solo si no hay filtros de contenido activos
       setViewMode('ccaa');
-    } else if (viewMode === 'detail' && newBounds.zoom >= 7) {
-      // Recargar detalle
+    } else if (viewMode === 'detail') {
+      // Recargar detalle (cualquier zoom si hay filtros activos, o zoom >= 7 sin filtros)
       loadMarkers(newBounds, newBounds.zoom);
     }
-  }, [loadMarkers, showCCAASummary, viewMode]);
+  }, [loadMarkers, showCCAASummary, viewMode, hasContentFilters]);
 
   const handleMarkerClick = (feature) => {
     if (onMarkerClick) {
@@ -251,7 +325,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
                 ]}
                 radius={6}
                 pathOptions={{
-                  fillColor: getCategoryColor(feature.properties.categoria, feature.properties.tipo),
+                  fillColor: getCategoryColor(feature.properties.tipo_monumento, feature.properties.categoria),
                   fillOpacity: 0.8,
                   color: '#fff',
                   weight: 1,
@@ -264,7 +338,13 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
                   <div className="popup-content">
                     <h4>{feature.properties.nombre}</h4>
                     <p>{feature.properties.municipio}, {feature.properties.provincia}</p>
-                    {feature.properties.categoria && (
+                    {feature.properties.tipo_monumento && (
+                      <span className="popup-tag popup-tag-tipo">{feature.properties.tipo_monumento}</span>
+                    )}
+                    {feature.properties.periodo && (
+                      <span className="popup-tag popup-tag-periodo">{feature.properties.periodo}</span>
+                    )}
+                    {!feature.properties.tipo_monumento && feature.properties.categoria && (
                       <span className="popup-tag">{feature.properties.categoria}</span>
                     )}
                     {feature.properties.imagen && (
@@ -296,6 +376,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
         <span className="legend-item"><span className="legend-dot" style={{background: '#0369a1'}}></span> {t('map.legend.palaces')}</span>
         <span className="legend-item"><span className="legend-dot" style={{background: '#92400e'}}></span> {t('map.legend.archaeology')}</span>
         <span className="legend-item"><span className="legend-dot" style={{background: '#065f46'}}></span> {t('map.legend.ethnologic')}</span>
+        <span className="legend-item"><span className="legend-dot" style={{background: '#475569'}}></span> {t('map.legend.infrastructure')}</span>
         <span className="legend-item"><span className="legend-dot" style={{background: '#3b82f6'}}></span> {t('map.legend.others')}</span>
       </div>
 
