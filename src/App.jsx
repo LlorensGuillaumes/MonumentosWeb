@@ -29,6 +29,7 @@ const Pricing = lazy(() => import('./pages/Pricing'));
 const Profile = lazy(() => import('./pages/Profile'));
 const CuratedRoutes = lazy(() => import('./pages/CuratedRoutes'));
 const CuratedRouteDetail = lazy(() => import('./pages/CuratedRouteDetail'));
+const CulturalRouteDetail = lazy(() => import('./pages/CulturalRouteDetail'));
 const Diary = lazy(() => import('./pages/Diary'));
 const UserStats = lazy(() => import('./pages/UserStats'));
 
@@ -67,6 +68,7 @@ function App() {
                   <Route path="/mis-estadisticas" element={<RequireAuth><UserStats /></RequireAuth>} />
                   <Route path="/rutas-curadas" element={<CuratedRoutes />} />
                   <Route path="/rutas-curadas/:id" element={<CuratedRouteDetail />} />
+                  <Route path="/rutas-culturales/:slug" element={<CulturalRouteDetail />} />
                   <Route path="/contacto" element={<Contact />} />
                 </Routes>
               </Suspense>

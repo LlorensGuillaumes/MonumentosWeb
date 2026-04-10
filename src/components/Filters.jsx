@@ -26,6 +26,7 @@ export default function Filters({ onSearch }) {
     setFilter('clasificacion', '');
     setFilter('tipo_monumento', '');
     setFilter('periodo', '');
+    setFilter('evento', '');
     await reloadFiltros(value, '', '');
   };
 
@@ -38,6 +39,7 @@ export default function Filters({ onSearch }) {
     setFilter('clasificacion', '');
     setFilter('tipo_monumento', '');
     setFilter('periodo', '');
+    setFilter('evento', '');
     await reloadFiltros(filters.pais, value, '');
   };
 
@@ -49,6 +51,7 @@ export default function Filters({ onSearch }) {
     setFilter('clasificacion', '');
     setFilter('tipo_monumento', '');
     setFilter('periodo', '');
+    setFilter('evento', '');
     await reloadFiltros(filters.pais, filters.region, value);
   };
 
@@ -235,6 +238,18 @@ export default function Filters({ onSearch }) {
               onChange={(v) => handleChange('periodo', v)}
               options={translateOptions(filtros.periodos, 'filters.periods')}
               placeholder={t('filters.allPeriods')}
+            />
+          </div>
+        )}
+
+        {filtros.eventos?.length > 0 && (
+          <div className="filter-group">
+            <label>{t('filters.event')}</label>
+            <SearchableSelect
+              value={filters.evento}
+              onChange={(v) => handleChange('evento', v)}
+              options={translateOptions(filtros.eventos, 'filters.events')}
+              placeholder={t('filters.allEvents')}
             />
           </div>
         )}

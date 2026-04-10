@@ -196,14 +196,14 @@ export default function Header() {
                   <img src={user.avatar_url} alt="" className="user-avatar" />
                 ) : (
                   <span className="user-initial">
-                    {(user.nombre || user.email)[0].toUpperCase()}
+                    {((user.nombre || user.email || '?')[0] || '?').toUpperCase()}
                   </span>
                 )}
               </button>
               {menuOpen && (
                 <div className="user-dropdown">
                   <div className="user-dropdown-info">
-                    <strong>{user.nombre || user.email.split('@')[0]}</strong>
+                    <strong>{user.nombre || (user.email ? user.email.split('@')[0] : '')}</strong>
                     <small>{user.email}</small>
                   </div>
                   <hr />

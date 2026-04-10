@@ -372,4 +372,12 @@ export const sendContact = ({ email, asunto, mensaje, archivos = [] }) => {
   }).then(r => r.data);
 };
 
+// ============== RUTAS CULTURALES ==============
+
+export const getRutasCulturales = () =>
+  api.get('/rutas-culturales').then(r => r.data);
+
+export const getRutaCultural = (slug) =>
+  api.get(`/rutas-culturales/${slug}`).then(r => r.data);
+
 export default api;

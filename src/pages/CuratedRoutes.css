@@ -255,3 +255,15 @@
     padding: 0.25rem 0.5rem;
   }
 }
+
+/* ===== Cultural Route Badge (inline in curated cards) ===== */
+.curated-card-cultural-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: var(--accent, #3b82f6);
+  color: white;
+}

@@ -1,0 +1,204 @@
+.cultural-route-detail {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* Breadcrumb */
+.cr-breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 1.5rem;
+}
+.cr-breadcrumb a {
+  color: var(--accent, #3b82f6);
+  text-decoration: none;
+}
+.cr-breadcrumb a:hover { text-decoration: underline; }
+
+/* Header */
+.cr-header {
+  margin-bottom: 2rem;
+}
+.cr-header h1 {
+  font-size: 1.8rem;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary, #1e293b);
+}
+.cr-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.cr-tag {
+  font-size: 0.78rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  background: var(--accent, #3b82f6);
+  color: white;
+  font-weight: 500;
+}
+.cr-description {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary, #475569);
+  text-align: justify;
+}
+
+/* Loading / Error */
+.cr-loading, .cr-error {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted, #94a3b8);
+}
+.cr-error a {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--accent, #3b82f6);
+}
+
+/* Map */
+.cr-map-section {
+  margin-bottom: 2rem;
+}
+.cr-map-section h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary, #1e293b);
+}
+.cr-map {
+  height: 420px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+/* Numbered markers */
+.cr-marker-wrapper {
+  background: none !important;
+  border: none !important;
+}
+.cr-marker {
+  width: 32px;
+  height: 32px;
+  background: var(--accent, #3b82f6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+.cr-marker-active {
+  background: #ef4444;
+  transform: scale(1.25);
+}
+
+/* Stop cards */
+.cr-stops {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.cr-stop-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.cr-stop-card:hover {
+  border-color: var(--accent, #3b82f6);
+}
+.cr-stop-card.active {
+  border-color: var(--accent, #3b82f6);
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.15);
+}
+
+.cr-stop-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.cr-stop-number {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  background: var(--accent, #3b82f6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.cr-stop-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--text-primary, #1e293b);
+}
+.cr-stop-locality {
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.cr-stop-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.cr-chip {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-secondary, #475569);
+}
+
+.cr-stop-description {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text-secondary, #475569);
+  text-align: justify;
+  margin-top: 1rem;
+}
+
+.cr-stop-bien-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent, #3b82f6);
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  text-decoration: none;
+}
+.cr-stop-bien-link:hover { text-decoration: underline; }
+
+/* Actions */
+.cr-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cultural-route-detail { padding: 1rem 0.75rem 2rem; }
+  .cr-header h1 { font-size: 1.4rem; }
+  .cr-map { height: 280px; }
+  .cr-stop-card { padding: 1rem; }
+  .cr-stop-header h3 { font-size: 1rem; }
+}

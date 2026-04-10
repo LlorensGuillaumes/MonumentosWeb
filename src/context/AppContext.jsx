@@ -16,6 +16,7 @@ const initialState = {
     estilo: '',
     tipo_monumento: '',
     periodo: '',
+    evento: '',
     clasificacion: '',
     q: '',
     solo_coords: true,

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { getFiltros, getMonumentos, getMonumentosRadio, getMonumento, optimizarRuta, createRuta, getRutaPdfUrl } from '../services/api';
+import { getFiltros, getMonumentos, getMonumentosRadio, getMonumento, optimizarRuta, createRuta, getRutaPdfUrl, getRutaCultural } from '../services/api';
 import { getRouteById } from '../data/curatedRoutes';
 import { useAuth } from '../context/AuthContext';
 import PremiumCTA from '../components/PremiumCTA';
@@ -162,6 +162,41 @@ export default function RoutePlanner() {
     };
 
     loadCurated();
+  }, [searchParams, setSearchParams]);
+
+  // Load cultural route if from_cultural param is present
+  const culturalLoadedRef = useRef(false);
+  useEffect(() => {
+    const culturalSlug = searchParams.get('from_cultural');
+    if (!culturalSlug || culturalLoadedRef.current) return;
+    culturalLoadedRef.current = true;
+
+    const loadCultural = async () => {
+      setCuratedLoading(true);
+      try {
+        const ruta = await getRutaCultural(culturalSlug);
+        if (!ruta || !ruta.paradas) return;
+        const bienIds = ruta.paradas.filter(p => p.bien_id).map(p => p.bien_id);
+        const items = await Promise.all(bienIds.map(id => getMonumento(id).catch(() => null)));
+        const valid = items.filter(m => m && m.latitud && m.longitud);
+        setMonuments(valid);
+        setTotalCount(valid.length);
+        setRouteName(ruta.nombre);
+        // Pre-select all stops
+        const newSelected = new Set(valid.map(m => m.id));
+        setSelected(newSelected);
+        const newMap = new Map(valid.map(m => [m.id, m]));
+        setSelectedMonumentsMap(newMap);
+        setFiltersCollapsed(true);
+        setSearchParams({}, { replace: true });
+      } catch (err) {
+        console.error('Error loading cultural route:', err);
+      } finally {
+        setCuratedLoading(false);
+      }
+    };
+
+    loadCultural();
   }, [searchParams, setSearchParams]);
 
   // Cascading filter handlers — NO reset of selection
