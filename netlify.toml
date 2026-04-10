@@ -5,6 +5,13 @@
 [build.environment]
   VITE_API_URL = "https://patrimonio-api-pmvp.onrender.com/api"
 
+# Redirect dominio antiguo al nuevo (preserva path)
+[[redirects]]
+  from = "https://shiny-licorice-a01ea4.netlify.app/*"
+  to = "https://patrimonio-europeo.netlify.app/:splat"
+  status = 301
+  force = true
+
 # SPA: redirect all routes to index.html
 [[redirects]]
   from = "/*"
