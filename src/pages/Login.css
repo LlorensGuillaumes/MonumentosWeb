@@ -7,18 +7,18 @@
 }
 
 .login-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   padding: 2rem;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px var(--shadow-lg);
 }
 
 .login-card h1 {
   margin: 0 0 1.5rem;
   font-size: 1.5rem;
-  color: #1a365d;
+  color: var(--text-primary);
   text-align: center;
 }
 
@@ -47,23 +47,30 @@
 .form-group label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #4a5568;
+  color: var(--text-secondary);
 }
 
 .form-group input,
 .form-group select {
   padding: 0.625rem 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.95rem;
+  color: var(--text-primary);
+  background-color: var(--bg-card);
   transition: border-color 0.2s;
+}
+
+.form-group select option {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .btn-block {
@@ -102,11 +109,11 @@
 .login-divider::after {
   content: '';
   flex: 1;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color);
 }
 
 .login-divider span {
-  color: #a0aec0;
+  color: var(--text-muted);
   font-size: 0.875rem;
 }
 
@@ -118,14 +125,14 @@
 .login-switch {
   text-align: center;
   margin-top: 1.5rem;
-  color: #718096;
+  color: var(--text-secondary);
   font-size: 0.875rem;
 }
 
 .link-btn {
   background: none;
   border: none;
-  color: #3182ce;
+  color: var(--accent);
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
@@ -148,7 +155,7 @@
 .form-hint {
   margin: 0 0 0.5rem;
   font-size: 0.88rem;
-  color: #64748b;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 

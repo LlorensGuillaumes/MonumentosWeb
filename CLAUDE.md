@@ -30,8 +30,8 @@ Sin TS ni frameworks CSS. Plain CSS.
 ## Changelog (Max 5 entradas)
 | Fecha | Cambios | Archivos |
 |-------|---------|----------|
+| 2026-04-10 | Soporte dark mode en Filters/Search/Login (vars CSS) | `Filters.css`, `Search.css`, `Login.css` |
 | 2026-04-10 | Redirect 301 dominio antiguo Netlify al nuevo | `netlify.toml` |
 | 2026-04-10 | Fix Header crash con user sin nombre/email (página en blanco) | `Header.jsx` |
 | 2026-02-19 | Integrar rutas culturales en grid unificado, subtítulo dinámico, badge, filtros | `CuratedRoutes.jsx`, `CuratedRoutes.css`, `locales/*.json` |
 | 2026-02-19 | Planificar ruta cultural: botón + soporte from_cultural en RoutePlanner | `CulturalRouteDetail.jsx/css`, `RoutePlanner.jsx` |
-| 2026-02-19 | Rutas culturales: página detalle, PhotoGallery, integración browse, i18n 8 idiomas | `CulturalRouteDetail.jsx/css`, `PhotoGallery.jsx/css`, `CuratedRoutes.jsx/css`, `api.js`, `App.jsx`, `locales/*.json` |

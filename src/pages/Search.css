@@ -6,7 +6,7 @@
 
 .search-page h1 {
   margin: 0 0 1.5rem 0;
-  color: #1a365d;
+  color: var(--text-primary);
 }
 
 .search-results {
@@ -22,7 +22,7 @@
 
 .results-count {
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .results-controls {
@@ -36,21 +36,26 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .results-controls select {
   padding: 0.35rem 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: white;
+  background: var(--bg-card);
   font-size: 0.85rem;
-  color: #1a365d;
+  color: var(--text-primary);
   cursor: pointer;
 }
 
+.results-controls select option {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+}
+
 .results-controls select:hover {
-  border-color: #cbd5e1;
+  border-color: var(--border-hover);
 }
 
 .monumentos-grid {
@@ -88,7 +93,7 @@
   text-align: center;
   padding: 1rem 0;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -96,7 +101,7 @@
 .no-results {
   text-align: center;
   padding: 4rem 2rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .no-results-icon {
@@ -107,7 +112,7 @@
 
 .no-results h3 {
   margin: 0 0 0.5rem 0;
-  color: #1a365d;
+  color: var(--text-primary);
 }
 
 .no-results p {

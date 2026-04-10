@@ -1,8 +1,8 @@
 .filters {
-  background: white;
+  background: var(--bg-card);
   padding: 1.25rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--shadow);
   margin-bottom: 1.5rem;
 }
 
@@ -26,7 +26,7 @@
 .filter-group label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -34,17 +34,24 @@
 .filter-group input,
 .filter-group select {
   padding: 0.6rem 0.8rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.9rem;
+  color: var(--text-primary);
+  background-color: var(--bg-card);
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-group select option {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
 }
 
 .filter-group input:focus,
 .filter-group select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .filter-checkbox {
@@ -85,21 +92,21 @@
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--accent);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2563eb;
+  background: var(--accent-hover);
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
 }
 
 .btn-secondary:hover {
-  background: #cbd5e1;
+  background: var(--border-hover);
 }
 
 .filter-group-search {
@@ -108,15 +115,17 @@
 
 .filter-group-search .autocomplete-input {
   padding: 0.6rem 0.8rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.9rem;
+  color: var(--text-primary);
+  background-color: var(--bg-card);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .filter-group-search .autocomplete-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 @media (max-width: 768px) {
