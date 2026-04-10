@@ -143,12 +143,12 @@ export default function CulturalRouteDetail() {
               )}
             </div>
 
-            {p.fotos && p.fotos.length > 0 && (
-              <PhotoGallery photos={p.fotos} altBase={p.nombre} />
-            )}
-
             {p.descripcion && (
               <p className="cr-stop-description">{p.descripcion}</p>
+            )}
+
+            {p.fotos && p.fotos.length > 0 && (
+              <PhotoGallery photos={p.fotos} altBase={p.nombre} />
             )}
 
             {p.bien_id && (
