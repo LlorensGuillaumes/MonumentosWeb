@@ -558,6 +558,7 @@
   },
   "footer": {
     "dataSources": "Datu-iturriak:",
+    "privacy": "Datuen babesa: erregistratutako erabiltzaileen datu pertsonalak plataformaren barne-funtzionamenduetarako soilik erabiltzen dira. Ez dira hirugarrenei lagatzen ez eta helburu komertzialetarako erabiltzen.",
     "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Datu irekiak dagozkien lizentzien arabera berrerabiliak"
   },
   "auth": {
@@ -1046,7 +1047,7 @@
     "period": "Aldia",
     "restoration": "Berriztatzea",
     "locality": "Herria",
-    "viewChurch": "Elizaren fitxa ikusi",
+    "viewMonument": "Monumentuaren xehetasunak ikusi",
     "mapTitle": "Ibilbidearen mapa",
     "loading": "Kultur ibilbidea kargatzen...",
     "notFound": "Kultur ibilbidea ez da aurkitu",

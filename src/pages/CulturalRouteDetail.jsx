@@ -153,7 +153,7 @@ export default function CulturalRouteDetail() {
 
             {p.bien_id && (
               <Link to={`/monumento/${p.bien_id}`} className="cr-stop-bien-link">
-                {t('culturalRoutes.viewChurch')} &rarr;
+                {t('culturalRoutes.viewMonument')} &rarr;
               </Link>
             )}
           </article>

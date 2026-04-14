@@ -184,6 +184,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
+  table-layout: fixed;
 }
 
 .admin-table th {
@@ -196,13 +197,53 @@
   border-bottom: 2px solid #e2e8f0;
   position: sticky;
   top: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-table th .th-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 1;
+}
+
+.admin-table th .th-resizer:hover,
+.admin-table th .th-resizer.resizing {
+  background: #3b82f6;
+}
+
+.admin-table th {
+  position: relative;
 }
 
 .admin-table td {
   padding: 0.55rem 0.75rem;
   border-bottom: 1px solid #edf2f7;
   color: #2d3748;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.tipo-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.tipo-ayuntamiento { background: #e2e8f0; color: #475569; }
+.tipo-turismo { background: #dbeafe; color: #1d4ed8; }
+.tipo-museo { background: #fef3c7; color: #92400e; }
+.tipo-patronato { background: #d1fae5; color: #065f46; }
+.tipo-asociacion { background: #ede9fe; color: #5b21b6; }
+.tipo-otro { background: #f3f4f6; color: #6b7280; }
 
 .admin-table tbody tr:hover {
   background: #f7fafc;

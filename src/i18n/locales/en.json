@@ -558,6 +558,7 @@
   },
   "footer": {
     "dataSources": "Data sources:",
+    "privacy": "Data protection: registered users'personal data is used exclusively for the internal operation of the platform. It is not shared with third parties, not used for commercial or advertising purposes, and can be deleted at any time by contacting us.",
     "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Open data reused according to their respective licences"
   },
   "auth": {
@@ -1046,7 +1047,7 @@
     "period": "Period",
     "restoration": "Restoration",
     "locality": "Locality",
-    "viewChurch": "View church details",
+    "viewMonument": "View monument details",
     "mapTitle": "Route map",
     "loading": "Loading cultural route...",
     "notFound": "Cultural route not found",

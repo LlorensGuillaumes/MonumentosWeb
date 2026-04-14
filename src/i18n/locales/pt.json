@@ -558,6 +558,7 @@
   },
   "footer": {
     "dataSources": "Fontes de dados:",
+    "privacy": "Proteção de dados: os dados pessoais dos utilizadores são usados exclusivamente para o funcionamento interno da plataforma. Não são cedidos a terceiros nem usados para fins comerciais.",
     "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Dados abertos reutilizados de acordo com as respetivas licenças"
   },
   "auth": {
@@ -1046,7 +1047,7 @@
     "period": "Período",
     "restoration": "Restauro",
     "locality": "Localidade",
-    "viewChurch": "Ver ficha da igreja",
+    "viewMonument": "Ver detalhes do monumento",
     "mapTitle": "Mapa da rota",
     "loading": "A carregar rota cultural...",
     "notFound": "Rota cultural não encontrada",

@@ -110,6 +110,9 @@ export const updateUsuarioPremium = (id, data) =>
 
 // ============== ADMIN: CONTACTOS ==============
 
+export const createContacto = (data) =>
+  api.post('/contactos', data).then(r => r.data);
+
 export const getContactos = (params = {}) =>
   api.get('/contactos', { params }).then(r => r.data);
 
@@ -371,6 +374,17 @@ export const sendContact = ({ email, asunto, mensaje, archivos = [] }) => {
     timeout: 30000,
   }).then(r => r.data);
 };
+
+// ============== SOCIAL ACCOUNTS (menciones en posts) ==============
+
+export const getSocialAccountsSuggest = (params = {}) =>
+  api.get('/admin/social-accounts/suggest', { params }).then(r => r.data);
+
+export const markSocialAccountsUsed = (account_ids) =>
+  api.post('/admin/social-accounts/mark-used', { account_ids }).then(r => r.data);
+
+export const getSocialAccounts = () =>
+  api.get('/admin/social-accounts').then(r => r.data);
 
 // ============== RUTAS CULTURALES ==============
 

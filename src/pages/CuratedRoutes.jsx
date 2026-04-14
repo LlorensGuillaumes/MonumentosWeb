@@ -8,6 +8,7 @@ import './CuratedRoutes.css';
 
 const COUNTRIES = [
   { id: 'España', flag: '🇪🇸' },
+  { id: 'Italia', flag: '🇮🇹' },
   { id: 'Francia', flag: '🇫🇷' },
   { id: 'Portugal', flag: '🇵🇹' },
 ];

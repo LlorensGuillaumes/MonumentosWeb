@@ -558,6 +558,7 @@
   },
   "footer": {
     "dataSources": "Fonts de dades:",
+    "privacy": "Protecció de dades: les dades personals dels usuaris registrats s'utilitzen exclusivament per al funcionament intern de la plataforma. No es cedeixen a tercers ni s'utilitzen amb fins comercials.",
     "license": "Wikidata: CC0 | Viquipèdia/Commons: CC BY-SA 3.0 | Dades obertes reutilitzades segons les seves respectives llicències"
   },
   "auth": {
@@ -1046,7 +1047,7 @@
     "period": "Període",
     "restoration": "Restauració",
     "locality": "Localitat",
-    "viewChurch": "Veure fitxa de l'església",
+    "viewMonument": "Veure detalls del monument",
     "mapTitle": "Mapa de la ruta",
     "loading": "Carregant ruta cultural...",
     "notFound": "Ruta cultural no trobada",

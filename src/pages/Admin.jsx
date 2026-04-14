@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, updateUsuarioPremium, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory } from '../services/api';
+import { createContacto, getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, updateUsuarioPremium, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory, getSocialAccountsSuggest, markSocialAccountsUsed, getRutasCulturales, getRutaCultural } from '../services/api';
+import { CURATED_ROUTES } from '../data/curatedRoutes';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
 import AdminSettings from '../components/AdminSettings';
+import WebPresentationModal from '../components/WebPresentationModal';
 import './Admin.css';
 
 const ITEMS_PER_PAGE = 50;
@@ -19,6 +21,7 @@ export default function Admin() {
     region: '',
     filtro_email: '',
     filtro_telefono: '',
+    filtro_tipo: '',
   });
   const [search, setSearch] = useState('');
   const [searchTimeout, setSearchTimeout] = useState(null);
@@ -35,7 +38,7 @@ export default function Admin() {
   const [monumentos, setMonumentos] = useState(null);
   const [monumentosLoading, setMonumentosLoading] = useState(false);
   const [emailModal, setEmailModal] = useState(false);
-  const [emailForm, setEmailForm] = useState({ asunto: '', cuerpo: '', gmail_user: 'webdepatrimonio@gmail.com', gmail_pass: 'fisio1109' });
+  const [emailForm, setEmailForm] = useState({ asunto: '', cuerpo: '', gmail_user: import.meta.env.VITE_GMAIL_USER || '', gmail_pass: import.meta.env.VITE_GMAIL_PASS || '' });
   const [emailFiles, setEmailFiles] = useState([]);
   const [emailIncludePDF, setEmailIncludePDF] = useState(false);
   const [emailStatus, setEmailStatus] = useState(null);
@@ -93,6 +96,41 @@ export default function Admin() {
   const [socialPlatform, setSocialPlatform] = useState('instagram');
   const [socialText, setSocialText] = useState('');
   const [socialCopied, setSocialCopied] = useState('');
+  const [socialMentions, setSocialMentions] = useState([]);
+  const [socialMode, setSocialMode] = useState('monumento'); // 'monumento' | 'ruta'
+  const [rutasCulturales, setRutasCulturales] = useState([]);
+  const [rutasCulturalesLoaded, setRutasCulturalesLoaded] = useState(false);
+  const [selectedRuta, setSelectedRuta] = useState(null);
+  const [rutaPhotos, setRutaPhotos] = useState([]); // 6 random photos for the route post
+  const [showNewContact, setShowNewContact] = useState(false);
+  const [newContactData, setNewContactData] = useState({ municipio: '', provincia: '', comunidad_autonoma: '', email_general: '', email_patrimonio: '', persona_contacto: '', cargo: '', telefono: '', web: '', fuente: '', tipo: 'turismo', pais: 'España' });
+  const [newContactSaving, setNewContactSaving] = useState(false);
+  const [showWebPresentation, setShowWebPresentation] = useState(false);
+
+  // Column resize handler for admin tables
+  const handleColumnResize = useCallback((e) => {
+    const th = e.target.parentElement;
+    const startX = e.clientX;
+    const startWidth = th.offsetWidth;
+    const table = th.closest('table');
+    table.style.userSelect = 'none';
+    e.target.classList.add('resizing');
+
+    const onMouseMove = (ev) => {
+      const newWidth = Math.max(50, startWidth + ev.clientX - startX);
+      th.style.width = newWidth + 'px';
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      table.style.userSelect = '';
+      e.target.classList.remove('resizing');
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, []);
 
   const fetchContactos = useCallback(async (p = 1) => {
     setLoading(true);
@@ -108,6 +146,7 @@ export default function Admin() {
       if (filters.filtro_email === 'sin') params.solo_sin_email = 'true';
       if (filters.filtro_telefono === 'con') params.solo_con_telefono = 'true';
       if (filters.filtro_telefono === 'sin') params.solo_sin_telefono = 'true';
+      if (filters.filtro_tipo) params.tipo = filters.filtro_tipo;
 
       const data = await getContactos(params);
       setContactos(data.items);
@@ -244,6 +283,23 @@ export default function Admin() {
       console.error('Error guardando:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleCreateContact = async () => {
+    if (!newContactData.municipio.trim()) return;
+    setNewContactSaving(true);
+    try {
+      const created = await createContacto(newContactData);
+      setContactos(prev => [created, ...prev]);
+      setTotal(prev => prev + 1);
+      setShowNewContact(false);
+      setNewContactData({ municipio: '', provincia: '', comunidad_autonoma: '', email_general: '', email_patrimonio: '', persona_contacto: '', cargo: '', telefono: '', web: '', fuente: '', tipo: 'turismo', pais: 'España' });
+    } catch (err) {
+      console.error('Error creando contacto:', err);
+      alert('Error al crear contacto: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setNewContactSaving(false);
     }
   };
 
@@ -688,9 +744,10 @@ export default function Admin() {
     return [...new Set(tags)];
   };
 
-  const socialGenerateText = (monumento, platform) => {
+  const socialGenerateText = (monumento, platform, mentions = []) => {
     const desc = monumento.wiki_descripcion || monumento.descripcion_completa || monumento.descripcion || '';
-    const webUrl = `${window.location.origin}/monumento/${monumento.id}`;
+    const webUrl = `https://patrimonio-europeo.netlify.app/monumento/${monumento.id}`;
+    const mentionStr = mentions.length > 0 ? '\n\n📌 ' + mentions.map(m => '@' + m.username).join(' ') : '';
 
     if (platform === 'instagram') {
       const shortDesc = desc.length > 200 ? desc.slice(0, 200).replace(/\s+\S*$/, '') + '...' : desc;
@@ -701,8 +758,9 @@ export default function Admin() {
       if (monumento.estilo) text += `🎨 Estilo: ${monumento.estilo}\n`;
       if (monumento.inception) text += `📅 ${monumento.inception}\n`;
       if (monumento.estilo || monumento.inception) text += '\n';
-      text += `🔗 Mas info: ${webUrl}\n\n`;
-      text += hashtags.join(' ');
+      text += `🔗 Mas info: ${webUrl}`;
+      text += mentionStr;
+      text += '\n\n' + hashtags.join(' ');
       return text;
     } else {
       const longDesc = desc.length > 500 ? desc.slice(0, 500).replace(/\s+\S*$/, '') + '...' : desc;
@@ -713,8 +771,9 @@ export default function Admin() {
       if (monumento.inception) text += `Fecha: ${monumento.inception}\n`;
       if (monumento.arquitecto) text += `Arquitecto: ${monumento.arquitecto}\n`;
       if (monumento.estilo || monumento.inception || monumento.arquitecto) text += '\n';
-      text += `🔗 Ficha completa: ${webUrl}\n\n`;
-      text += '#PatrimonioEuropeo #Monumentos';
+      text += `🔗 Ficha completa: ${webUrl}`;
+      text += mentionStr;
+      text += '\n\n#PatrimonioEuropeo #Monumentos';
       return text;
     }
   };
@@ -769,7 +828,16 @@ export default function Admin() {
           const pick = candidates[Math.floor(Math.random() * candidates.length)];
           const detail = await getMonumento(pick.id);
           setSocialSelected(detail);
-          setSocialText(socialGenerateText(detail, socialPlatform));
+          // Fetch mention suggestions
+          let mentions = [];
+          try {
+            const params = { limit: 5 };
+            if (detail.pais) params.pais = detail.pais;
+            if (detail.comunidad_autonoma) params.region = detail.comunidad_autonoma;
+            mentions = await getSocialAccountsSuggest(params);
+          } catch { /* silent */ }
+          setSocialMentions(mentions);
+          setSocialText(socialGenerateText(detail, socialPlatform, mentions));
           setSocialMonumentos([pick]);
           return;
         }
@@ -787,7 +855,32 @@ export default function Admin() {
     try {
       const detail = await getMonumento(mon.id);
       setSocialSelected(detail);
-      setSocialText(socialGenerateText(detail, socialPlatform));
+
+      // Fetch suggested mentions based on monument's country, region and theme
+      let mentions = [];
+      try {
+        const params = { limit: 5 };
+        if (detail.pais) params.pais = detail.pais;
+        if (detail.comunidad_autonoma) params.region = detail.comunidad_autonoma;
+        if (detail.estilo) {
+          // Map estilo to theme keywords
+          const estiloLower = (detail.estilo || '').toLowerCase();
+          if (estiloLower.includes('roman') || estiloLower.includes('románi')) params.theme = 'romanico';
+          else if (estiloLower.includes('góti') || estiloLower.includes('goti')) params.theme = 'gotico';
+          else if (estiloLower.includes('barro')) params.theme = 'religioso';
+          else if (estiloLower.includes('castill') || estiloLower.includes('fortale')) params.theme = 'castillos';
+        }
+        if (detail.tipo_monumento) {
+          const tipoLower = (detail.tipo_monumento || '').toLowerCase();
+          if (tipoLower.includes('castill') || tipoLower.includes('torre') || tipoLower.includes('murall')) params.theme = 'castillos';
+          else if (tipoLower.includes('iglesi') || tipoLower.includes('catedr') || tipoLower.includes('monaster')) params.theme = 'religioso';
+        }
+        mentions = await getSocialAccountsSuggest(params);
+      } catch {
+        // silently fail if social accounts table doesn't exist yet
+      }
+      setSocialMentions(mentions);
+      setSocialText(socialGenerateText(detail, socialPlatform, mentions));
     } catch (err) {
       console.error('Error cargando monumento:', err);
     } finally {
@@ -797,8 +890,153 @@ export default function Admin() {
 
   const handleSocialPlatformChange = (platform) => {
     setSocialPlatform(platform);
-    if (socialSelected) {
-      setSocialText(socialGenerateText(socialSelected, platform));
+    if (socialMode === 'ruta' && selectedRuta) {
+      setSocialText(rutaGenerateText(selectedRuta, platform, socialMentions));
+    } else if (socialSelected) {
+      setSocialText(socialGenerateText(socialSelected, platform, socialMentions));
+    }
+  };
+
+  // --- Rutas culturales para publicaciones ---
+  const loadRutasCulturales = async () => {
+    if (rutasCulturalesLoaded) return;
+    try {
+      const rutas = await getRutasCulturales();
+      setRutasCulturales(rutas);
+      setRutasCulturalesLoaded(true);
+    } catch (err) {
+      console.error('Error cargando rutas culturales:', err);
+    }
+  };
+
+  // Pick N random items from array (Fisher-Yates shuffle + slice)
+  const pickRandom = (arr, n) => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy.slice(0, n);
+  };
+
+  const handleSelectRuta = async (value) => {
+    if (!value) { setSelectedRuta(null); setSocialText(''); setRutaPhotos([]); return; }
+    setSocialLoading(true);
+    setRutaPhotos([]);
+    try {
+      let ruta;
+      let photos = [];
+
+      if (value.startsWith('curated:')) {
+        // Curated route from curatedRoutes.js
+        const curatedId = value.replace('curated:', '');
+        const curated = CURATED_ROUTES.find(r => r.id === curatedId);
+        if (!curated) return;
+        ruta = {
+          _type: 'curated',
+          slug: curated.id,
+          nombre: curated.name,
+          pais: curated.countries?.[0] || null,
+          region: null,
+          descripcion: curated.period ? `${curated.period}. ` : '',
+          paradas: (curated.highlights || []).map(h => ({ nombre: h })),
+          stopsEstimate: curated.stopsEstimate,
+          searchParams: curated.searchParams,
+        };
+
+        // Fetch monument images for the curated route using searchParams
+        try {
+          const searchData = await getMonumentos({ ...curated.searchParams, solo_wikidata: true, solo_imagen: true, limit: 30 });
+          const withImage = (searchData.items || []).filter(m => m.imagen_url);
+          photos = pickRandom(withImage, 6).map(m => ({
+            url: m.imagen_url,
+            alt: m.denominacion,
+            municipio: m.municipio,
+          }));
+        } catch { /* silent */ }
+      } else {
+        // Cultural route from DB
+        ruta = await getRutaCultural(value);
+
+        // Collect all photos from paradas (supabase photos + bien images)
+        const allPhotos = [];
+        for (const p of (ruta.paradas || [])) {
+          if (p.fotos?.length > 0) {
+            p.fotos.forEach(f => allPhotos.push({ url: f.url, alt: p.nombre || f.titulo }));
+          } else if (p.bien_imagen_url) {
+            allPhotos.push({ url: p.bien_imagen_url, alt: p.nombre || p.bien_denominacion });
+          }
+        }
+        photos = pickRandom(allPhotos, 6);
+      }
+
+      setSelectedRuta(ruta);
+      setRutaPhotos(photos);
+
+      // Fetch mentions
+      let mentions = [];
+      try {
+        const params = { limit: 5 };
+        if (ruta.pais) params.pais = ruta.pais;
+        if (ruta.region) params.region = ruta.region;
+        mentions = await getSocialAccountsSuggest(params);
+      } catch { /* silent */ }
+      setSocialMentions(mentions);
+      setSocialText(rutaGenerateText(ruta, socialPlatform, mentions));
+    } catch (err) {
+      console.error('Error cargando ruta:', err);
+    } finally {
+      setSocialLoading(false);
+    }
+  };
+
+  const rutaGenerateText = (ruta, platform, mentions = []) => {
+    const isCurated = ruta._type === 'curated';
+    const webUrl = isCurated
+      ? `https://patrimonio-europeo.netlify.app/rutas-curadas/${ruta.slug}`
+      : `https://patrimonio-europeo.netlify.app/rutas-culturales/${ruta.slug}`;
+    const paradas = ruta.paradas || [];
+    const numParadas = ruta.stopsEstimate || paradas.length;
+    const mentionStr = mentions.length > 0 ? '\n\n📌 ' + mentions.map(m => '@' + m.username).join(' ') : '';
+
+    if (platform === 'instagram') {
+      let text = `🗺️ ${ruta.nombre}\n\n`;
+      text += `📍 ${ruta.region || ruta.pais || ''}\n`;
+      if (ruta.descripcion) text += `📅 ${ruta.descripcion}\n`;
+      text += '\n';
+      text += `🏛️ ${numParadas}${isCurated ? '+' : ''} monumentos\n`;
+      if (paradas.length > 0) {
+        const topParadas = paradas.slice(0, 5);
+        topParadas.forEach((p, i) => {
+          text += `  ${i + 1}. ${p.nombre || p.bien_denominacion || ''}\n`;
+        });
+        if (paradas.length > 5) text += `  ... y ${paradas.length - 5} más\n`;
+        else if (isCurated && numParadas > paradas.length) text += `  ... y muchos más\n`;
+      }
+      text += `\n🔗 Descubre la ruta completa: ${webUrl}`;
+      text += mentionStr;
+      text += '\n\n#PatrimonioEuropeo #RutasCulturales #heritage #culturalheritage #monumentos #turismocultural';
+      if (ruta.pais === 'España') text += ' #spain #españa #visitspain #patrimonioespañol';
+      if (ruta.pais === 'Francia') text += ' #france #visitfrance #patrimoinefrance';
+      if (ruta.pais === 'Italia') text += ' #italy #italia #bellaitalia #patrimonioitaliano';
+      if (ruta.pais === 'Portugal') text += ' #portugal #visitportugal #patrimonioPortugues';
+      return text;
+    } else {
+      let text = `🗺️ ${ruta.nombre}\n\n`;
+      text += `📍 ${[ruta.region, ruta.pais].filter(Boolean).join(', ')}\n`;
+      if (ruta.descripcion) text += `📅 ${ruta.descripcion}\n`;
+      text += '\n';
+      text += `🏛️ ${numParadas}${isCurated ? '+' : ''} monumentos para descubrir:\n`;
+      if (paradas.length > 0) {
+        paradas.forEach((p, i) => {
+          text += `  ${i + 1}. ${p.nombre || p.bien_denominacion || ''}${p.municipio ? ' (' + p.municipio + ')' : ''}\n`;
+        });
+        if (isCurated && numParadas > paradas.length) text += `  ... y muchos más en la ruta\n`;
+      }
+      text += `\n🔗 Ruta completa: ${webUrl}`;
+      text += mentionStr;
+      text += '\n\n#PatrimonioEuropeo #RutasCulturales';
+      return text;
     }
   };
 
@@ -834,6 +1072,12 @@ export default function Admin() {
     if (!socialSelected) return;
     try {
       await addSocialHistory(socialSelected.id, socialPlatform);
+      // Mark social accounts as used for rotation algorithm
+      if (socialMentions.length > 0) {
+        try {
+          await markSocialAccountsUsed(socialMentions.map(m => m.id));
+        } catch { /* silent */ }
+      }
       setSocialCopied('used');
       setTimeout(() => setSocialCopied(''), 2500);
     } catch {
@@ -853,7 +1097,7 @@ export default function Admin() {
             onClick={() => setActiveSection('ayuntamientos')}
           >
             <span className="admin-nav-icon">🏛️</span>
-            Ayuntamientos
+            Contactos
           </button>
           <button
             className={`admin-nav-item ${activeSection === 'usuarios' ? 'active' : ''}`}
@@ -912,8 +1156,11 @@ export default function Admin() {
       <div className="admin-main">
         {activeSection === 'ayuntamientos' && (
           <>
-            <div className="admin-header">
-              <h1>Contactos Ayuntamientos</h1>
+            <div className="admin-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+              <h1 style={{ margin: 0 }}>Directorio de Contactos</h1>
+              <button className="detail-save-btn" style={{ marginTop: 0 }} onClick={() => setShowNewContact(true)}>
+                + Nuevo contacto
+              </button>
               {stats && (
                 <div className="admin-stats-row">
                   <div className="admin-stat">
@@ -958,6 +1205,19 @@ export default function Admin() {
               </select>
               <select
                 className="admin-select"
+                value={filters.filtro_tipo}
+                onChange={(e) => { setFilters(f => ({ ...f, filtro_tipo: e.target.value })); }}
+              >
+                <option value="">Tipo: todos</option>
+                <option value="ayuntamiento">Ayuntamientos</option>
+                <option value="turismo">Oficinas de turismo</option>
+                <option value="museo">Museos</option>
+                <option value="patronato">Patronatos</option>
+                <option value="asociacion">Asociaciones</option>
+                <option value="otro">Otros</option>
+              </select>
+              <select
+                className="admin-select"
                 value={filters.filtro_email}
                 onChange={(e) => handleEmailFilter(e.target.value)}
               >
@@ -992,7 +1252,7 @@ export default function Admin() {
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th className="th-check">
+                      <th className="th-check" style={{ width: 36 }}>
                         <input
                           type="checkbox"
                           checked={allPageSelected}
@@ -1000,12 +1260,13 @@ export default function Admin() {
                           onChange={toggleSelectAll}
                         />
                       </th>
-                      <th>Municipio</th>
-                      <th>CCAA</th>
-                      <th>Email</th>
-                      <th>Persona de contacto</th>
-                      <th>Tel.</th>
-                      <th>Fuente</th>
+                      <th style={{ width: 220 }}>Municipio / Nombre<div className="th-resizer" onMouseDown={handleColumnResize} /></th>
+                      <th style={{ width: 80 }}>Tipo<div className="th-resizer" onMouseDown={handleColumnResize} /></th>
+                      <th style={{ width: 140 }}>CCAA<div className="th-resizer" onMouseDown={handleColumnResize} /></th>
+                      <th style={{ width: 220 }}>Email<div className="th-resizer" onMouseDown={handleColumnResize} /></th>
+                      <th style={{ width: 160 }}>Persona de contacto<div className="th-resizer" onMouseDown={handleColumnResize} /></th>
+                      <th style={{ width: 100 }}>Tel.<div className="th-resizer" onMouseDown={handleColumnResize} /></th>
+                      <th style={{ width: 100 }}>Fuente<div className="th-resizer" onMouseDown={handleColumnResize} /></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1023,6 +1284,7 @@ export default function Admin() {
                             />
                           </td>
                           <td className="td-municipio">{c.municipio}</td>
+                          <td><span className={`tipo-badge tipo-${c.tipo || 'ayuntamiento'}`}>{c.tipo || 'ayuntamiento'}</span></td>
                           <td>{c.comunidad_autonoma}</td>
                           <td className="td-email">
                             {c.email_patrimonio && (
@@ -1568,40 +1830,110 @@ export default function Admin() {
 
         {activeSection === 'publicaciones' && (
           <>
-            <div className="admin-header">
+            <div className="admin-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
               <h1>Publicaciones para redes sociales</h1>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  className="detail-save-btn"
+                  style={{ marginTop: 0 }}
+                  onClick={() => setShowWebPresentation(true)}
+                >
+                  🎨 Presentación de la web
+                </button>
+                <button
+                  className="social-random-btn"
+                  style={{ marginTop: 0 }}
+                  onClick={() => window.open('/logo-generator.html', '_blank')}
+                >
+                  🏛️ Generador de logos
+                </button>
+              </div>
             </div>
 
-            <div className="social-search-bar">
-              <input
-                type="text"
-                className="admin-search"
-                placeholder="Buscar monumento..."
-                value={socialSearch}
-                onChange={e => setSocialSearch(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleSocialSearch(); }}
-              />
-              <select
-                className="admin-select"
-                value={socialSearchPais}
-                onChange={e => setSocialSearchPais(e.target.value)}
-              >
-                <option value="">Todos los paises</option>
-                <option value="España">España</option>
-                <option value="Francia">Francia</option>
-                <option value="Portugal">Portugal</option>
-                <option value="Italia">Italia</option>
-              </select>
-              <button className="detail-save-btn" style={{ marginTop: 0 }} onClick={handleSocialSearch} disabled={socialLoading || !socialSearch.trim()}>
-                {socialLoading ? 'Buscando...' : 'Buscar'}
-              </button>
-              <button className="social-random-btn" onClick={handleSocialRandom} disabled={socialLoading}>
-                🎲 Aleatorio
-              </button>
+            {/* Mode selector: Monumento vs Ruta */}
+            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', alignItems: 'center' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontWeight: socialMode === 'monumento' ? 700 : 400 }}>
+                <input type="radio" name="socialMode" value="monumento" checked={socialMode === 'monumento'} onChange={() => { setSocialMode('monumento'); setSelectedRuta(null); }} />
+                🏛️ Monumento
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontWeight: socialMode === 'ruta' ? 700 : 400 }}>
+                <input type="radio" name="socialMode" value="ruta" checked={socialMode === 'ruta'} onChange={() => { setSocialMode('ruta'); setSocialSelected(null); setSocialText(''); loadRutasCulturales(); }} />
+                🗺️ Ruta cultural
+              </label>
             </div>
+
+            {socialMode === 'monumento' ? (
+              <div className="social-search-bar">
+                <input
+                  type="text"
+                  className="admin-search"
+                  placeholder="Buscar monumento..."
+                  value={socialSearch}
+                  onChange={e => setSocialSearch(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleSocialSearch(); }}
+                />
+                {/* Country filter chips */}
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                  {[{ value: '', label: 'Todos' }, { value: 'España', label: '🇪🇸' }, { value: 'Francia', label: '🇫🇷' }, { value: 'Italia', label: '🇮🇹' }, { value: 'Portugal', label: '🇵🇹' }].map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setSocialSearchPais(opt.value)}
+                      style={{
+                        padding: '0.35rem 0.7rem',
+                        border: socialSearchPais === opt.value ? '2px solid #3b82f6' : '1px solid #cbd5e1',
+                        borderRadius: '20px',
+                        background: socialSearchPais === opt.value ? '#3b82f6' : 'white',
+                        color: socialSearchPais === opt.value ? 'white' : '#475569',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        fontWeight: socialSearchPais === opt.value ? 600 : 400,
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <button className="detail-save-btn" style={{ marginTop: 0 }} onClick={handleSocialSearch} disabled={socialLoading || !socialSearch.trim()}>
+                  {socialLoading ? 'Buscando...' : 'Buscar'}
+                </button>
+                <button className="social-random-btn" onClick={handleSocialRandom} disabled={socialLoading}>
+                  🎲 Aleatorio
+                </button>
+              </div>
+            ) : (
+              <div className="social-search-bar">
+                <select
+                  className="admin-select"
+                  style={{ flex: 1, minWidth: '250px' }}
+                  value={selectedRuta ? (selectedRuta._type === 'curated' ? 'curated:' + selectedRuta.slug : selectedRuta.slug) : ''}
+                  onChange={e => handleSelectRuta(e.target.value)}
+                  disabled={socialLoading}
+                >
+                  <option value="">Selecciona una ruta...</option>
+                  {rutasCulturales.length > 0 && (
+                    <optgroup label="🗺️ Rutas culturales (con paradas y fotos)">
+                      {rutasCulturales.map(r => (
+                        <option key={r.slug} value={r.slug}>
+                          {r.nombre} ({r.num_paradas || '?'} paradas) — {r.pais || ''}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  <optgroup label="📍 Rutas curadas (temáticas)">
+                    {CURATED_ROUTES.map(r => (
+                      <option key={r.id} value={'curated:' + r.id}>
+                        {r.name} ({r.stopsEstimate}+ monumentos) — {r.countries?.join(', ')}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+            )}
 
             <div className="social-content">
-              {/* Left: results list */}
+              {/* Left: results list (only in monumento mode) */}
+              {socialMode === 'monumento' && (
               <div className="social-results">
                 {socialMonumentos.length === 0 && !socialLoading && (
                   <p className="no-data" style={{ padding: '1.5rem', textAlign: 'center' }}>
@@ -1632,12 +1964,13 @@ export default function Admin() {
                   </div>
                 ))}
               </div>
+              )}
 
               {/* Right: post generator */}
-              <div className="social-generator">
-                {!socialSelected ? (
+              <div className="social-generator" style={socialMode === 'ruta' ? { gridColumn: '1 / -1' } : undefined}>
+                {(socialMode === 'monumento' && !socialSelected) || (socialMode === 'ruta' && !selectedRuta) ? (
                   <div className="social-placeholder">
-                    <span>Selecciona un monumento de la lista para generar la publicacion</span>
+                    <span>{socialMode === 'monumento' ? 'Selecciona un monumento de la lista para generar la publicacion' : 'Selecciona una ruta cultural del desplegable'}</span>
                   </div>
                 ) : (
                   <>
@@ -1657,7 +1990,7 @@ export default function Admin() {
                     </div>
 
                     <div className="social-preview-area">
-                      {socialImageUrl && (
+                      {socialMode === 'monumento' && socialImageUrl && (
                         <div className="social-image-preview">
                           <img src={socialImageUrl} alt={socialSelected.denominacion} onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
                           <div className="social-image-actions">
@@ -1667,6 +2000,66 @@ export default function Admin() {
                             <a href={socialImageUrl} download target="_blank" rel="noopener noreferrer" className="social-download-btn">
                               Descargar
                             </a>
+                          </div>
+                        </div>
+                      )}
+                      {socialMode === 'ruta' && rutaPhotos.length > 0 && (
+                        <div className="social-image-preview" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                          {/* Main photo */}
+                          <img src={rutaPhotos[0].url} alt={rutaPhotos[0].alt} style={{ borderRadius: '8px', maxHeight: '280px', objectFit: 'cover' }} onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                          {/* Thumbnails */}
+                          {rutaPhotos.length > 1 && (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.4rem' }}>
+                              {rutaPhotos.slice(1).map((p, i) => (
+                                <div key={i} style={{ position: 'relative' }}>
+                                  <img
+                                    src={p.url}
+                                    alt={p.alt}
+                                    style={{ width: '100%', height: '70px', objectFit: 'cover', borderRadius: '6px', cursor: 'pointer' }}
+                                    title={p.alt}
+                                    onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <div className="social-image-actions">
+                            <button className="social-copy-btn" onClick={() => {
+                              // Re-shuffle photos
+                              const allPhotosForShuffle = selectedRuta._type === 'curated' ? rutaPhotos : [];
+                              if (selectedRuta._type !== 'curated' && selectedRuta.paradas) {
+                                for (const p of selectedRuta.paradas) {
+                                  if (p.fotos?.length > 0) p.fotos.forEach(f => allPhotosForShuffle.push({ url: f.url, alt: p.nombre || f.titulo }));
+                                  else if (p.bien_imagen_url) allPhotosForShuffle.push({ url: p.bien_imagen_url, alt: p.nombre || p.bien_denominacion });
+                                }
+                              }
+                              if (allPhotosForShuffle.length > 6) setRutaPhotos(pickRandom(allPhotosForShuffle, 6));
+                            }} title="Mezclar fotos aleatorias">
+                              🔀 Mezclar fotos
+                            </button>
+                            <button className="social-download-btn" onClick={async () => {
+                              // Download all photos one by one
+                              for (let i = 0; i < rutaPhotos.length; i++) {
+                                try {
+                                  const resp = await fetch(rutaPhotos[i].url);
+                                  const blob = await resp.blob();
+                                  const blobUrl = URL.createObjectURL(blob);
+                                  const a = document.createElement('a');
+                                  a.href = blobUrl;
+                                  a.download = `ruta-${selectedRuta.slug}-${i + 1}.${blob.type.split('/')[1] || 'jpg'}`;
+                                  document.body.appendChild(a);
+                                  a.click();
+                                  document.body.removeChild(a);
+                                  URL.revokeObjectURL(blobUrl);
+                                } catch {
+                                  window.open(rutaPhotos[i].url, '_blank');
+                                }
+                              }
+                              setSocialCopied('image');
+                              setTimeout(() => setSocialCopied(''), 2000);
+                            }}>
+                              {socialCopied === 'image' ? `✓ ${rutaPhotos.length} descargadas` : `⬇ Descargar ${rutaPhotos.length} fotos`}
+                            </button>
                           </div>
                         </div>
                       )}
@@ -1685,7 +2078,7 @@ export default function Admin() {
                           <div className="social-text-actions">
                             <button
                               className="social-regen-btn"
-                              onClick={() => setSocialText(socialGenerateText(socialSelected, socialPlatform))}
+                              onClick={() => setSocialText(socialMode === 'ruta' && selectedRuta ? rutaGenerateText(selectedRuta, socialPlatform, socialMentions) : socialGenerateText(socialSelected, socialPlatform, socialMentions))}
                               title="Regenerar texto original"
                             >
                               Regenerar
@@ -1976,8 +2369,8 @@ export default function Admin() {
       )}
 
       {emailModal && (
-        <div className="modal-overlay" onClick={closeEmailModal}>
-          <div className="modal-content email-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) closeEmailModal(); }}>
+          <div className="modal-content email-modal">
             <div className="modal-header">
               <h2>Enviar emails</h2>
               <button className="detail-close" onClick={closeEmailModal}>&times;</button>
@@ -2064,28 +2457,87 @@ export default function Admin() {
                   <span className="email-progress-text">
                     {emailStatus.sent} enviados, {emailStatus.failed} fallidos de {emailStatus.total}
                     {emailStatus.running && ' - Enviando...'}
-                    {!emailStatus.running && emailStatus.finished_at && ' - Completado'}
                   </span>
-                  {emailStatus.errors?.length > 0 && (
-                    <details className="email-errors">
-                      <summary>{emailStatus.errors.length} error{emailStatus.errors.length !== 1 ? 'es' : ''}</summary>
-                      <ul>
-                        {emailStatus.errors.map((e, i) => (
-                          <li key={i}>{e.municipio} ({e.email}): {e.error}</li>
-                        ))}
-                      </ul>
-                    </details>
-                  )}
                 </div>
               )}
               {emailStatus?.error && (
                 <div className="email-error-msg">{emailStatus.error}</div>
               )}
+
+              {/* Results modal when finished */}
+              {emailStatus && !emailStatus.running && emailStatus.finished_at && (
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '1.25rem', marginTop: '1rem' }}>
+                  <h3 style={{ margin: '0 0 0.75rem', color: '#166534', fontSize: '1.1rem' }}>
+                    Envío completado
+                  </h3>
+                  <div style={{ display: 'flex', gap: '2rem', marginBottom: '0.75rem' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#16a34a' }}>{emailStatus.sent}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#166534' }}>enviados</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.8rem', fontWeight: 700, color: emailStatus.failed > 0 ? '#dc2626' : '#94a3b8' }}>{emailStatus.failed}</div>
+                      <div style={{ fontSize: '0.8rem', color: emailStatus.failed > 0 ? '#991b1b' : '#64748b' }}>fallidos</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#475569' }}>{emailStatus.total}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#64748b' }}>total</div>
+                    </div>
+                  </div>
+
+                  {emailStatus.errors?.length > 0 && (
+                    <div style={{ marginTop: '0.75rem' }}>
+                      <p style={{ margin: '0 0 0.5rem', fontWeight: 600, color: '#991b1b', fontSize: '0.9rem' }}>
+                        Emails fallidos ({emailStatus.errors.length}):
+                      </p>
+                      <div style={{ maxHeight: '150px', overflowY: 'auto', background: '#fff1f2', borderRadius: '6px', padding: '0.5rem 0.75rem', fontSize: '0.8rem' }}>
+                        {emailStatus.errors.map((e, i) => (
+                          <div key={i} style={{ padding: '0.25rem 0', borderBottom: i < emailStatus.errors.length - 1 ? '1px solid #fecdd3' : 'none' }}>
+                            <strong>{e.municipio}</strong> ({e.email}): <span style={{ color: '#991b1b' }}>{e.error}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        style={{ marginTop: '0.5rem', padding: '0.4rem 0.8rem', border: '1px solid #fca5a5', borderRadius: '6px', background: 'white', color: '#dc2626', cursor: 'pointer', fontSize: '0.8rem' }}
+                        onClick={() => {
+                          const csv = 'Municipio;Email;Error\n' + emailStatus.errors.map(e => `${e.municipio};${e.email};${e.error}`).join('\n');
+                          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `emails-fallidos-${new Date().toISOString().slice(0, 10)}.csv`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        }}
+                      >
+                        ⬇ Descargar listado de fallidos (.csv)
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    className="detail-save-btn"
+                    style={{ marginTop: '1rem', width: '100%' }}
+                    onClick={() => {
+                      setEmailModal(false);
+                      setEmailStatus(null);
+                      setEmailForm(f => ({ ...f, asunto: '', cuerpo: '' }));
+                      setEmailFiles([]);
+                      setEmailIncludePDF(false);
+                      setSelectedIds(new Set());
+                    }}
+                  >
+                    Cerrar y preparar nuevo envío
+                  </button>
+                </div>
+              )}
             </div>
             <div className="modal-footer">
               {emailSending ? (
                 <button className="btn-cancel-email" onClick={handleCancelEmail}>Cancelar envio</button>
-              ) : (
+              ) : !emailStatus?.finished_at ? (
                 <button
                   className="detail-save-btn"
                   onClick={handleStartEmail}
@@ -2093,13 +2545,108 @@ export default function Admin() {
                 >
                   Iniciar envio
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
       )}
 
       {activeSection === 'settings' && <AdminSettings />}
+
+      {showWebPresentation && (
+        <WebPresentationModal onClose={() => setShowWebPresentation(false)} />
+      )}
+
+      {showNewContact && (
+        <div className="modal-overlay" onClick={() => setShowNewContact(false)}>
+          <div className="modal-content" style={{ maxWidth: 540 }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Nuevo contacto</h2>
+              <button className="detail-close" onClick={() => setShowNewContact(false)}>&times;</button>
+            </div>
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1.5rem' }}>
+              <label className="detail-field">
+                <span>Nombre / Organismo *</span>
+                <input type="text" value={newContactData.municipio} onChange={e => setNewContactData(d => ({ ...d, municipio: e.target.value }))} placeholder="Ej: Oficina de Turismo de Sevilla" />
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <label className="detail-field">
+                  <span>Tipo</span>
+                  <select value={newContactData.tipo} onChange={e => setNewContactData(d => ({ ...d, tipo: e.target.value }))}>
+                    <option value="ayuntamiento">Ayuntamiento</option>
+                    <option value="turismo">Oficina de turismo</option>
+                    <option value="museo">Museo</option>
+                    <option value="patronato">Patronato</option>
+                    <option value="asociacion">Asociación</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </label>
+                <label className="detail-field">
+                  <span>País</span>
+                  <select value={newContactData.pais} onChange={e => setNewContactData(d => ({ ...d, pais: e.target.value }))}>
+                    <option value="España">España</option>
+                    <option value="Francia">Francia</option>
+                    <option value="Italia">Italia</option>
+                    <option value="Portugal">Portugal</option>
+                  </select>
+                </label>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <label className="detail-field">
+                  <span>Provincia</span>
+                  <input type="text" value={newContactData.provincia} onChange={e => setNewContactData(d => ({ ...d, provincia: e.target.value }))} placeholder="Ej: Sevilla" />
+                </label>
+                <label className="detail-field">
+                  <span>CCAA / Región</span>
+                  <input type="text" value={newContactData.comunidad_autonoma} onChange={e => setNewContactData(d => ({ ...d, comunidad_autonoma: e.target.value }))} placeholder="Ej: Andalucia" />
+                </label>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <label className="detail-field">
+                  <span>Email general</span>
+                  <input type="email" value={newContactData.email_general} onChange={e => setNewContactData(d => ({ ...d, email_general: e.target.value }))} placeholder="info@..." />
+                </label>
+                <label className="detail-field">
+                  <span>Email patrimonio</span>
+                  <input type="email" value={newContactData.email_patrimonio} onChange={e => setNewContactData(d => ({ ...d, email_patrimonio: e.target.value }))} placeholder="patrimonio@..." />
+                </label>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <label className="detail-field">
+                  <span>Persona de contacto</span>
+                  <input type="text" value={newContactData.persona_contacto} onChange={e => setNewContactData(d => ({ ...d, persona_contacto: e.target.value }))} />
+                </label>
+                <label className="detail-field">
+                  <span>Cargo</span>
+                  <input type="text" value={newContactData.cargo} onChange={e => setNewContactData(d => ({ ...d, cargo: e.target.value }))} placeholder="Ej: Director/a" />
+                </label>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <label className="detail-field">
+                  <span>Teléfono</span>
+                  <input type="text" value={newContactData.telefono} onChange={e => setNewContactData(d => ({ ...d, telefono: e.target.value }))} />
+                </label>
+                <label className="detail-field">
+                  <span>Web</span>
+                  <input type="url" value={newContactData.web} onChange={e => setNewContactData(d => ({ ...d, web: e.target.value }))} placeholder="https://..." />
+                </label>
+              </div>
+              <label className="detail-field">
+                <span>Fuente</span>
+                <input type="text" value={newContactData.fuente} onChange={e => setNewContactData(d => ({ ...d, fuente: e.target.value }))} placeholder="Ej: web oficial, directorio, etc." />
+              </label>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <button className="btn-secondary" style={{ padding: '0.6rem 1.2rem', border: 'none', borderRadius: '8px', cursor: 'pointer', background: '#e2e8f0', color: '#475569' }} onClick={() => setShowNewContact(false)}>
+                  Cancelar
+                </button>
+                <button className="detail-save-btn" onClick={handleCreateContact} disabled={newContactSaving || !newContactData.municipio.trim()}>
+                  {newContactSaving ? 'Guardando...' : 'Crear contacto'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

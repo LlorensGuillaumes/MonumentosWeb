@@ -557,6 +557,7 @@
   },
   "footer": {
     "dataSources": "Fonti dei dati:",
+    "privacy": "Protezione dei dati: i dati personali degli utenti registrati sono utilizzati esclusivamente per il funzionamento interno della piattaforma. Non vengono ceduti a terzi né utilizzati per scopi commerciali.",
     "license": "Wikidata: CC0 | Wikipedia/Commons: CC BY-SA 3.0 | Dati aperti riutilizzati secondo le rispettive licenze"
   },
   "auth": {
@@ -1045,7 +1046,7 @@
     "period": "Periodo",
     "restoration": "Restauro",
     "locality": "Località",
-    "viewChurch": "Vedi scheda della chiesa",
+    "viewMonument": "Vedi dettagli del monumento",
     "mapTitle": "Mappa del percorso",
     "loading": "Caricamento percorso culturale...",
     "notFound": "Percorso culturale non trovato",

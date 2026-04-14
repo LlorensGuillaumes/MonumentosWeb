@@ -1,0 +1,223 @@
+.wpm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+}
+
+.wpm-modal {
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #1a202c);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.wpm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.wpm-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary, #1a202c);
+}
+
+.wpm-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  padding: 0 0.5rem;
+}
+
+.wpm-close:hover {
+  color: var(--text-primary, #1a202c);
+}
+
+.wpm-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 1.2fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .wpm-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wpm-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.wpm-preview-area {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: var(--bg-secondary, #f1f5f9);
+  border-radius: 10px;
+  padding: 1rem;
+  min-height: 300px;
+}
+
+.wpm-preview-wrapper {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wpm-preview-wrapper[data-format="landscape"],
+.wpm-preview-wrapper[data-format="cover"] {
+  max-width: 100%;
+}
+
+.wpm-preview-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.wpm-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.wpm-control-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 0.5rem;
+}
+
+.wpm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wpm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #1a202c);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.wpm-chip:hover {
+  border-color: var(--accent, #3b82f6);
+}
+
+.wpm-chip.active {
+  background: var(--accent, #3b82f6);
+  color: white;
+  border-color: var(--accent, #3b82f6);
+}
+
+.wpm-chip-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wpm-download-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wpm-btn {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.wpm-btn-primary {
+  background: var(--accent, #3b82f6);
+  color: white;
+  flex: 1;
+}
+
+.wpm-btn-primary:hover {
+  background: var(--accent-hover, #2563eb);
+}
+
+.wpm-btn-secondary {
+  background: var(--btn-secondary-bg, #e2e8f0);
+  color: var(--btn-secondary-text, #475569);
+}
+
+.wpm-btn-secondary:hover {
+  background: var(--border-hover, #cbd5e1);
+}
+
+.wpm-btn.copied {
+  background: #16a34a;
+  color: white;
+}
+
+.wpm-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-primary, #1a202c);
+  background: var(--bg-card, #fff);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.wpm-text-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.wpm-char-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #64748b);
+  flex: 1;
+  min-width: 150px;
+}
