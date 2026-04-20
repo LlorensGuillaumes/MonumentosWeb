@@ -114,9 +114,11 @@ export default function MyRoutes() {
     <div className="my-routes">
       <div className="my-routes-header">
         <h1>{t('myRoutes.title')}</h1>
-        <Link to="/rutas" className="btn btn-primary">
-          {t('myRoutes.createNew')}
-        </Link>
+        {rutas.length > 0 && (
+          <Link to="/rutas" className="btn btn-primary">
+            {t('myRoutes.createNew')}
+          </Link>
+        )}
       </div>
 
       {!isPremium && <PremiumCTA />}

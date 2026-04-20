@@ -97,7 +97,10 @@ export default function Admin() {
   const [socialText, setSocialText] = useState('');
   const [socialCopied, setSocialCopied] = useState('');
   const [socialMentions, setSocialMentions] = useState([]);
-  const [socialMode, setSocialMode] = useState('monumento'); // 'monumento' | 'ruta'
+  const [socialMode, setSocialMode] = useState('monumento'); // 'monumento' | 'ruta' | 'diario'
+  const [diarioDays, setDiarioDays] = useState([]); // [{ dateStr, dateObj, monument, loading }]
+  const [diarioDaysCount] = useState(14); // preview next 14 days
+  const [diarioSelectedDate, setDiarioSelectedDate] = useState(null);
   const [rutasCulturales, setRutasCulturales] = useState([]);
   const [rutasCulturalesLoaded, setRutasCulturalesLoaded] = useState(false);
   const [selectedRuta, setSelectedRuta] = useState(null);
@@ -796,6 +799,74 @@ export default function Admin() {
     }
   };
 
+  // ======== DIARIO (monumento del día calendar) ========
+  const computeDailyPage = (dateObj) => {
+    // Same algorithm as Home's MonumentOfDay.jsx — deterministic by date
+    const seed = dateObj.getFullYear() * 10000 + (dateObj.getMonth() + 1) * 100 + dateObj.getDate();
+    return (seed % 500) + 1;
+  };
+
+  const fetchMonumentForDate = async (dateObj) => {
+    const page = computeDailyPage(dateObj);
+    const data = await getMonumentos({ solo_wikidata: true, solo_imagen: true, limit: 1, page });
+    const mon = data.items?.[0];
+    if (!mon) return null;
+    // Fetch full detail for description/style/etc. (used by socialGenerateText)
+    try {
+      return await getMonumento(mon.id);
+    } catch {
+      return mon;
+    }
+  };
+
+  const loadDiarioDays = async () => {
+    setSocialLoading(true);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = Array.from({ length: diarioDaysCount }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      return { dateStr, dateObj: d, monument: null, loading: true };
+    });
+    setDiarioDays(days);
+
+    // Fetch each day's monument (sequential to avoid rate limit)
+    for (let i = 0; i < days.length; i++) {
+      try {
+        const mon = await fetchMonumentForDate(days[i].dateObj);
+        setDiarioDays(prev => {
+          const next = [...prev];
+          next[i] = { ...next[i], monument: mon, loading: false };
+          return next;
+        });
+      } catch {
+        setDiarioDays(prev => {
+          const next = [...prev];
+          next[i] = { ...next[i], loading: false };
+          return next;
+        });
+      }
+    }
+    setSocialLoading(false);
+  };
+
+  const handleDiarioSelectDate = async (day) => {
+    if (!day.monument) return;
+    setDiarioSelectedDate(day.dateStr);
+    setSocialSelected(day.monument);
+    // Suggest mentions using the monument's metadata
+    let mentions = [];
+    try {
+      const params = { limit: 5 };
+      if (day.monument.pais) params.pais = day.monument.pais;
+      if (day.monument.comunidad_autonoma) params.region = day.monument.comunidad_autonoma;
+      mentions = await getSocialAccountsSuggest(params);
+    } catch { /* silent */ }
+    setSocialMentions(mentions);
+    setSocialText(socialGenerateText(day.monument, socialPlatform, mentions));
+  };
+
   const handleSocialRandom = async () => {
     setSocialLoading(true);
     setSocialSelected(null);
@@ -1065,6 +1136,30 @@ export default function Admin() {
       window.open(imgUrl, '_blank');
       setSocialCopied('image-url');
       setTimeout(() => setSocialCopied(''), 2000);
+    }
+  };
+
+  const handleSocialDownloadImage = async () => {
+    const imgUrl = socialSelected?.imagen_url || socialSelected?.imagenes?.[0]?.url;
+    if (!imgUrl) return;
+    try {
+      const resp = await fetch(imgUrl);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      // Build filename from monument name + extension inferred from blob type
+      const ext = (blob.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg').split(';')[0];
+      const safeName = (socialSelected.denominacion || 'monumento').replace(/[^\p{L}\p{N}\s-]/gu, '').trim().replace(/\s+/g, '-').slice(0, 60);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `${safeName}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Error descargando imagen:', err);
+      // Fallback: open in new tab
+      window.open(imgUrl, '_blank');
     }
   };
 
@@ -1860,7 +1955,17 @@ export default function Admin() {
                 <input type="radio" name="socialMode" value="ruta" checked={socialMode === 'ruta'} onChange={() => { setSocialMode('ruta'); setSocialSelected(null); setSocialText(''); loadRutasCulturales(); }} />
                 🗺️ Ruta cultural
               </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontWeight: socialMode === 'diario' ? 700 : 400 }}>
+                <input type="radio" name="socialMode" value="diario" checked={socialMode === 'diario'} onChange={() => { setSocialMode('diario'); setSocialSelected(null); setSocialText(''); setSelectedRuta(null); if (diarioDays.length === 0) loadDiarioDays(); }} />
+                📅 Diario
+              </label>
             </div>
+
+            {socialMode === 'diario' && (
+              <div style={{ marginBottom: '1rem', padding: '0.75rem 1rem', background: '#eff6ff', border: '1px solid #93c5fd', borderRadius: 8, fontSize: '0.88rem', color: '#1e3a8a' }}>
+                📅 El monumento de cada día se calcula automáticamente a partir de la fecha (misma regla que el home público). Usa esta vista para preparar publicaciones de los próximos {diarioDaysCount} días.
+              </div>
+            )}
 
             {socialMode === 'monumento' ? (
               <div className="social-search-bar">
@@ -1966,11 +2071,66 @@ export default function Admin() {
               </div>
               )}
 
+              {/* Left: calendar list (diario mode) */}
+              {socialMode === 'diario' && (
+                <div className="social-results">
+                  {diarioDays.length === 0 && socialLoading && (
+                    <div className="admin-loading">Cargando calendario...</div>
+                  )}
+                  {diarioDays.map((day, idx) => {
+                    const d = day.dateObj;
+                    const weekdayShort = d.toLocaleDateString('es-ES', { weekday: 'short' });
+                    const dayNum = d.getDate();
+                    const monthShort = d.toLocaleDateString('es-ES', { month: 'short' });
+                    const isToday = idx === 0;
+                    const selected = diarioSelectedDate === day.dateStr;
+                    return (
+                      <div
+                        key={day.dateStr}
+                        className={`social-result-card ${selected ? 'active' : ''}`}
+                        onClick={() => handleDiarioSelectDate(day)}
+                        style={isToday ? { borderLeft: '3px solid #3b82f6' } : undefined}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: 56, background: isToday ? '#eff6ff' : '#f8fafc', borderRadius: 8, padding: '0.5rem 0.25rem' }}>
+                          <span style={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase' }}>{weekdayShort}</span>
+                          <strong style={{ fontSize: '1.3rem', color: isToday ? '#1e3a8a' : '#1e293b' }}>{dayNum}</strong>
+                          <span style={{ fontSize: '0.7rem', color: '#64748b' }}>{monthShort}</span>
+                        </div>
+                        <div className="social-result-img">
+                          {day.monument?.imagen_url ? (
+                            <img src={day.monument.imagen_url} alt="" onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                          ) : (
+                            <img src="/no-image.svg" alt="" />
+                          )}
+                        </div>
+                        <div className="social-result-info">
+                          {day.loading ? (
+                            <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Cargando...</span>
+                          ) : day.monument ? (
+                            <>
+                              <strong>{day.monument.denominacion}</strong>
+                              <span>{[day.monument.municipio, day.monument.provincia].filter(Boolean).join(', ')}</span>
+                              <span className="social-result-pais">{day.monument.pais}</span>
+                            </>
+                          ) : (
+                            <span style={{ color: '#ef4444' }}>Sin monumento</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               {/* Right: post generator */}
               <div className="social-generator" style={socialMode === 'ruta' ? { gridColumn: '1 / -1' } : undefined}>
-                {(socialMode === 'monumento' && !socialSelected) || (socialMode === 'ruta' && !selectedRuta) ? (
+                {(socialMode === 'monumento' && !socialSelected) || (socialMode === 'ruta' && !selectedRuta) || (socialMode === 'diario' && !socialSelected) ? (
                   <div className="social-placeholder">
-                    <span>{socialMode === 'monumento' ? 'Selecciona un monumento de la lista para generar la publicacion' : 'Selecciona una ruta cultural del desplegable'}</span>
+                    <span>
+                      {socialMode === 'monumento' && 'Selecciona un monumento de la lista para generar la publicacion'}
+                      {socialMode === 'ruta' && 'Selecciona una ruta cultural del desplegable'}
+                      {socialMode === 'diario' && 'Selecciona un día del calendario para generar su publicación'}
+                    </span>
                   </div>
                 ) : (
                   <>
@@ -1990,16 +2150,16 @@ export default function Admin() {
                     </div>
 
                     <div className="social-preview-area">
-                      {socialMode === 'monumento' && socialImageUrl && (
+                      {(socialMode === 'monumento' || socialMode === 'diario') && socialImageUrl && (
                         <div className="social-image-preview">
                           <img src={socialImageUrl} alt={socialSelected.denominacion} onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
                           <div className="social-image-actions">
                             <button className="social-copy-btn" onClick={handleSocialCopyImage} title="Copiar imagen o abrir en nueva pestaña">
                               {socialCopied === 'image' ? '✓ Imagen copiada' : socialCopied === 'image-url' ? '↗ Abierta en pestaña' : 'Copiar imagen'}
                             </button>
-                            <a href={socialImageUrl} download target="_blank" rel="noopener noreferrer" className="social-download-btn">
+                            <button className="social-download-btn" onClick={handleSocialDownloadImage} title="Descargar imagen al disco">
                               Descargar
-                            </a>
+                            </button>
                           </div>
                         </div>
                       )}

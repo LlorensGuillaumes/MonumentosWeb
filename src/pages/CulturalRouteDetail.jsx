@@ -117,6 +117,18 @@ export default function CulturalRouteDetail() {
         </section>
       )}
 
+      {/* Actions */}
+      <div className="cr-actions">
+        {user && (
+          <Link to={`/rutas?from_cultural=${slug}`} className="btn btn-primary btn-lg">
+            {t('curatedRoutes.planThisRoute')}
+          </Link>
+        )}
+        <Link to="/rutas-curadas" className="btn btn-outline">
+          {t('culturalRoutes.backToRoutes')}
+        </Link>
+      </div>
+
       {/* Stops */}
       <section className="cr-stops">
         {paradas.map((p, i) => (
@@ -160,17 +172,6 @@ export default function CulturalRouteDetail() {
         ))}
       </section>
 
-      {/* Actions */}
-      <div className="cr-actions">
-        {user && (
-          <Link to={`/rutas?from_cultural=${slug}`} className="btn btn-primary btn-lg">
-            {t('curatedRoutes.planThisRoute')}
-          </Link>
-        )}
-        <Link to="/rutas-curadas" className="btn btn-outline">
-          {t('culturalRoutes.backToRoutes')}
-        </Link>
-      </div>
     </div>
   );
 }

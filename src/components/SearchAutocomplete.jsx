@@ -4,14 +4,21 @@ import { useTranslation } from 'react-i18next';
 import { getMonumentos } from '../services/api';
 import './SearchAutocomplete.css';
 
-export default function SearchAutocomplete({ value, onChange, onSearch, placeholder }) {
+export default function SearchAutocomplete({ value, onChange, onSearch, onSelect, placeholder }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [localValue, setLocalValue] = useState(value || '');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const timeoutRef = useRef(null);
+  const syncTimeoutRef = useRef(null);
   const wrapperRef = useRef(null);
+
+  // Re-sync from external value (e.g. reset/clear) without overwriting active typing
+  useEffect(() => {
+    setLocalValue(value || '');
+  }, [value]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -25,7 +32,11 @@ export default function SearchAutocomplete({ value, onChange, onSearch, placehol
 
   const handleChange = (e) => {
     const q = e.target.value;
-    onChange(q);
+    setLocalValue(q);  // instant update — no global re-render
+
+    // Debounced sync to parent (so global state and dependent renders happen only when typing pauses)
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = setTimeout(() => onChange(q), 300);
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (q.length < 2) {
@@ -50,11 +61,20 @@ export default function SearchAutocomplete({ value, onChange, onSearch, placehol
 
   const handleSelect = (m) => {
     setShowSuggestions(false);
-    navigate(`/monumento/${m.id}`);
+    if (onSelect) {
+      onSelect(m);
+    } else {
+      navigate(`/monumento/${m.id}`);
+    }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
+      // Flush pending debounced sync so the search uses the current text
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+        onChange(localValue);
+      }
       setShowSuggestions(false);
       if (onSearch) onSearch();
     }
@@ -67,7 +87,7 @@ export default function SearchAutocomplete({ value, onChange, onSearch, placehol
     <div className="autocomplete-wrapper" ref={wrapperRef}>
       <input
         type="text"
-        value={value}
+        value={localValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}

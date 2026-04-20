@@ -1,32 +1,126 @@
-.language-select {
-  appearance: none;
-  -webkit-appearance: none;
+.language-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.language-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   background: rgba(255, 255, 255, 0.12);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 6px;
-  padding: 0.35rem 2rem 0.35rem 0.6rem;
+  padding: 0.4rem 0.65rem;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  outline: none;
-  transition: all 0.2s;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.7)'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.6rem center;
+  transition: all 0.15s;
+  font-family: inherit;
 }
 
-.language-select:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+.language-trigger:hover {
+  background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.4);
 }
 
-.language-select:focus {
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+.lang-flag {
+  font-size: 1rem;
+  line-height: 1;
 }
 
-.language-select option {
-  background: #1a365d;
-  color: white;
+.lang-code {
+  letter-spacing: 0.5px;
+  font-size: 0.78rem;
+}
+
+.lang-arrow {
+  opacity: 0.7;
+  transition: transform 0.2s;
+}
+
+.language-trigger[aria-expanded="true"] .lang-arrow {
+  transform: rotate(180deg);
+}
+
+/* Menu */
+.language-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  min-width: 180px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: lang-menu-in 0.15s ease-out;
+}
+
+@keyframes lang-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #1e293b;
+  transition: background 0.1s;
+}
+
+.language-option:hover {
+  background: #f1f5f9;
+}
+
+.language-option.active {
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.language-option .lang-label {
+  flex: 1;
+}
+
+.lang-check {
+  color: #1e3a8a;
+  flex-shrink: 0;
+}
+
+/* When inside the mobile hamburger settings dropdown, override colors so it looks right on light bg */
+.settings-dropdown-floating .language-trigger {
+  background: white;
+  color: #1e293b;
+  border: 1.5px solid #cbd5e1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  min-height: 38px;
+}
+
+.settings-dropdown-floating .language-trigger:hover {
+  background: #f8fafc;
+  border-color: #1a365d;
+}
+
+.settings-dropdown-floating .language-menu {
+  right: auto;
+  left: 0;
+  min-width: 200px;
 }

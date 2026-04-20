@@ -227,15 +227,16 @@ export default function Detail() {
         })}</script>
       </Helmet>
       <nav className="breadcrumb">
-        <button className="back-btn" onClick={() => navigate(-1)} title={t('detail.back')}>
-          ← {t('detail.back')}
-        </button>
-        <span className="breadcrumb-sep">/</span>
-        <Link to="/">{t('nav.home')}</Link>
-        <span>/</span>
-        <Link to="/buscar">{t('nav.search')}</Link>
-        <span>/</span>
-        <span>{monumento.denominacion}</span>
+        <div className="breadcrumb-nav">
+          <button className="back-btn" onClick={() => navigate(-1)} title={t('detail.back')}>
+            ← {t('detail.back')}
+          </button>
+          <span className="breadcrumb-sep">/</span>
+          <Link to="/">{t('nav.home')}</Link>
+          <span>/</span>
+          <Link to="/buscar">{t('nav.search')}</Link>
+        </div>
+        <div className="breadcrumb-current">{monumento.denominacion}</div>
       </nav>
 
       <div className="detail-layout">

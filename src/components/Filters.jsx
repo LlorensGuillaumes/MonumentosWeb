@@ -1,12 +1,17 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import SearchableSelect from './SearchableSelect';
 import SearchAutocomplete from './SearchAutocomplete';
 import './Filters.css';
 
-export default function Filters({ onSearch }) {
+export default function Filters({ onSearch, onMonumentSelect }) {
   const { filters, filtros, setFilter, resetFilters, reloadFiltros } = useApp();
   const { t } = useTranslation();
+  // En móvil, los filtros avanzados empiezan colapsados; en desktop siempre se ven
+  const [showAdvanced, setShowAdvanced] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth > 768 : true
+  );
 
   // Traduce las opciones de filtro manteniendo el value original (español/BD)
   const translateOptions = (options, i18nPrefix) =>
@@ -150,148 +155,179 @@ export default function Filters({ onSearch }) {
       )
     : [];
 
+  // Count active advanced filters (everything except the free-text search)
+  const activeAdvancedCount = [
+    filters.pais, filters.region, filters.provincia, filters.municipio,
+    filters.clasificacion, filters.tipo_monumento, filters.periodo,
+    filters.evento, filters.estilo,
+  ].filter(Boolean).length + (filters.solo_wikidata ? 1 : 0) + (filters.solo_imagen ? 1 : 0);
+
   return (
     <form className="filters" onSubmit={handleSubmit}>
-      <div className="filters-row">
+      {/* Fila 1: siempre visible — búsqueda + botón toggle en móvil */}
+      <div className="filters-row filters-row-always">
         <div className="filter-group filter-group-search">
           <label>{t('filters.search')}</label>
           <SearchAutocomplete
             value={filters.q}
             onChange={(v) => handleChange('q', v)}
             onSearch={onSearch}
+            onSelect={onMonumentSelect}
             placeholder={t('filters.searchPlaceholder')}
           />
         </div>
 
-        {filtros.paises && filtros.paises.length > 1 && (
+        {/* Toggle visible solo en móvil */}
+        <button
+          type="button"
+          className="filters-toggle-btn"
+          onClick={() => setShowAdvanced(v => !v)}
+          aria-expanded={showAdvanced}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" y1="6" x2="20" y2="6" /><line x1="7" y1="12" x2="17" y2="12" /><line x1="10" y1="18" x2="14" y2="18" />
+          </svg>
+          <span>{showAdvanced ? t('filters.hideFilters', 'Ocultar filtros') : t('filters.showFilters', 'Más filtros')}</span>
+          {activeAdvancedCount > 0 && (
+            <span className="filters-toggle-badge">{activeAdvancedCount}</span>
+          )}
+        </button>
+      </div>
+
+      {/* Filtros avanzados: colapsables en móvil */}
+      <div className={`filters-advanced ${showAdvanced ? 'open' : ''}`}>
+        <div className="filters-row">
+          {filtros.paises && filtros.paises.length > 1 && (
+            <div className="filter-group">
+              <label>{t('filters.country')}</label>
+              <SearchableSelect
+                value={filters.pais}
+                onChange={handlePaisChange}
+                options={translateOptions(filtros.paises, 'filters.countries')}
+                placeholder={t('filters.allCountries')}
+              />
+            </div>
+          )}
+
           <div className="filter-group">
-            <label>{t('filters.country')}</label>
+            <label>{labels.region}</label>
             <SearchableSelect
-              value={filters.pais}
-              onChange={handlePaisChange}
-              options={translateOptions(filtros.paises, 'filters.countries')}
-              placeholder={t('filters.allCountries')}
+              value={filters.region}
+              onChange={handleRegionChange}
+              options={regionesFiltradas}
+              placeholder={placeholders.region}
             />
           </div>
-        )}
 
-        <div className="filter-group">
-          <label>{labels.region}</label>
-          <SearchableSelect
-            value={filters.region}
-            onChange={handleRegionChange}
-            options={regionesFiltradas}
-            placeholder={placeholders.region}
-          />
+          <div className="filter-group">
+            <label>{labels.provincia}</label>
+            <SearchableSelect
+              value={filters.provincia}
+              onChange={handleProvinciaChange}
+              options={provinciasFiltradas}
+              placeholder={placeholders.provincia}
+            />
+          </div>
+
+          <div className="filter-group">
+            <label>{labels.municipio}</label>
+            <SearchableSelect
+              value={filters.municipio}
+              onChange={handleMunicipioChange}
+              options={municipiosFiltrados}
+              placeholder={hasGeoFilter ? placeholders.municipio : t('filters.selectFilterFirst')}
+              disabled={!hasGeoFilter}
+            />
+          </div>
         </div>
 
-        <div className="filter-group">
-          <label>{labels.provincia}</label>
-          <SearchableSelect
-            value={filters.provincia}
-            onChange={handleProvinciaChange}
-            options={provinciasFiltradas}
-            placeholder={placeholders.provincia}
-          />
-        </div>
+        <div className="filters-row">
+          <div className="filter-group">
+            <label>{t('filters.classification')}</label>
+            <SearchableSelect
+              value={filters.clasificacion}
+              onChange={handleClasificacionChange}
+              options={clasificacionOptions}
+              placeholder={t('filters.allClassifications')}
+            />
+          </div>
 
-        <div className="filter-group">
-          <label>{labels.municipio}</label>
-          <SearchableSelect
-            value={filters.municipio}
-            onChange={handleMunicipioChange}
-            options={municipiosFiltrados}
-            placeholder={hasGeoFilter ? placeholders.municipio : t('filters.selectFilterFirst')}
-            disabled={!hasGeoFilter}
-          />
+          {filtros.tipos_monumento?.length > 0 && (
+            <div className="filter-group">
+              <label>{t('filters.monumentType')}</label>
+              <SearchableSelect
+                value={filters.tipo_monumento}
+                onChange={handleTipoMonumentoChange}
+                options={translateOptions(filtros.tipos_monumento, 'filters.monumentTypes')}
+                placeholder={t('filters.allMonumentTypes')}
+              />
+            </div>
+          )}
+
+          {filtros.periodos?.length > 0 && (
+            <div className="filter-group">
+              <label>{t('filters.period')}</label>
+              <SearchableSelect
+                value={filters.periodo}
+                onChange={(v) => handleChange('periodo', v)}
+                options={translateOptions(filtros.periodos, 'filters.periods')}
+                placeholder={t('filters.allPeriods')}
+              />
+            </div>
+          )}
+
+          {filtros.eventos?.length > 0 && (
+            <div className="filter-group">
+              <label>{t('filters.event')}</label>
+              <SearchableSelect
+                value={filters.evento}
+                onChange={(v) => handleChange('evento', v)}
+                options={translateOptions(filtros.eventos, 'filters.events')}
+                placeholder={t('filters.allEvents')}
+              />
+            </div>
+          )}
+
+          <div className="filter-group">
+            <label>{t('filters.style')}</label>
+            <SearchableSelect
+              value={filters.estilo}
+              onChange={(v) => handleChange('estilo', v)}
+              options={filtros.estilos}
+              placeholder={t('filters.allStyles')}
+            />
+          </div>
+
+          <div className="filter-group filter-checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={filters.solo_wikidata}
+                onChange={(e) => handleChange('solo_wikidata', e.target.checked)}
+              />
+              {t('filters.onlyWikipedia')}
+            </label>
+          </div>
+
+          <div className="filter-group filter-checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={filters.solo_imagen}
+                onChange={(e) => handleChange('solo_imagen', e.target.checked)}
+              />
+              {t('filters.onlyImage')}
+            </label>
+          </div>
         </div>
       </div>
 
-      <div className="filters-row">
-        <div className="filter-group">
-          <label>{t('filters.classification')}</label>
-          <SearchableSelect
-            value={filters.clasificacion}
-            onChange={handleClasificacionChange}
-            options={clasificacionOptions}
-            placeholder={t('filters.allClassifications')}
-          />
-        </div>
-
-        {filtros.tipos_monumento?.length > 0 && (
-          <div className="filter-group">
-            <label>{t('filters.monumentType')}</label>
-            <SearchableSelect
-              value={filters.tipo_monumento}
-              onChange={handleTipoMonumentoChange}
-              options={translateOptions(filtros.tipos_monumento, 'filters.monumentTypes')}
-              placeholder={t('filters.allMonumentTypes')}
-            />
-          </div>
-        )}
-
-        {filtros.periodos?.length > 0 && (
-          <div className="filter-group">
-            <label>{t('filters.period')}</label>
-            <SearchableSelect
-              value={filters.periodo}
-              onChange={(v) => handleChange('periodo', v)}
-              options={translateOptions(filtros.periodos, 'filters.periods')}
-              placeholder={t('filters.allPeriods')}
-            />
-          </div>
-        )}
-
-        {filtros.eventos?.length > 0 && (
-          <div className="filter-group">
-            <label>{t('filters.event')}</label>
-            <SearchableSelect
-              value={filters.evento}
-              onChange={(v) => handleChange('evento', v)}
-              options={translateOptions(filtros.eventos, 'filters.events')}
-              placeholder={t('filters.allEvents')}
-            />
-          </div>
-        )}
-
-        <div className="filter-group">
-          <label>{t('filters.style')}</label>
-          <SearchableSelect
-            value={filters.estilo}
-            onChange={(v) => handleChange('estilo', v)}
-            options={filtros.estilos}
-            placeholder={t('filters.allStyles')}
-          />
-        </div>
-
-        <div className="filter-group filter-checkbox">
-          <label>
-            <input
-              type="checkbox"
-              checked={filters.solo_wikidata}
-              onChange={(e) => handleChange('solo_wikidata', e.target.checked)}
-            />
-            {t('filters.onlyWikipedia')}
-          </label>
-        </div>
-
-        <div className="filter-group filter-checkbox">
-          <label>
-            <input
-              type="checkbox"
-              checked={filters.solo_imagen}
-              onChange={(e) => handleChange('solo_imagen', e.target.checked)}
-            />
-            {t('filters.onlyImage')}
-          </label>
-        </div>
-
-        <div className="filter-actions">
-          <button type="submit" className="btn btn-primary">{t('filters.search')}</button>
-          <button type="button" className="btn btn-secondary" onClick={handleReset}>
-            {t('filters.reset')}
-          </button>
-        </div>
+      {/* Acciones: siempre visibles */}
+      <div className="filter-actions filter-actions-bottom">
+        <button type="submit" className="btn btn-primary">{t('filters.search')}</button>
+        <button type="button" className="btn btn-secondary" onClick={handleReset}>
+          {t('filters.reset')}
+        </button>
       </div>
     </form>
   );

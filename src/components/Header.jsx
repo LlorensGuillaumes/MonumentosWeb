@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
@@ -17,11 +18,46 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [rutasOpen, setRutasOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => document.documentElement.getAttribute('data-theme') === 'dark');
+
+  // Observe theme changes (the ThemeToggle component sets data-theme on the html element)
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.getAttribute('data-theme') === 'dark');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
   const [profileForm, setProfileForm] = useState({});
   const [profileMsg, setProfileMsg] = useState(null);
   const [profileSaving, setProfileSaving] = useState(false);
   const menuRef = useRef(null);
   const rutasRef = useRef(null);
+  const rutasBtnRef = useRef(null);
+  const settingsRef = useRef(null);
+  const settingsDropdownRef = useRef(null);
+  const [rutasMenuStyle, setRutasMenuStyle] = useState({});
+
+  // Cuando se abre el dropdown de Rutas, calcular su posición fixed en móvil
+  useEffect(() => {
+    if (!rutasOpen || !rutasBtnRef.current) {
+      setRutasMenuStyle({});
+      return;
+    }
+    // Solo aplicamos position fixed en mobile (≤768px), en desktop el CSS por defecto se encarga
+    if (window.innerWidth > 768) {
+      setRutasMenuStyle({});
+      return;
+    }
+    const rect = rutasBtnRef.current.getBoundingClientRect();
+    setRutasMenuStyle({
+      position: 'fixed',
+      top: `${rect.bottom + 6}px`,
+      left: `${Math.max(8, rect.left)}px`,
+    });
+  }, [rutasOpen]);
 
   // Cerrar menús al hacer clic fuera
   useEffect(() => {
@@ -31,6 +67,13 @@ export default function Header() {
       }
       if (rutasRef.current && !rutasRef.current.contains(e.target)) {
         setRutasOpen(false);
+      }
+      // Settings dropdown is rendered via Portal, so check both the button wrapper AND the portal node
+      if (
+        settingsRef.current && !settingsRef.current.contains(e.target) &&
+        (!settingsDropdownRef.current || !settingsDropdownRef.current.contains(e.target))
+      ) {
+        setSettingsOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClick);
@@ -93,6 +136,8 @@ export default function Header() {
           <span className="logo-text">{t('header.title')}</span>
         </Link>
 
+        <Link to="/" className="header-mobile-title">{t('header.title')}</Link>
+
         <nav className="nav">
           {user?.rol === 'admin' && (
             <Link
@@ -124,13 +169,14 @@ export default function Header() {
               </Link>
               <div className="nav-dropdown" ref={rutasRef}>
                 <button
+                  ref={rutasBtnRef}
                   className={`nav-dropdown-btn ${location.pathname === '/rutas' || location.pathname.startsWith('/rutas-curadas') ? 'active' : ''}`}
                   onClick={() => setRutasOpen(!rutasOpen)}
                 >
                   {t('nav.routes')} <span className="dropdown-arrow">&#9662;</span>
                 </button>
                 {rutasOpen && (
-                  <div className="nav-dropdown-menu">
+                  <div className="nav-dropdown-menu" style={rutasMenuStyle}>
                     <Link to="/rutas" onClick={() => setRutasOpen(false)}>{t('nav.myRoutes')}</Link>
                     <Link to="/rutas-curadas" onClick={() => setRutasOpen(false)}>{t('nav.curatedRoutes')}</Link>
                   </div>
@@ -176,9 +222,86 @@ export default function Header() {
         </nav>
 
         <div className="header-right">
-          <ThemeToggle />
-          <NotificationBell />
-          <LanguageSelector />
+          {/* Desktop: settings visibles directamente */}
+          <div className="header-settings-desktop">
+            <ThemeToggle />
+            <NotificationBell />
+            <LanguageSelector />
+          </div>
+
+          {/* Mobile: botón hamburguesa que despliega los mismos controles */}
+          <div className="header-settings-mobile" ref={settingsRef}>
+            <button
+              className="settings-hamburger"
+              onClick={() => setSettingsOpen(o => !o)}
+              aria-label="Abrir menú de configuración"
+              title="Configuración"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+            {settingsOpen && createPortal(
+              <div className="settings-dropdown-portal">
+                <div className="settings-backdrop" onClick={() => setSettingsOpen(false)} />
+                <div className="settings-dropdown-floating" ref={settingsDropdownRef}>
+                  <div
+                    className="settings-row"
+                    onMouseDown={e => {
+                      // Forward to the inner button on mousedown so the doc-listener doesn't close us first
+                      const btn = e.currentTarget.querySelector('button');
+                      if (btn && !btn.contains(e.target)) {
+                        e.preventDefault();
+                        btn.click();
+                      }
+                    }}
+                  >
+                    <ThemeToggle />
+                    <span className="settings-label">{isDark ? 'Modo claro' : 'Modo oscuro'}</span>
+                  </div>
+                  <div
+                    className="settings-row"
+                    onMouseDown={e => {
+                      const btn = e.currentTarget.querySelector('button');
+                      if (btn && !btn.contains(e.target)) {
+                        e.preventDefault();
+                        btn.click();
+                      }
+                    }}
+                  >
+                    <NotificationBell />
+                    <span className="settings-label">Notificaciones</span>
+                  </div>
+                  <div
+                    className="settings-row"
+                    onMouseDown={e => {
+                      // Don't intercept if click is inside the language dropdown menu (options list)
+                      if (e.target.closest('.language-menu')) return;
+                      const btn = e.currentTarget.querySelector('.language-trigger');
+                      if (btn && !btn.contains(e.target)) {
+                        e.preventDefault();
+                        btn.click();
+                      }
+                    }}
+                  >
+                    <LanguageSelector />
+                    <span className="settings-label">Idioma</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="settings-close-btn"
+                    onClick={() => setSettingsOpen(false)}
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>,
+              document.body
+            )}
+          </div>
 
           {stats && (
             <div className="stats-badge">

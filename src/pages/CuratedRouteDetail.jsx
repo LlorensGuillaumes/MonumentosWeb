@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { getMonumentos, getMonumentosRadio } from '../services/api';
+import { getMonumentos, getMonumentosRadio, getRutaCultural } from '../services/api';
 import { getRouteById, THEMES } from '../data/curatedRoutes';
 import { useAuth } from '../context/AuthContext';
 import 'leaflet/dist/leaflet.css';
@@ -17,49 +17,61 @@ export default function CuratedRouteDetail() {
   const route = getRouteById(id);
 
   const [monuments, setMonuments] = useState([]);
+  const [paradas, setParadas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMonuments, setLoadingMonuments] = useState(false);
+  const [showNearby, setShowNearby] = useState(false);
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('grid'); // grid | list
 
   const theme = route ? THEMES.find(th => th.id === route.theme) : null;
 
+  // Fetch paradas from API (rutas_culturales)
   useEffect(() => {
     if (!route) return;
     setLoading(true);
     setError(null);
 
-    const fetchMonuments = async () => {
-      try {
-        let items = [];
-        // Try radius search first if defined
-        if (route.radiusSearch) {
-          const data = await getMonumentosRadio({
-            lat: route.radiusSearch.lat,
-            lng: route.radiusSearch.lng,
-            km: route.radiusSearch.km,
-            limit: route.searchParams.limit || 30,
-            ...(route.searchParams.categoria && { categoria: route.searchParams.categoria }),
-            ...(route.searchParams.estilo && { estilo: route.searchParams.estilo }),
-            ...(route.searchParams.pais && { pais: route.searchParams.pais }),
-          });
-          items = data.items || [];
-        }
-        // If radius search returned few results, or no radius search, use normal search
-        if (items.length < 3) {
-          const data = await getMonumentos(route.searchParams);
-          items = data.items || [];
-        }
-        setMonuments(items);
-      } catch (err) {
-        console.error('Error loading route monuments:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMonuments();
+    getRutaCultural(route.id)
+      .then(data => {
+        const stops = (data.paradas || []).filter(p => p.bien_id);
+        setParadas(stops);
+      })
+      .catch(() => setParadas([]))
+      .finally(() => setLoading(false));
   }, [route]);
+
+  // Fetch nearby monuments (lazy, on demand)
+  const fetchNearbyMonuments = async () => {
+    if (monuments.length > 0 || !route) return;
+    setLoadingMonuments(true);
+    try {
+      let items = [];
+      if (route.radiusSearch) {
+        const data = await getMonumentosRadio({
+          lat: route.radiusSearch.lat,
+          lng: route.radiusSearch.lng,
+          km: route.radiusSearch.km,
+          limit: route.searchParams.limit || 30,
+          ...(route.searchParams.categoria && { categoria: route.searchParams.categoria }),
+          ...(route.searchParams.estilo && { estilo: route.searchParams.estilo }),
+          ...(route.searchParams.pais && { pais: route.searchParams.pais }),
+        });
+        items = data.items || [];
+      }
+      if (items.length < 3) {
+        const data = await getMonumentos(route.searchParams);
+        items = data.items || [];
+      }
+      // Exclude monuments already in paradas
+      const paradaIds = new Set(paradas.map(p => p.bien_id));
+      setMonuments(items.filter(m => !paradaIds.has(m.id)));
+    } catch (err) {
+      console.error('Error loading nearby monuments:', err);
+    } finally {
+      setLoadingMonuments(false);
+    }
+  };
 
   if (!route) {
     return (
@@ -72,8 +84,10 @@ export default function CuratedRouteDetail() {
     );
   }
 
-  const countryFlags = { 'España': '🇪🇸', 'Francia': '🇫🇷', 'Portugal': '🇵🇹' };
+  const countryFlags = { 'España': '🇪🇸', 'Francia': '🇫🇷', 'Portugal': '🇵🇹', 'Italia': '🇮🇹', 'Alemania': '🇩🇪', 'Austria': '🇦🇹', 'Reino Unido': '🇬🇧', 'Rumanía': '🇷🇴', 'Suiza': '🇨🇭', 'Líbano': '🇱🇧', 'Túnez': '🇹🇳' };
+  const paradasWithCoords = paradas.filter(p => p.latitud && p.longitud);
   const monumentsWithCoords = monuments.filter(m => m.latitud && m.longitud);
+  const mapItems = paradasWithCoords.length > 0 ? paradasWithCoords : monumentsWithCoords;
 
   return (
     <div className="curated-detail">
@@ -109,22 +123,12 @@ export default function CuratedRouteDetail() {
       {/* Description */}
       <p className="curated-detail-desc">{t(route.descKey)}</p>
 
-      {/* Highlights */}
-      <div className="curated-detail-highlights">
-        <h3>{t('curatedRoutes.keyMonuments')}</h3>
-        <div className="curated-detail-highlight-list">
-          {route.highlights.map(h => (
-            <span key={h} className="curated-detail-highlight">{h}</span>
-          ))}
-        </div>
-      </div>
-
       {/* Map */}
       <section className="curated-detail-map-section">
         <h2>{t('curatedRoutes.mapTitle')}</h2>
         {loading ? (
           <div className="curated-detail-map-loading">{t('curatedRoutes.loadingMonuments')}</div>
-        ) : monumentsWithCoords.length > 0 ? (
+        ) : mapItems.length > 0 ? (
           <div className="curated-detail-map">
             <MapContainer
               center={[route.center.lat, route.center.lng]}
@@ -132,14 +136,13 @@ export default function CuratedRouteDetail() {
               style={{ height: '100%', width: '100%' }}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              {monumentsWithCoords.map(m => (
-                <Marker key={m.id} position={[m.latitud, m.longitud]}>
+              {mapItems.map((m, i) => (
+                <Marker key={m.bien_id || m.id || i} position={[m.latitud, m.longitud]}>
                   <Popup>
-                    <strong>{m.denominacion}</strong><br />
-                    {m.municipio}
-                    {m.provincia && <>, {m.provincia}</>}
+                    <strong>{m.nombre || m.denominacion}</strong><br />
+                    {m.localidad || m.municipio}
                     <br />
-                    <a href={`/monumento/${m.id}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`/monumento/${m.bien_id || m.id}`} target="_blank" rel="noopener noreferrer">
                       {t('curatedRoutes.viewMonument')}
                     </a>
                   </Popup>
@@ -151,6 +154,42 @@ export default function CuratedRouteDetail() {
           <div className="curated-detail-map-empty">{t('curatedRoutes.noMonumentsFound')}</div>
         )}
       </section>
+
+      {/* Paradas (from DB) */}
+      {!loading && paradas.length > 0 && (
+        <section className="curated-detail-stops">
+          <h2>{t('curatedRoutes.routeStops', { count: paradas.length })}</h2>
+          <div className="curated-stops-list">
+            {paradas.map((p, i) => (
+              <Link key={p.id || i} to={`/monumento/${p.bien_id}`} className="curated-stop-row">
+                <span className="curated-stop-num">{p.orden || i + 1}</span>
+                <img
+                  src={p.bien_imagen_url || '/no-image.svg'}
+                  alt=""
+                  loading="lazy"
+                  onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }}
+                />
+                <div className="curated-stop-info">
+                  <strong>{p.nombre}</strong>
+                  <span>{p.localidad || p.bien_denominacion || ''}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Highlights fallback (if no paradas from DB) */}
+      {!loading && paradas.length === 0 && (
+        <div className="curated-detail-highlights">
+          <h3>{t('curatedRoutes.keyMonuments')}</h3>
+          <div className="curated-detail-highlight-list">
+            {route.highlights.map(h => (
+              <span key={h} className="curated-detail-highlight" title={h}>{h}</span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="curated-detail-actions">
@@ -167,11 +206,26 @@ export default function CuratedRouteDetail() {
         </Link>
       </div>
 
-      {/* Monuments list */}
-      {!loading && monuments.length > 0 && (
+      {/* Nearby monuments (on demand) */}
+      {paradas.length > 0 && !showNearby && (
+        <div className="curated-detail-nearby-toggle">
+          <button
+            className="btn btn-outline"
+            onClick={() => { setShowNearby(true); fetchNearbyMonuments(); }}
+          >
+            {t('curatedRoutes.showNearbyMonuments')}
+          </button>
+        </div>
+      )}
+
+      {showNearby && loadingMonuments && (
+        <div className="curated-detail-map-loading">{t('curatedRoutes.loadingMonuments')}</div>
+      )}
+
+      {showNearby && !loadingMonuments && monuments.length > 0 && (
         <section className="curated-detail-monuments">
           <div className="curated-detail-monuments-header">
-            <h2>{t('curatedRoutes.monumentsFound', { count: monuments.length })}</h2>
+            <h2>{t('curatedRoutes.nearbyMonuments', { count: monuments.length })}</h2>
             <div className="curated-view-toggle">
               <button
                 className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}

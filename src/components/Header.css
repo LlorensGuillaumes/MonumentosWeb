@@ -33,6 +33,7 @@
 
 .nav {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
@@ -43,9 +44,13 @@
   border-radius: 6px;
   transition: all 0.2s;
   font-weight: 500;
-  display: flex;
+  font-size: 1rem;
+  line-height: 1.4;
+  display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  height: 36px;
+  box-sizing: border-box;
 }
 
 .nav-link:hover {
@@ -76,10 +81,13 @@
   padding: 0.5rem;
   border-radius: 6px;
   transition: all 0.2s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
   position: relative;
+  height: 36px;
+  box-sizing: border-box;
 }
 
 .nav-icon-link svg {
@@ -119,12 +127,16 @@
   border-radius: 6px;
   transition: all 0.2s;
   font-weight: 500;
-  font-size: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
   font-family: inherit;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
+  height: 36px;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .nav-dropdown-btn:hover {
@@ -174,6 +186,196 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+/* Centered title — only visible on mobile, sits between logo and hamburger */
+.header-mobile-title {
+  display: none;
+}
+
+.header-settings-desktop {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-settings-mobile {
+  display: none;
+  position: relative;
+}
+
+.settings-hamburger {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.settings-hamburger:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  min-width: 220px;
+  padding: 0.5rem;
+  z-index: 1600;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Portal version (renderizada en document.body para evitar stacking issues) */
+.settings-dropdown-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.settings-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+}
+
+.settings-dropdown-floating {
+  position: absolute;
+  top: 60px;
+  right: 0.75rem;
+  left: 0.75rem;
+  max-width: 360px;
+  margin-left: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  pointer-events: auto;
+}
+
+.settings-dropdown-floating .settings-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.settings-dropdown-floating .settings-row:hover {
+  background: #f1f5f9;
+}
+
+.settings-dropdown-floating .settings-label {
+  color: #1e293b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+  text-align: right;
+  user-select: none;
+}
+
+/* Override dark-on-dark / light-on-light style problems for components inside dropdown */
+.settings-dropdown-floating .theme-toggle {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  flex-shrink: 0;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.settings-dropdown-floating .theme-toggle:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.settings-dropdown-floating .bell-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  flex-shrink: 0;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.settings-dropdown-floating .bell-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* LanguageSelector overrides moved to LanguageSelector.css for cleaner separation */
+
+/* Close button */
+.settings-close-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.6rem;
+  background: #1a365d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.settings-close-btn:hover {
+  background: #2c5282;
+}
+
+.settings-close-btn:active {
+  background: #0f1f3a;
+}
+
+/* Reposition notification dropdown when it's inside the hamburger menu */
+.settings-dropdown-floating .notification-dropdown {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  transform: translate(-50%, -50%);
+  margin-top: 0;
+  width: 90vw;
+  max-width: 360px;
+  z-index: 10000;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.settings-row:hover {
+  background: #f1f5f9;
+}
+
+.settings-label {
+  color: #1e293b;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .stats-badge {
@@ -447,10 +649,14 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    padding: 0 0.5rem;
+  }
+
   .header-content {
     flex-wrap: wrap;
     height: auto;
-    padding: 0.75rem 0;
+    padding: 0.5rem 0;
     gap: 0.5rem;
   }
 
@@ -458,48 +664,142 @@
     display: none;
   }
 
+  /* Show centered title on mobile, between logo and hamburger */
+  .logo {
+    order: 0;
+  }
+
+  .header-mobile-title {
+    display: block;
+    flex: 1;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 0.5rem;
+    order: 1;
+  }
+
+  .header-right {
+    order: 2;
+  }
+
+  /* Hide stats badge in mobile to free space for logo + controls in 1 row */
+  .stats-badge {
+    display: none;
+  }
+
+  /* Swap: hide desktop settings, show hamburger */
+  .header-settings-desktop {
+    display: none;
+  }
+
+  .header-settings-mobile {
+    display: block;
+  }
+
+  .header-right {
+    gap: 0.5rem;
+  }
+
+  /* Navbar spans full width on its own row, with horizontal scroll if needed */
   .nav {
     order: 3;
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0;
+    margin: 0 -0.5rem;
+    padding-right: 1rem;
+    padding-left: 0.5rem;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
   }
 
-  .stats-badge {
-    font-size: 0.75rem;
+  .nav::-webkit-scrollbar {
+    display: none;
   }
 
   .nav-link {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .nav-icon-link {
-    padding: 0.4rem;
+    padding: 0.4rem 0.5rem;
+    flex-shrink: 0;
   }
 
   .nav-dropdown-btn {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
+  .nav-dropdown {
+    flex-shrink: 0;
+  }
+
+  /* Dropdown del navbar (Rutas): position fixed para escapar del overflow del .nav */
   .nav-dropdown-menu {
-    position: static;
-    box-shadow: none;
-    border: none;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    min-width: auto;
-    margin-top: 0.2rem;
+    position: fixed;
+    top: auto;
+    bottom: auto;
+    left: 0.5rem;
+    margin-top: 0.3rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    min-width: 200px;
+    z-index: 1001;
   }
 
   .nav-dropdown-menu a {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+    display: block;
+    color: #1e293b;
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+    text-decoration: none;
   }
 
   .nav-dropdown-menu a:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
+    background: #f1f5f9;
+    color: #1a365d;
+  }
+}
+
+/* Extra compact on very small screens (phones in portrait) */
+@media (max-width: 480px) {
+  .header-content {
+    padding: 0.4rem 0;
+  }
+
+  .logo-icon {
+    font-size: 1.3rem;
+  }
+
+  .user-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-link {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.75rem;
+  }
+
+  .nav-dropdown-btn {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.75rem;
   }
 }

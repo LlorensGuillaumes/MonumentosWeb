@@ -36,6 +36,11 @@ export default function CuratedRoutes() {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [search, setSearch] = useState('');
   const [culturalRoutes, setCulturalRoutes] = useState([]);
+  const [showAdvanced, setShowAdvanced] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth > 768 : true
+  );
+
+  const activeAdvancedCount = (selectedTheme ? 1 : 0) + (selectedCountry ? 1 : 0);
 
   useEffect(() => {
     getRutasCulturales().then(setCulturalRoutes).catch(() => {});
@@ -84,53 +89,71 @@ export default function CuratedRoutes() {
 
       {/* Filters */}
       <div className="curated-filters">
-        <div className="curated-search">
-          <input
-            type="text"
-            placeholder={t('curatedRoutes.searchPlaceholder')}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+        <div className="curated-search-row">
+          <div className="curated-search">
+            <input
+              type="text"
+              placeholder={t('curatedRoutes.searchPlaceholder')}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <button
+            type="button"
+            className="curated-toggle-btn"
+            onClick={() => setShowAdvanced(v => !v)}
+            aria-expanded={showAdvanced}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6" /><line x1="7" y1="12" x2="17" y2="12" /><line x1="10" y1="18" x2="14" y2="18" />
+            </svg>
+            <span>{showAdvanced ? t('filters.hideFilters') : t('filters.showFilters')}</span>
+            {activeAdvancedCount > 0 && (
+              <span className="curated-toggle-badge">{activeAdvancedCount}</span>
+            )}
+          </button>
         </div>
 
-        <div className="curated-filter-row">
-          {/* Country filter */}
-          <div className="curated-country-pills">
-            <button
-              className={`country-pill ${!selectedCountry ? 'active' : ''}`}
-              onClick={() => setSelectedCountry('')}
-            >
-              {t('curatedRoutes.allCountries')}
-            </button>
-            {COUNTRIES.map(c => (
+        <div className={`curated-advanced ${showAdvanced ? 'open' : ''}`}>
+          <div className="curated-filter-row">
+            {/* Country filter */}
+            <div className="curated-country-pills">
               <button
-                key={c.id}
-                className={`country-pill ${selectedCountry === c.id ? 'active' : ''}`}
-                onClick={() => setSelectedCountry(prev => prev === c.id ? '' : c.id)}
+                className={`country-pill ${!selectedCountry ? 'active' : ''}`}
+                onClick={() => setSelectedCountry('')}
               >
-                {c.flag} {c.id}
+                {t('curatedRoutes.allCountries')}
+              </button>
+              {COUNTRIES.map(c => (
+                <button
+                  key={c.id}
+                  className={`country-pill ${selectedCountry === c.id ? 'active' : ''}`}
+                  onClick={() => setSelectedCountry(prev => prev === c.id ? '' : c.id)}
+                >
+                  {c.flag} {c.id}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Theme filter */}
+          <div className="curated-theme-pills">
+            <button
+              className={`theme-pill ${!selectedTheme ? 'active' : ''}`}
+              onClick={() => setSelectedTheme('')}
+            >
+              {t('curatedRoutes.allThemes')}
+            </button>
+            {THEMES.map(th => (
+              <button
+                key={th.id}
+                className={`theme-pill ${selectedTheme === th.id ? 'active' : ''}`}
+                onClick={() => setSelectedTheme(prev => prev === th.id ? '' : th.id)}
+              >
+                {th.icon} {t(th.labelKey)}
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Theme filter */}
-        <div className="curated-theme-pills">
-          <button
-            className={`theme-pill ${!selectedTheme ? 'active' : ''}`}
-            onClick={() => setSelectedTheme('')}
-          >
-            {t('curatedRoutes.allThemes')}
-          </button>
-          {THEMES.map(th => (
-            <button
-              key={th.id}
-              className={`theme-pill ${selectedTheme === th.id ? 'active' : ''}`}
-              onClick={() => setSelectedTheme(prev => prev === th.id ? '' : th.id)}
-            >
-              {th.icon} {t(th.labelKey)}
-            </button>
-          ))}
         </div>
       </div>
 

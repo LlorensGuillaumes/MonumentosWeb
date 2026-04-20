@@ -6,33 +6,47 @@
 
 .breadcrumb {
   display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb-nav {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #64748b;
-  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-current {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
+  word-break: break-word;
 }
 
 .breadcrumb .back-btn {
   background: none;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-color, #cbd5e1);
   border-radius: 6px;
   padding: 0.25rem 0.75rem;
   font-size: 0.85rem;
-  color: #3b82f6;
+  color: var(--accent, #3b82f6);
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .breadcrumb .back-btn:hover {
-  background: #3b82f6;
+  background: var(--accent, #3b82f6);
   color: white;
-  border-color: #3b82f6;
+  border-color: var(--accent, #3b82f6);
 }
 
 .breadcrumb a {
-  color: #3b82f6;
+  color: var(--accent, #3b82f6);
   text-decoration: none;
 }
 
@@ -93,14 +107,14 @@
 .detail-main h1 {
   margin: 0 0 0.75rem 0;
   font-size: 2rem;
-  color: #1a365d;
+  color: var(--text-primary);
 }
 
 .detail-location {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: var(--text-secondary);
   margin-bottom: 1rem;
 }
 
@@ -162,9 +176,9 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #64748b;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
@@ -195,7 +209,7 @@
 .share-copy:hover {
   background: #3b82f6;
   color: white;
-  border-color: #3b82f6;
+  border-color: var(--accent);
 }
 
 /* Gallery */
@@ -245,14 +259,14 @@
 
 .detail-section h2 {
   font-size: 1.25rem;
-  color: #1a365d;
+  color: var(--text-primary);
   margin: 0 0 0.75rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .detail-section p {
-  color: #475569;
+  color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
   text-align: justify;
@@ -267,12 +281,12 @@
 
 .detail-dl dt {
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .detail-dl dd {
   margin: 0;
-  color: #1a365d;
+  color: var(--text-primary);
 }
 
 /* Sidebar */
@@ -283,7 +297,7 @@
 }
 
 .sidebar-card {
-  background: white;
+  background: var(--bg-card);
   padding: 1rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -292,7 +306,7 @@
 .sidebar-card h3 {
   margin: 0 0 0.75rem 0;
   font-size: 1rem;
-  color: #1a365d;
+  color: var(--text-primary);
 }
 
 .sidebar-map {
@@ -321,12 +335,12 @@
   padding: 0.5rem;
   border-radius: 6px;
   text-decoration: none;
-  color: #3b82f6;
+  color: var(--accent);
   transition: background 0.2s;
 }
 
 .sidebar-links a:hover {
-  background: #f1f5f9;
+  background: var(--bg-secondary);
 }
 
 .sidebar-dl {
@@ -338,12 +352,12 @@
 }
 
 .sidebar-dl dt {
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .sidebar-dl dd {
   margin: 0;
-  color: #1a365d;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -351,11 +365,11 @@
 .wiki-attribution {
   margin-top: 0.75rem !important;
   font-size: 0.85rem;
-  color: #64748b !important;
+  color: var(--text-secondary) !important;
 }
 
 .wiki-attribution a {
-  color: #3b82f6;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -364,7 +378,7 @@
 }
 
 .wiki-loading {
-  color: #94a3b8 !important;
+  color: var(--text-muted) !important;
   font-style: italic;
 }
 
@@ -380,7 +394,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   text-decoration: none;
   color: inherit;
@@ -388,7 +402,7 @@
 }
 
 .related-card:hover {
-  border-color: #3b82f6;
+  border-color: var(--accent);
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
 }
 
@@ -409,7 +423,7 @@
 
 .related-card-info strong {
   font-size: 0.82rem;
-  color: #1a365d;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -419,12 +433,12 @@
 
 .related-card-info span {
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 /* ===== CTA SUTIL ===== */
 .section-cta {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-style: italic;
   padding: 0.75rem 0;
@@ -466,12 +480,12 @@
 .ratings-number {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--text-primary);
 }
 
 .ratings-count {
   font-size: 0.82rem;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .ratings-detail-row {
@@ -483,22 +497,22 @@
 
 .ratings-label {
   min-width: 110px;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .ratings-small {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.8rem;
 }
 
 .ratings-few {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-style: italic;
 }
 
 .ratings-form {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   margin-top: 0.75rem;
@@ -507,7 +521,7 @@
 .ratings-form-label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   display: block;
@@ -524,13 +538,13 @@
 .ratings-form-row > span:first-child {
   min-width: 110px;
   font-size: 0.85rem;
-  color: #475569;
+  color: var(--text-secondary);
 }
 
 .ratings-more-btn {
   background: none;
   border: none;
-  color: #3b82f6;
+  color: var(--accent);
   font-size: 0.82rem;
   cursor: pointer;
   padding: 0.25rem 0;
@@ -552,11 +566,11 @@
 
 .ratings-login-hint {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .ratings-login-hint a {
-  color: #3b82f6;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -575,23 +589,23 @@
 
 .notas-form-top select {
   padding: 0.4rem 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 0.85rem;
-  background: white;
+  background: var(--bg-card);
 }
 
 .notas-form-top input {
   flex: 1;
   padding: 0.4rem 0.6rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 0.85rem;
   outline: none;
 }
 
 .notas-form-top input:focus {
-  border-color: #3b82f6;
+  border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
 }
 
@@ -609,9 +623,9 @@
 
 .nota-item {
   padding: 0.6rem 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  background: white;
+  background: var(--bg-card);
 }
 
 .nota-tipo-horario { border-left: 3px solid #3b82f6; }
@@ -636,11 +650,11 @@
 
 .nota-badge-horario { background: #dbeafe; color: #1e40af; }
 .nota-badge-precio { background: #dcfce7; color: #166534; }
-.nota-badge-nota { background: #f1f5f9; color: #64748b; }
+.nota-badge-nota { background: var(--bg-secondary); color: var(--text-secondary); }
 
 .nota-author {
   font-size: 0.8rem;
-  color: #475569;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -658,7 +672,7 @@
 
 .nota-date {
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin-left: auto;
 }
 
@@ -677,12 +691,12 @@
 .nota-text {
   margin: 0;
   font-size: 0.88rem;
-  color: #334155;
+  color: var(--text-primary);
   line-height: 1.5;
 }
 
 .notas-empty {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.85rem;
   text-align: center;
   padding: 1rem;
@@ -690,12 +704,21 @@
 
 @media (max-width: 900px) {
   .detail-layout {
+    display: flex;
+    flex-direction: column;
     grid-template-columns: 1fr;
   }
 
-  .detail-sidebar {
-    order: -1;
+  /* Let main's children participate in the parent flex order so we can
+     interleave the gallery (inside main) with the sidebar */
+  .detail-main {
+    display: contents;
   }
+
+  /* Order: title row (-3) → gallery (-2) → sidebar map/links (-1) → rest of main (default 0) */
+  .detail-title-row { order: -3; }
+  .detail-gallery { order: -2; }
+  .detail-sidebar { order: -1; }
 
   .detail-main h1 {
     font-size: 1.5rem;

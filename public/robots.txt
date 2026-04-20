@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://patrimonio-europeo.com/sitemap.xml
+Sitemap: https://patrimonio-europeo.netlify.app/sitemap.xml

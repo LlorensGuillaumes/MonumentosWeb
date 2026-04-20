@@ -59,6 +59,17 @@ const getCategoryColor = (tipoMonumento, categoria) => {
   return '#3b82f6';
 };
 
+// Componente que vuela el mapa a una coordenada cuando cambia flyTo
+function FlyToHandler({ flyTo }) {
+  const map = useMap();
+  useEffect(() => {
+    if (flyTo && flyTo.lat != null && flyTo.lng != null) {
+      map.flyTo([flyTo.lat, flyTo.lng], flyTo.zoom || 16, { duration: 1.2 });
+    }
+  }, [flyTo, map]);
+  return null;
+}
+
 // Componente para manejar eventos del mapa (usa refs para evitar closures obsoletas)
 function MapEvents({ onBoundsChange }) {
   const callbackRef = useRef(onBoundsChange);
@@ -85,7 +96,7 @@ function MapEvents({ onBoundsChange }) {
   return null;
 }
 
-export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true }) {
+export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null }) {
   const [markers, setMarkers] = useState([]);
   const [ccaaMarkers, setCCAAMarkers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -280,6 +291,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
         />
 
         <MapEvents onBoundsChange={handleBoundsChange} />
+        <FlyToHandler flyTo={flyTo} />
 
         {/* Vista resumen CCAA */}
         {viewMode === 'ccaa' && ccaaMarkers.map((feature) => {
@@ -368,17 +380,69 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
             ))}
           </MarkerClusterGroup>
         )}
+
+        {/* Marcador EXTRA para el monumento seleccionado desde el buscador */}
+        {highlight && highlight.lat != null && highlight.lng != null && (
+          <Marker
+            position={[highlight.lat, highlight.lng]}
+            icon={L.divIcon({
+              html: `<div class="highlight-marker">
+                       <div class="highlight-pulse"></div>
+                       <div class="highlight-pin">
+                         <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+                         </svg>
+                       </div>
+                     </div>`,
+              className: 'highlight-marker-wrapper',
+              iconSize: [40, 50],
+              iconAnchor: [20, 30],
+            })}
+            zIndexOffset={1000}
+          >
+            {highlight.name && (
+              <Popup>
+                <div className="popup-content">
+                  <h4>{highlight.name}</h4>
+                  <button
+                    className="popup-btn"
+                    onClick={() => navigate(`/monumento/${highlight.id}`)}
+                  >
+                    {t('map.viewDetail')}
+                  </button>
+                </div>
+              </Popup>
+            )}
+          </Marker>
+        )}
       </MapContainer>
 
-      <div className="map-legend">
-        <span className="legend-item"><span className="legend-dot" style={{background: '#7c3aed'}}></span> {t('map.legend.castles')}</span>
-        <span className="legend-item"><span className="legend-dot" style={{background: '#be185d'}}></span> {t('map.legend.churches')}</span>
-        <span className="legend-item"><span className="legend-dot" style={{background: '#0369a1'}}></span> {t('map.legend.palaces')}</span>
-        <span className="legend-item"><span className="legend-dot" style={{background: '#92400e'}}></span> {t('map.legend.archaeology')}</span>
-        <span className="legend-item"><span className="legend-dot" style={{background: '#065f46'}}></span> {t('map.legend.ethnologic')}</span>
-        <span className="legend-item"><span className="legend-dot" style={{background: '#475569'}}></span> {t('map.legend.infrastructure')}</span>
-        <span className="legend-item"><span className="legend-dot" style={{background: '#3b82f6'}}></span> {t('map.legend.others')}</span>
-      </div>
+      {(() => {
+        const ALL_LEGEND = [
+          { key: 'militar', color: '#7c3aed', label: 'map.legend.castles' },
+          { key: 'religiosa', color: '#be185d', label: 'map.legend.churches' },
+          { key: 'civil', color: '#0369a1', label: 'map.legend.palaces' },
+          { key: 'arqueologica', color: '#92400e', label: 'map.legend.archaeology' },
+          { key: 'etnologica', color: '#065f46', label: 'map.legend.ethnologic' },
+          { key: 'infraestructura', color: '#475569', label: 'map.legend.infrastructure' },
+          { key: 'otros', color: '#3b82f6', label: 'map.legend.others' },
+        ];
+        const selected = (filters.clasificacion || '').split(',').filter(Boolean);
+        const visible = selected.length > 0
+          ? ALL_LEGEND.filter(l => selected.includes(l.key))
+          : ALL_LEGEND;
+        if (visible.length === 0) return null;
+        return (
+          <div className="map-legend">
+            {visible.map(l => (
+              <span key={l.key} className="legend-item">
+                <span className="legend-dot" style={{ background: l.color }}></span>
+                {t(l.label)}
+              </span>
+            ))}
+          </div>
+        );
+      })()}
 
       <div className="map-count">
         {viewMode === 'ccaa'

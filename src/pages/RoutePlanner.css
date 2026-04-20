@@ -408,10 +408,11 @@
   color: #dc2626;
 }
 
-/* Buttons */
+/* Buttons — scoped to route planner to avoid polluting global .btn-outline */
 .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
 .btn-block { width: 100%; text-align: center; display: block; }
-.btn-outline {
+.route-planner .btn-outline,
+.route-sidebar .btn-outline {
   background: white;
   border: 1px solid #e2e8f0;
   color: #475569;
@@ -424,7 +425,8 @@
   transition: all 0.15s;
 }
 
-.btn-outline:hover {
+.route-planner .btn-outline:hover,
+.route-sidebar .btn-outline:hover {
   background: #f1f5f9;
   border-color: #cbd5e1;
 }
@@ -698,13 +700,161 @@
   color: #dc2626;
 }
 
+/* Explore-nearby banner (visible when exploring around a specific stop) */
+.route-explore-banner {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.15);
+}
+
+.route-explore-banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.route-explore-banner-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: #1e40af;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.route-explore-banner-text strong {
+  font-size: 0.92rem;
+  color: #1e3a8a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.route-explore-banner-text small {
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+/* Explore button in each stop row */
+.route-stop-explore {
+  background: none;
+  border: 1px solid #cbd5e1;
+  color: #3b82f6;
+  padding: 0.3rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.route-stop-explore:hover {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+/* Location action buttons (Use my location / Search other location) */
+.route-location-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.route-location-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  width: 100%;
+  text-align: left;
+}
+
+.route-location-btn svg {
+  flex-shrink: 0;
+}
+
+.route-location-btn span {
+  flex: 1;
+}
+
+.route-location-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary — filled blue (Use my location) */
+.route-location-btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: 1px solid #2563eb;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.route-location-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+}
+
+.route-location-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Secondary — outlined (Search other location) */
+.route-location-btn-secondary {
+  background: white;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.route-location-btn-secondary:hover {
+  border-color: #3b82f6;
+  color: #1e3a8a;
+  background: #f8fafc;
+}
+
+.route-location-chevron {
+  transition: transform 0.2s;
+  opacity: 0.6;
+}
+
+.route-location-chevron.open {
+  transform: rotate(180deg);
+}
+
+.route-search-btn {
+  margin-top: 0.85rem;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .route-layout {
     flex-direction: column;
+    min-height: 0;
   }
   .route-map-container {
-    min-height: 350px;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 55vh;
+    min-height: 320px;
+    max-height: 500px;
   }
   .route-sidebar {
     width: 100%;

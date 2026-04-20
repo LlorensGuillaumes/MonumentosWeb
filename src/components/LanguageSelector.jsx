@@ -1,21 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import './LanguageSelector.css';
 
 const LANGUAGES = [
-  { code: 'es', label: 'Español' },
-  { code: 'en', label: 'English' },
-  { code: 'fr', label: 'Français' },
-  { code: 'pt', label: 'Português' },
-  { code: 'ca', label: 'Català' },
-  { code: 'eu', label: 'Euskara' },
-  { code: 'gl', label: 'Galego' },
-  { code: 'it', label: 'Italiano' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'pt', label: 'Português', flag: '🇵🇹' },
+  { code: 'ca', label: 'Català', flag: '🏴󠁥󠁳󠁣󠁴󠁿' },
+  { code: 'eu', label: 'Euskara', flag: '🏴󠁥󠁳󠁰󠁶󠁿' },
+  { code: 'gl', label: 'Galego', flag: '🏴󠁥󠁳󠁧󠁡󠁿' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
 ];
 
 export default function LanguageSelector() {
   const { i18n } = useTranslation();
   const [lang, setLang] = useState(() => i18n.language?.split('-')[0] || 'es');
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
   // Sincronizar si el idioma cambia desde fuera (ej: AuthContext)
   useEffect(() => {
@@ -24,23 +26,64 @@ export default function LanguageSelector() {
     return () => i18n.off('languageChanged', handleChange);
   }, [i18n]);
 
-  const handleChange = (e) => {
-    const newLang = e.target.value;
+  // Cerrar al hacer click fuera
+  useEffect(() => {
+    function handleOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener('mousedown', handleOutside);
+      return () => document.removeEventListener('mousedown', handleOutside);
+    }
+  }, [open]);
+
+  const selectLang = (newLang) => {
     setLang(newLang);
     i18n.changeLanguage(newLang);
+    setOpen(false);
   };
 
+  const current = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+
   return (
-    <select
-      className="language-select"
-      value={lang}
-      onChange={handleChange}
-    >
-      {LANGUAGES.map(({ code, label }) => (
-        <option key={code} value={code}>
-          {label}
-        </option>
-      ))}
-    </select>
+    <div className="language-selector" ref={ref}>
+      <button
+        type="button"
+        className="language-trigger"
+        onClick={() => setOpen(o => !o)}
+        aria-label="Seleccionar idioma"
+        aria-expanded={open}
+      >
+        <span className="lang-flag">{current.flag}</span>
+        <span className="lang-code">{current.code.toUpperCase()}</span>
+        <svg className="lang-arrow" width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+          <path d="M0 0l5 6 5-6z" />
+        </svg>
+      </button>
+
+      {open && (
+        <ul className="language-menu" role="listbox">
+          {LANGUAGES.map(({ code, label, flag }) => (
+            <li
+              key={code}
+              role="option"
+              aria-selected={code === lang}
+              className={`language-option ${code === lang ? 'active' : ''}`}
+              onClick={() => selectLang(code)}
+            >
+              <span className="lang-flag">{flag}</span>
+              <span className="lang-label">{label}</span>
+              {code === lang && (
+                <svg className="lang-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

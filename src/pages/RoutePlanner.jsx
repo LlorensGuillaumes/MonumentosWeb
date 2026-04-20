@@ -74,7 +74,6 @@ export default function RoutePlanner() {
   // Phase: 'search' or 'route'
   const [phase, setPhase] = useState('search');
   const [curatedLoading, setCuratedLoading] = useState(false);
-  const [filtersCollapsed, setFiltersCollapsed] = useState(false);
 
   // Cascading filter state
   const [pais, setPais] = useState('');
@@ -92,6 +91,16 @@ export default function RoutePlanner() {
   const [searchText, setSearchText] = useState('');
   const [monuments, setMonuments] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+
+  // Explore-nearby state: when set, the search phase is showing monuments around a specific stop
+  const [exploreCenter, setExploreCenter] = useState(null); // {id, denominacion, lat, lng}
+  const EXPLORE_RADIUS_KM = 5;
+
+  // Geo cascade visibility (país/región/provincia/municipio) — collapsed by default
+  const [geoCascadeOpen, setGeoCascadeOpen] = useState(false);
+
+  // True when user came from a curated or cultural route (monuments pre-loaded)
+  const [fromPredefinedRoute, setFromPredefinedRoute] = useState(false);
 
   // Selection state — stores full monument objects (accumulated across searches)
   const [selected, setSelected] = useState(new Set());
@@ -151,7 +160,7 @@ export default function RoutePlanner() {
         setMonuments(withCoords);
         setTotalCount(withCoords.length);
         setRouteName(route.name);
-        setFiltersCollapsed(true);
+        setFromPredefinedRoute(true);
         // Clean the URL param
         setSearchParams({}, { replace: true });
       } catch (err) {
@@ -182,12 +191,13 @@ export default function RoutePlanner() {
         setMonuments(valid);
         setTotalCount(valid.length);
         setRouteName(ruta.nombre);
+        setFromPredefinedRoute(true);
+        setPhase('route'); // cultural routes come pre-built → go directly to route phase
         // Pre-select all stops
         const newSelected = new Set(valid.map(m => m.id));
         setSelected(newSelected);
         const newMap = new Map(valid.map(m => [m.id, m]));
         setSelectedMonumentsMap(newMap);
-        setFiltersCollapsed(true);
         setSearchParams({}, { replace: true });
       } catch (err) {
         console.error('Error loading cultural route:', err);
@@ -309,6 +319,7 @@ export default function RoutePlanner() {
     setRouteData(null);
     setRouteGeometry(null);
     setSavedRuta(null);
+    setExploreCenter(null); // normal search exits explore mode
     try {
       const params = { limit: 200, solo_coords: true };
       if (pais) params.pais = pais;
@@ -327,6 +338,79 @@ export default function RoutePlanner() {
     } finally {
       setSearchLoading(false);
     }
+  };
+
+  // Use geolocation API to explore around the user's current position
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      alert(t('routes.geolocationUnsupported', 'Tu navegador no soporta geolocalización'));
+      return;
+    }
+    setSearchLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setRouteData(null);
+        setRouteGeometry(null);
+        setExploreCenter({
+          id: null,
+          denominacion: t('routes.myLocation', 'Mi ubicación actual'),
+          lat, lng,
+        });
+        try {
+          const data = await getMonumentosRadio({ lat, lng, km: EXPLORE_RADIUS_KM, limit: 100 });
+          setMonuments((data.items || []).filter(m => m.latitud && m.longitud));
+          setTotalCount(data.items?.length || 0);
+          } catch (err) {
+          console.error('Error searching by location:', err);
+          setMonuments([]);
+        } finally {
+          setSearchLoading(false);
+        }
+      },
+      (err) => {
+        setSearchLoading(false);
+        alert(t('routes.geolocationError', 'No se pudo obtener tu ubicación: ') + err.message);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  };
+
+  // Explore around a specific stop: load nearby monuments and switch to search phase
+  const handleExploreNearby = async (monument) => {
+    if (!monument?.latitud || !monument?.longitud) return;
+    setSearchLoading(true);
+    setRouteData(null);
+    setRouteGeometry(null);
+    setExploreCenter({
+      id: monument.id,
+      denominacion: monument.denominacion,
+      lat: monument.latitud,
+      lng: monument.longitud,
+    });
+    try {
+      const data = await getMonumentosRadio({
+        lat: monument.latitud,
+        lng: monument.longitud,
+        km: EXPLORE_RADIUS_KM,
+        limit: 100,
+      });
+      setMonuments((data.items || []).filter(m => m.latitud && m.longitud));
+      setTotalCount(data.items?.length || 0);
+      setPhase('search');
+    } catch (err) {
+      console.error('Error exploring nearby:', err);
+      setMonuments([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Return from explore mode to route phase
+  const handleBackToRoute = () => {
+    setExploreCenter(null);
+    setPhase('route');
   };
 
   const toggleSelect = useCallback((id) => {
@@ -364,7 +448,16 @@ export default function RoutePlanner() {
     });
   }, []);
 
-  const filteredMonuments = [...monuments].sort((a, b) => (selected.has(b.id) ? 1 : 0) - (selected.has(a.id) ? 1 : 0));
+  const normStr = (v) => (v == null ? '' : String(v).trim().toLowerCase());
+  const filteredMonuments = monuments
+    .filter(m => {
+      // Always keep selected monuments visible so the user doesn't lose their stops
+      if (selected.has(m.id)) return true;
+      if (filterTipoMonumento && normStr(m.tipo_monumento) !== normStr(filterTipoMonumento)) return false;
+      if (filterPeriodo && normStr(m.periodo) !== normStr(filterPeriodo)) return false;
+      return true;
+    })
+    .sort((a, b) => (selected.has(b.id) ? 1 : 0) - (selected.has(a.id) ? 1 : 0));
 
   const selectAll = () => {
     const toSelect = filteredMonuments.slice(0, MAX_STOPS);
@@ -458,6 +551,7 @@ export default function RoutePlanner() {
 
   const handleBackToSearch = () => {
     setPhase('search');
+    setFromPredefinedRoute(false); // user is now in free-search mode
   };
 
   const getGoogleMapsUrl = () => {
@@ -555,6 +649,25 @@ export default function RoutePlanner() {
         <div className="route-sidebar">
           {phase === 'search' ? (
             <>
+              {/* Explore-nearby banner — appears when user clicked "Explorar cerca" on a stop */}
+              {exploreCenter && (
+                <div className="route-explore-banner">
+                  <div className="route-explore-banner-text">
+                    <span className="route-explore-banner-label">
+                      {t('routes.exploringNear', 'Explorando alrededor de')}
+                    </span>
+                    <strong>{exploreCenter.denominacion}</strong>
+                    <small>{EXPLORE_RADIUS_KM} km</small>
+                  </div>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    onClick={handleBackToRoute}
+                  >
+                    ← {t('routes.backToRoute', 'Volver a la ruta')}
+                  </button>
+                </div>
+              )}
+
               {/* Selection badge when there are already selected monuments */}
               {selected.size > 0 && (
                 <div className="route-selection-badge">
@@ -569,16 +682,45 @@ export default function RoutePlanner() {
                 </div>
               )}
 
-              {/* Step 1: Location filters (collapsible) */}
-              <div className={`route-step ${filtersCollapsed ? 'route-step-collapsed' : ''}`}>
-                <div className="route-step-header" onClick={() => setFiltersCollapsed(prev => !prev)}>
-                  <h3>{t('routes.selectLocation')}</h3>
-                  <span className={`route-step-chevron ${filtersCollapsed ? 'collapsed' : ''}`}>&#9650;</span>
-                </div>
+              {/* Step 1: Location & filters — hidden when coming from a predefined (cultural/curated) route */}
+              {!fromPredefinedRoute && (
+              <div className="route-step">
+                <div className="route-location-actions">
+                      <button
+                        type="button"
+                        className="route-location-btn route-location-btn-primary"
+                        onClick={handleUseMyLocation}
+                        disabled={searchLoading}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="3" />
+                          <circle cx="12" cy="12" r="9" strokeDasharray="2 3" />
+                          <line x1="12" y1="1" x2="12" y2="4" />
+                          <line x1="12" y1="20" x2="12" y2="23" />
+                          <line x1="1" y1="12" x2="4" y2="12" />
+                          <line x1="20" y1="12" x2="23" y2="12" />
+                        </svg>
+                        <span>{t('routes.useMyLocation', 'Usar mi ubicación actual')}</span>
+                      </button>
 
-                {!filtersCollapsed && (
-                  <>
-                    {filtros && (
+                      <button
+                        type="button"
+                        className="route-location-btn route-location-btn-secondary"
+                        onClick={() => setGeoCascadeOpen(v => !v)}
+                        aria-expanded={geoCascadeOpen}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                          <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        <span>{t('routes.searchOtherLocation', 'Buscar otra ubicación')}</span>
+                        <svg className={`route-location-chevron ${geoCascadeOpen ? 'open' : ''}`} width="12" height="8" viewBox="0 0 12 8" fill="currentColor">
+                          <path d="M0 0l6 8 6-8z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {filtros && geoCascadeOpen && (
                       <div className="route-cascading-filters">
                         {filtros.paises && filtros.paises.length > 1 && (
                           <div className="route-filter-group">
@@ -652,13 +794,15 @@ export default function RoutePlanner() {
                       </div>
                     )}
 
-                    <button
-                      className="btn btn-primary btn-block"
-                      onClick={handleSearch}
-                      disabled={(!pais && !region && !provincia && !municipio) || searchLoading}
-                    >
-                      {searchLoading ? t('routes.searching') : t('routes.search')}
-                    </button>
+                    {geoCascadeOpen && (
+                      <button
+                        className="btn btn-primary btn-block route-search-btn"
+                        onClick={handleSearch}
+                        disabled={(!pais && !region && !provincia && !municipio) || searchLoading}
+                      >
+                        {searchLoading ? t('routes.searching') : t('routes.search')}
+                      </button>
+                    )}
 
                     {monuments.length > 0 && totalCount > monuments.length && (
                       <div className="route-results-info route-results-warning">
@@ -670,9 +814,8 @@ export default function RoutePlanner() {
                         {monuments.length} {t('routes.found', '')}
                       </div>
                     )}
-                  </>
-                )}
               </div>
+              )}
 
               {/* Step 2: Results & selection */}
               {filteredMonuments.length > 0 && (
@@ -764,6 +907,16 @@ export default function RoutePlanner() {
                         <strong>{m.denominacion}</strong>
                         <span>{[m.municipio, m.provincia].filter(Boolean).join(', ')}</span>
                       </div>
+                      <button
+                        className="route-stop-explore"
+                        onClick={e => { e.stopPropagation(); handleExploreNearby(m); }}
+                        title={t('routes.exploreNearby', 'Explorar alrededores')}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="11" cy="11" r="8" />
+                          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                      </button>
                       <button
                         className="route-stop-remove"
                         onClick={e => { e.stopPropagation(); removeStop(m.id); }}

@@ -32,6 +32,8 @@ Sin TS ni frameworks CSS. Plain CSS.
 |-------|---------|----------|
 | 2026-04-10 | Soporte dark mode en Filters/Search/Login (vars CSS) | `Filters.css`, `Search.css`, `Login.css` |
 | 2026-04-10 | Redirect 301 dominio antiguo Netlify al nuevo | `netlify.toml` |
+| 2026-04-17 | CuratedRouteDetail: mostrar paradas de BD (mapa→paradas→nearby lazy) | `CuratedRouteDetail.jsx/css`, `locales/es.json` |
+| 2026-04-16 | Reclasificación tipos_monumento ronda 1+2: 14.284 items corregidos | `node2/_reclasificar_desde_wikidata.cjs` |
+| 2026-04-16 | 68 rutas culturales en BD con ~1100 paradas vinculadas a bienes | `node2/_migrar_curated_a_culturales.cjs` + scripts |
 | 2026-04-10 | Fix Header crash con user sin nombre/email (página en blanco) | `Header.jsx` |
-| 2026-02-19 | Integrar rutas culturales en grid unificado, subtítulo dinámico, badge, filtros | `CuratedRoutes.jsx`, `CuratedRoutes.css`, `locales/*.json` |
-| 2026-02-19 | Planificar ruta cultural: botón + soporte from_cultural en RoutePlanner | `CulturalRouteDetail.jsx/css`, `RoutePlanner.jsx` |
+| 2026-04-10 | Redirect 301 dominio antiguo Netlify al nuevo | `netlify.toml` |
