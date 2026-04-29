@@ -1,9 +1,12 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_PRIMARY = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_FALLBACK = import.meta.env.VITE_API_URL_FALLBACK || '';
+
+let activeBaseURL = API_PRIMARY;
 
 const api = axios.create({
-  baseURL: API_BASE,
+  baseURL: activeBaseURL,
   timeout: 30000,
 });
 
@@ -13,17 +16,29 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  config.baseURL = activeBaseURL;
   return config;
 });
 
-// Interceptor: si 401 limpiar token
+// Interceptor: si 401 limpiar token; si error de red, intentar failover
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
+  async (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
     }
+
+    // Failover: error de red (no respuesta del servidor) y tenemos URL de respaldo
+    const isNetworkError = !err.response && err.code !== 'ERR_CANCELED';
+    if (isNetworkError && API_FALLBACK && activeBaseURL !== API_FALLBACK && !err.config._retried) {
+      console.warn('API primary failed, switching to fallback:', API_FALLBACK);
+      activeBaseURL = API_FALLBACK;
+      err.config._retried = true;
+      err.config.baseURL = API_FALLBACK;
+      return api.request(err.config);
+    }
+
     return Promise.reject(err);
   }
 );
