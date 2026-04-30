@@ -305,7 +305,7 @@ export default function Header() {
 
           {stats && (
             <div className="stats-badge">
-              <span>{stats.con_coordenadas.toLocaleString()}</span> {t('header.monuments')}
+              <span>{stats.total.toLocaleString()}</span> {t('header.monuments')}
             </div>
           )}
 
