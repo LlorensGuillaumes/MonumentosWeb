@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useApp } from '../context/AppContext';
 import Filters from '../components/Filters';
 import Map from '../components/Map';
+import { getMonumentos } from '../services/api';
 import './MapPage.css';
 
 const QUICK_CATEGORIES = [
@@ -33,6 +34,52 @@ export default function MapPage() {
     setFlyTo({ lat, lng, zoom: 14, _ts: Date.now() });
     setHighlight({ lat, lng, id: m.id, name: m.denominacion });
     setFiltersVisible(false);
+  };
+
+  // Volar a la ubicación correspondiente al filtro más específico aplicado
+  const handleSearch = async () => {
+    setFiltersVisible(false);
+    // Determinar nivel de zoom según filtro más específico
+    let zoom = 6;
+    if (filters.municipio) zoom = 13;
+    else if (filters.provincia) zoom = 9;
+    else if (filters.region) zoom = 7;
+    else if (filters.pais) zoom = 6;
+    else return; // Sin filtros geográficos, no hacer flyTo
+
+    try {
+      // Pedir hasta 200 monumentos del filtro para calcular centroide
+      const data = await getMonumentos({ ...filters, solo_coords: true, limit: 200 });
+      const items = (data.items || []).filter(m => m.latitud != null && m.longitud != null);
+      if (items.length === 0) return;
+
+      // Calcular centroide
+      let sumLat = 0, sumLng = 0;
+      let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+      for (const m of items) {
+        sumLat += m.latitud;
+        sumLng += m.longitud;
+        if (m.latitud < minLat) minLat = m.latitud;
+        if (m.latitud > maxLat) maxLat = m.latitud;
+        if (m.longitud < minLng) minLng = m.longitud;
+        if (m.longitud > maxLng) maxLng = m.longitud;
+      }
+      const lat = sumLat / items.length;
+      const lng = sumLng / items.length;
+
+      // Ajustar zoom según extensión real del bbox (si abarca mucho, alejar)
+      const range = Math.max(maxLat - minLat, maxLng - minLng);
+      let adjustedZoom = zoom;
+      if (range > 5) adjustedZoom = 6;
+      else if (range > 2) adjustedZoom = 7;
+      else if (range > 1) adjustedZoom = 8;
+      else if (range > 0.3) adjustedZoom = 10;
+      else if (range > 0.1) adjustedZoom = 12;
+
+      setFlyTo({ lat, lng, zoom: adjustedZoom, _ts: Date.now() });
+    } catch (err) {
+      console.error('Error en handleSearch del mapa:', err);
+    }
   };
 
   useEffect(() => {
@@ -164,7 +211,7 @@ export default function MapPage() {
 
       {filtersVisible && (
         <div className="map-filters">
-          <Filters onMonumentSelect={handleMonumentSelect} />
+          <Filters onSearch={handleSearch} onMonumentSelect={handleMonumentSelect} />
         </div>
       )}
 
