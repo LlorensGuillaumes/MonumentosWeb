@@ -226,9 +226,10 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: white;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 24px var(--shadow-lg);
   min-width: 220px;
   padding: 0.5rem;
   z-index: 1600;
@@ -255,80 +256,75 @@
 .settings-dropdown-floating {
   position: absolute;
   top: 60px;
-  right: 0.75rem;
-  left: 0.75rem;
-  max-width: 360px;
-  margin-left: auto;
-  background: white;
+  right: 1.25rem;
+  width: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 24px var(--shadow-lg);
   padding: 0.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  flex-direction: row;
+  gap: 0.4rem;
   pointer-events: auto;
+  box-sizing: border-box;
+  align-items: center;
 }
 
 .settings-dropdown-floating .settings-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.55rem 0.75rem;
+  padding: 0;
   border-radius: 6px;
-  transition: background 0.15s;
+  background: transparent;
   cursor: pointer;
 }
 
-.settings-dropdown-floating .settings-row:hover {
-  background: #f1f5f9;
-}
-
 .settings-dropdown-floating .settings-label {
-  color: #1e293b;
-  font-size: 0.9rem;
-  font-weight: 500;
-  flex: 1;
-  text-align: right;
-  user-select: none;
+  display: none; /* labels ocultas en móvil para ahorrar espacio */
 }
 
-/* Override dark-on-dark / light-on-light style problems for components inside dropdown */
+.settings-dropdown-floating .settings-close-btn {
+  display: none; /* ya no es necesario, el backdrop cierra al click fuera */
+}
+
+/* Components inside the dropdown: respect theme variables */
 .settings-dropdown-floating .theme-toggle {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #1e293b;
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
   flex-shrink: 0;
   min-width: 36px;
   min-height: 36px;
 }
 
 .settings-dropdown-floating .theme-toggle:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--accent);
 }
 
 .settings-dropdown-floating .bell-btn {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #1e293b;
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
   flex-shrink: 0;
   min-width: 36px;
   min-height: 36px;
 }
 
 .settings-dropdown-floating .bell-btn:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--accent);
 }
-
-/* LanguageSelector overrides moved to LanguageSelector.css for cleaner separation */
 
 /* Close button */
 .settings-close-btn {
   margin-top: 0.5rem;
   width: 100%;
   padding: 0.6rem;
-  background: #1a365d;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -339,11 +335,11 @@
 }
 
 .settings-close-btn:hover {
-  background: #2c5282;
+  background: var(--accent-hover);
 }
 
 .settings-close-btn:active {
-  background: #0f1f3a;
+  filter: brightness(0.92);
 }
 
 /* Reposition notification dropdown when it's inside the hamburger menu */
@@ -369,11 +365,11 @@
 }
 
 .settings-row:hover {
-  background: #f1f5f9;
+  background: var(--bg-secondary);
 }
 
 .settings-label {
-  color: #1e293b;
+  color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
 }

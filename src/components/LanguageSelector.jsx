@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import './LanguageSelector.css';
 
 const LANGUAGES = [
@@ -15,6 +16,7 @@ const LANGUAGES = [
 
 export default function LanguageSelector() {
   const { i18n } = useTranslation();
+  const { user, updateProfile } = useAuth();
   const [lang, setLang] = useState(() => i18n.language?.split('-')[0] || 'es');
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -39,10 +41,18 @@ export default function LanguageSelector() {
     }
   }, [open]);
 
-  const selectLang = (newLang) => {
+  const selectLang = async (newLang) => {
     setLang(newLang);
     i18n.changeLanguage(newLang);
     setOpen(false);
+    // Persistir en backend si hay user logueado (para que sobreviva al recargar)
+    if (user && user.idioma_por_defecto !== newLang) {
+      try {
+        await updateProfile({ idioma_por_defecto: newLang });
+      } catch (err) {
+        console.error('Error guardando idioma del usuario:', err);
+      }
+    }
   };
 
   const current = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];

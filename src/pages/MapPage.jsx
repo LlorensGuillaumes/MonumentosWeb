@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { useApp } from '../context/AppContext';
@@ -38,45 +38,56 @@ export default function MapPage() {
 
   // Volar a la ubicación correspondiente al filtro más específico aplicado
   const handleSearch = async () => {
-    setFiltersVisible(false);
-    // Determinar nivel de zoom según filtro más específico
-    let zoom = 6;
-    if (filters.municipio) zoom = 13;
-    else if (filters.provincia) zoom = 9;
-    else if (filters.region) zoom = 7;
-    else if (filters.pais) zoom = 6;
-    else return; // Sin filtros geográficos, no hacer flyTo
+    // Construir query para Nominatim según filtro más específico
+    let query = '';
+    let defaultZoom = 6;
+    if (filters.municipio) {
+      query = [filters.municipio, filters.provincia, filters.region, filters.pais].filter(Boolean).join(', ');
+      defaultZoom = 13;
+    } else if (filters.provincia) {
+      query = [filters.provincia, filters.region, filters.pais].filter(Boolean).join(', ');
+      defaultZoom = 9;
+    } else if (filters.region) {
+      query = [filters.region, filters.pais].filter(Boolean).join(', ');
+      defaultZoom = 7;
+    } else if (filters.pais) {
+      query = filters.pais;
+      defaultZoom = 6;
+    } else {
+      return;
+    }
 
     try {
-      // Pedir hasta 200 monumentos del filtro para calcular centroide
-      const data = await getMonumentos({ ...filters, solo_coords: true, limit: 200 });
-      const items = (data.items || []).filter(m => m.latitud != null && m.longitud != null);
-      if (items.length === 0) return;
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+      if (!res.ok) throw new Error('Nominatim ' + res.status);
+      const results = await res.json();
+      if (results.length === 0) return;
 
-      // Calcular centroide
-      let sumLat = 0, sumLng = 0;
-      let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
-      for (const m of items) {
-        sumLat += m.latitud;
-        sumLng += m.longitud;
-        if (m.latitud < minLat) minLat = m.latitud;
-        if (m.latitud > maxLat) maxLat = m.latitud;
-        if (m.longitud < minLng) minLng = m.longitud;
-        if (m.longitud > maxLng) maxLng = m.longitud;
+      const r = results[0];
+      const lat = parseFloat(r.lat);
+      const lng = parseFloat(r.lon);
+
+      // Calcular zoom según el bbox real devuelto por Nominatim
+      let zoom = defaultZoom;
+      if (r.boundingbox) {
+        const [bbS, bbN, bbW, bbE] = r.boundingbox.map(parseFloat);
+        const range = Math.max(bbN - bbS, bbE - bbW);
+        if (range > 8) zoom = 5;
+        else if (range > 4) zoom = 6;
+        else if (range > 2) zoom = 7;
+        else if (range > 1) zoom = 8;
+        else if (range > 0.5) zoom = 9;
+        else if (range > 0.2) zoom = 11;
+        else if (range > 0.05) zoom = 13;
+        else zoom = 14;
       }
-      const lat = sumLat / items.length;
-      const lng = sumLng / items.length;
 
-      // Ajustar zoom según extensión real del bbox (si abarca mucho, alejar)
-      const range = Math.max(maxLat - minLat, maxLng - minLng);
-      let adjustedZoom = zoom;
-      if (range > 5) adjustedZoom = 6;
-      else if (range > 2) adjustedZoom = 7;
-      else if (range > 1) adjustedZoom = 8;
-      else if (range > 0.3) adjustedZoom = 10;
-      else if (range > 0.1) adjustedZoom = 12;
+      const partes = [filters.municipio, filters.provincia, filters.region, filters.pais].filter(Boolean);
+      const nombre = partes[0] + (partes.length > 1 ? ` (${partes.slice(1).join(', ')})` : '');
 
-      setFlyTo({ lat, lng, zoom: adjustedZoom, _ts: Date.now() });
+      setFlyTo({ lat, lng, zoom, _ts: Date.now() });
+      setHighlight({ lat, lng, name: nombre });
     } catch (err) {
       console.error('Error en handleSearch del mapa:', err);
     }
@@ -91,6 +102,14 @@ export default function MapPage() {
       return () => document.removeEventListener('mousedown', handleOutside);
     }
   }, [catOpen]);
+
+  // En el mapa los filtros geográficos solo se usan para centrar la vista (Buscar),
+  // no para filtrar marcadores. Los filtros de contenido sí se aplican.
+  // Memoizado para evitar nueva referencia en cada render (causa bucle de fetch en Map.jsx).
+  const mapContentFilters = useMemo(() => {
+    const { pais, region, provincia, municipio, ...rest } = filters;
+    return rest;
+  }, [filters]);
 
   // Multi-select: clasificacion as comma-separated values
   const selectedCats = (filters.clasificacion || '').split(',').filter(Boolean);
@@ -119,6 +138,8 @@ export default function MapPage() {
       <Helmet>
         <title>{t('map.title')} - Patrimonio Europeo</title>
       </Helmet>
+
+      {/* Toolbar móvil: hamburguesa + chips categorías */}
       <div className="map-toolbar">
         <h1>{t('map.title')}</h1>
 
@@ -164,59 +185,66 @@ export default function MapPage() {
           )}
         </div>
 
+        {/* Botón hamburguesa: solo móvil/tablet */}
         <button
           className="map-filters-btn"
           onClick={() => setFiltersVisible(!filtersVisible)}
+          aria-label={t('filters.search')}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="18" x2="20" y2="18" />
           </svg>
-          <span>{t('filters.search')}</span>
+          <span className="map-filters-btn-label">{t('filters.search')}</span>
         </button>
       </div>
 
-      {/* Quick filter chips (desktop) */}
-      <div className="map-quick-filters">
-        {QUICK_CATEGORIES.map(cat => {
-          const active = cat.value === ''
-            ? selectedCats.length === 0
-            : selectedCats.includes(cat.value);
-          return (
-            <button
-              key={cat.value}
-              className={`map-chip ${active ? 'active' : ''}`}
-              onClick={() => toggleCategory(cat.value)}
-            >
-              {t(cat.label)}
-            </button>
-          );
-        })}
-        {filters.estilo && (
-          <span className="map-active-filter">
-            {t('filters.style')}: {filters.estilo}
-            <button onClick={() => setFilter('estilo', '')}>&times;</button>
-          </span>
-        )}
-      </div>
-
-      {filters.estilo && (
-        <div className="map-active-filter-mobile">
-          <span className="map-active-filter">
-            {t('filters.style')}: {filters.estilo}
-            <button onClick={() => setFilter('estilo', '')}>&times;</button>
-          </span>
-        </div>
-      )}
-
-      {filtersVisible && (
-        <div className="map-filters">
+      {/* Layout 2 columnas: sidebar filtros + mapa */}
+      <div className="map-layout">
+        {/* Sidebar filtros: siempre visible en desktop, toggle en móvil */}
+        <aside className={`map-sidebar ${filtersVisible ? 'open' : ''}`}>
           <Filters onSearch={handleSearch} onMonumentSelect={handleMonumentSelect} />
-        </div>
-      )}
+        </aside>
 
-      <div className="map-wrapper">
-        <Map filters={filters} height="calc(100vh - 220px)" flyTo={flyTo} highlight={highlight} />
+        <div className="map-main">
+          {/* Quick filter chips (desktop) */}
+          <div className="map-quick-filters">
+            {QUICK_CATEGORIES.map(cat => {
+              const active = cat.value === ''
+                ? selectedCats.length === 0
+                : selectedCats.includes(cat.value);
+              return (
+                <button
+                  key={cat.value}
+                  className={`map-chip ${active ? 'active' : ''}`}
+                  onClick={() => toggleCategory(cat.value)}
+                >
+                  {t(cat.label)}
+                </button>
+              );
+            })}
+            {filters.estilo && (
+              <span className="map-active-filter">
+                {t('filters.style')}: {filters.estilo}
+                <button onClick={() => setFilter('estilo', '')}>&times;</button>
+              </span>
+            )}
+          </div>
+
+          {filters.estilo && (
+            <div className="map-active-filter-mobile">
+              <span className="map-active-filter">
+                {t('filters.style')}: {filters.estilo}
+                <button onClick={() => setFilter('estilo', '')}>&times;</button>
+              </span>
+            </div>
+          )}
+
+          <div className="map-wrapper">
+            <Map filters={mapContentFilters} height="100%" flyTo={flyTo} highlight={highlight} />
+          </div>
+        </div>
       </div>
     </div>
   );

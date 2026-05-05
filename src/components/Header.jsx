@@ -259,7 +259,7 @@ export default function Header() {
                     }}
                   >
                     <ThemeToggle />
-                    <span className="settings-label">{isDark ? 'Modo claro' : 'Modo oscuro'}</span>
+                    <span className="settings-label">{isDark ? t('header.lightMode', 'Modo claro') : t('header.darkMode', 'Modo oscuro')}</span>
                   </div>
                   <div
                     className="settings-row"
@@ -272,7 +272,7 @@ export default function Header() {
                     }}
                   >
                     <NotificationBell />
-                    <span className="settings-label">Notificaciones</span>
+                    <span className="settings-label">{t('header.notifications', 'Notificaciones')}</span>
                   </div>
                   <div
                     className="settings-row"
@@ -287,7 +287,7 @@ export default function Header() {
                     }}
                   >
                     <LanguageSelector />
-                    <span className="settings-label">Idioma</span>
+                    <span className="settings-label">{t('header.language', 'Idioma')}</span>
                   </div>
 
                   <button
@@ -295,7 +295,7 @@ export default function Header() {
                     className="settings-close-btn"
                     onClick={() => setSettingsOpen(false)}
                   >
-                    Cerrar
+                    {t('header.close', 'Cerrar')}
                   </button>
                 </div>
               </div>,

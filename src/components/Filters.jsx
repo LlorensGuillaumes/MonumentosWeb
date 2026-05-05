@@ -13,9 +13,15 @@ export default function Filters({ onSearch, onMonumentSelect }) {
     typeof window !== 'undefined' ? window.innerWidth > 768 : true
   );
 
-  // Traduce las opciones de filtro manteniendo el value original (español/BD)
+  // Traduce las opciones de filtro manteniendo el value original.
+  // Orden de prioridad: traducción i18n → label de BD → QID.
   const translateOptions = (options, i18nPrefix) =>
-    options?.map(o => ({ ...o, label: t(`${i18nPrefix}.${o.value}`, o.value) })) || [];
+    options?.map(o => {
+      const key = `${i18nPrefix}.${o.value}`;
+      const translated = t(key);
+      const hasTranslation = translated && translated !== key && translated !== o.value;
+      return { ...o, label: hasTranslation ? translated : (o.label || o.value) };
+    }) || [];
 
   const handleChange = (key, value) => {
     setFilter(key, value);
@@ -32,6 +38,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
     setFilter('tipo_monumento', '');
     setFilter('periodo', '');
     setFilter('evento', '');
+    setFilter('evento_padre', '');
     await reloadFiltros(value, '', '');
   };
 
@@ -45,6 +52,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
     setFilter('tipo_monumento', '');
     setFilter('periodo', '');
     setFilter('evento', '');
+    setFilter('evento_padre', '');
     await reloadFiltros(filters.pais, value, '');
   };
 
@@ -57,6 +65,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
     setFilter('tipo_monumento', '');
     setFilter('periodo', '');
     setFilter('evento', '');
+    setFilter('evento_padre', '');
     await reloadFiltros(filters.pais, filters.region, value);
   };
 
@@ -159,7 +168,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
   const activeAdvancedCount = [
     filters.pais, filters.region, filters.provincia, filters.municipio,
     filters.clasificacion, filters.tipo_monumento, filters.periodo,
-    filters.evento, filters.estilo,
+    filters.evento, filters.evento_padre, filters.estilo,
   ].filter(Boolean).length + (filters.solo_wikidata ? 1 : 0) + (filters.solo_imagen ? 1 : 0);
 
   return (
@@ -196,108 +205,152 @@ export default function Filters({ onSearch, onMonumentSelect }) {
 
       {/* Filtros avanzados: colapsables en móvil */}
       <div className={`filters-advanced ${showAdvanced ? 'open' : ''}`}>
-        <div className="filters-row">
-          {filtros.paises && filtros.paises.length > 1 && (
+        {/* PANEL 1: UBICACIÓN */}
+        <details className="filter-panel">
+          <summary className="filter-panel-summary">
+            <span className="filter-panel-icon">📍</span>
+            <span>{t('filters.panelLocation', 'Ubicación')}</span>
+          </summary>
+          <div className="filters-row">
+            {filtros.paises && filtros.paises.length > 1 && (
+              <div className="filter-group">
+                <label>{t('filters.country')}</label>
+                <SearchableSelect
+                  value={filters.pais}
+                  onChange={handlePaisChange}
+                  options={translateOptions(filtros.paises, 'filters.countries')}
+                  placeholder={t('filters.allCountries')}
+                />
+              </div>
+            )}
+
             <div className="filter-group">
-              <label>{t('filters.country')}</label>
+              <label>{labels.region}</label>
               <SearchableSelect
-                value={filters.pais}
-                onChange={handlePaisChange}
-                options={translateOptions(filtros.paises, 'filters.countries')}
-                placeholder={t('filters.allCountries')}
+                value={filters.region}
+                onChange={handleRegionChange}
+                options={regionesFiltradas}
+                placeholder={placeholders.region}
               />
             </div>
-          )}
 
-          <div className="filter-group">
-            <label>{labels.region}</label>
-            <SearchableSelect
-              value={filters.region}
-              onChange={handleRegionChange}
-              options={regionesFiltradas}
-              placeholder={placeholders.region}
-            />
-          </div>
-
-          <div className="filter-group">
-            <label>{labels.provincia}</label>
-            <SearchableSelect
-              value={filters.provincia}
-              onChange={handleProvinciaChange}
-              options={provinciasFiltradas}
-              placeholder={placeholders.provincia}
-            />
-          </div>
-
-          <div className="filter-group">
-            <label>{labels.municipio}</label>
-            <SearchableSelect
-              value={filters.municipio}
-              onChange={handleMunicipioChange}
-              options={municipiosFiltrados}
-              placeholder={hasGeoFilter ? placeholders.municipio : t('filters.selectFilterFirst')}
-              disabled={!hasGeoFilter}
-            />
-          </div>
-        </div>
-
-        <div className="filters-row">
-          <div className="filter-group">
-            <label>{t('filters.classification')}</label>
-            <SearchableSelect
-              value={filters.clasificacion}
-              onChange={handleClasificacionChange}
-              options={clasificacionOptions}
-              placeholder={t('filters.allClassifications')}
-            />
-          </div>
-
-          {filtros.tipos_monumento?.length > 0 && (
             <div className="filter-group">
-              <label>{t('filters.monumentType')}</label>
+              <label>{labels.provincia}</label>
               <SearchableSelect
-                value={filters.tipo_monumento}
-                onChange={handleTipoMonumentoChange}
-                options={translateOptions(filtros.tipos_monumento, 'filters.monumentTypes')}
-                placeholder={t('filters.allMonumentTypes')}
+                value={filters.provincia}
+                onChange={handleProvinciaChange}
+                options={provinciasFiltradas}
+                placeholder={placeholders.provincia}
               />
             </div>
-          )}
 
-          {filtros.periodos?.length > 0 && (
             <div className="filter-group">
-              <label>{t('filters.period')}</label>
+              <label>{labels.municipio}</label>
               <SearchableSelect
-                value={filters.periodo}
-                onChange={(v) => handleChange('periodo', v)}
-                options={translateOptions(filtros.periodos, 'filters.periods')}
-                placeholder={t('filters.allPeriods')}
+                value={filters.municipio}
+                onChange={handleMunicipioChange}
+                options={municipiosFiltrados}
+                placeholder={hasGeoFilter ? placeholders.municipio : t('filters.selectFilterFirst')}
+                disabled={!hasGeoFilter}
               />
             </div>
-          )}
-
-          {filtros.eventos?.length > 0 && (
-            <div className="filter-group">
-              <label>{t('filters.event')}</label>
-              <SearchableSelect
-                value={filters.evento}
-                onChange={(v) => handleChange('evento', v)}
-                options={translateOptions(filtros.eventos, 'filters.events')}
-                placeholder={t('filters.allEvents')}
-              />
-            </div>
-          )}
-
-          <div className="filter-group">
-            <label>{t('filters.style')}</label>
-            <SearchableSelect
-              value={filters.estilo}
-              onChange={(v) => handleChange('estilo', v)}
-              options={filtros.estilos}
-              placeholder={t('filters.allStyles')}
-            />
           </div>
+        </details>
 
+        {/* PANEL 2: TIPO Y CLASIFICACIÓN */}
+        <details className="filter-panel">
+          <summary className="filter-panel-summary">
+            <span className="filter-panel-icon">🏛️</span>
+            <span>{t('filters.panelType', 'Tipo y clasificación')}</span>
+          </summary>
+          <div className="filters-row">
+            <div className="filter-group">
+              <label>{t('filters.classification')}</label>
+              <SearchableSelect
+                value={filters.clasificacion}
+                onChange={handleClasificacionChange}
+                options={clasificacionOptions}
+                placeholder={t('filters.allClassifications')}
+              />
+            </div>
+
+            {filtros.tipos_monumento?.length > 0 && (
+              <div className="filter-group">
+                <label>{t('filters.monumentType')}</label>
+                <SearchableSelect
+                  value={filters.tipo_monumento}
+                  onChange={handleTipoMonumentoChange}
+                  options={translateOptions(filtros.tipos_monumento, 'filters.monumentTypes')}
+                  placeholder={t('filters.allMonumentTypes')}
+                />
+              </div>
+            )}
+
+            {filtros.periodos?.length > 0 && (
+              <div className="filter-group">
+                <label>{t('filters.period')}</label>
+                <SearchableSelect
+                  value={filters.periodo}
+                  onChange={(v) => handleChange('periodo', v)}
+                  options={translateOptions(filtros.periodos, 'filters.periods')}
+                  placeholder={t('filters.allPeriods')}
+                />
+              </div>
+            )}
+
+            <div className="filter-group">
+              <label>{t('filters.style')}</label>
+              <SearchableSelect
+                value={filters.estilo}
+                onChange={(v) => handleChange('estilo', v)}
+                options={filtros.estilos}
+                placeholder={t('filters.allStyles')}
+              />
+            </div>
+          </div>
+        </details>
+
+        {/* PANEL 3: EVENTOS HISTÓRICOS (colapsado por defecto) */}
+        {(filtros.eventos_padres?.length > 0 || filtros.eventos?.length > 0) && (
+          <details className="filter-panel">
+            <summary className="filter-panel-summary">
+              <span className="filter-panel-icon">📜</span>
+              <span>{t('filters.panelEvents', 'Eventos históricos')}</span>
+            </summary>
+            <div className="filters-row">
+              {filtros.eventos_padres?.length > 0 && (
+                <div className="filter-group">
+                  <label>{t('filters.eventCategory')}</label>
+                  <SearchableSelect
+                    value={filters.evento_padre}
+                    onChange={async (v) => {
+                      handleChange('evento_padre', v);
+                      if (v) handleChange('evento', '');
+                      await reloadFiltros(filters.pais, filters.region, filters.provincia, v);
+                    }}
+                    options={translateOptions(filtros.eventos_padres, 'filters.events')}
+                    placeholder={t('filters.allEventCategories')}
+                  />
+                </div>
+              )}
+
+              {filtros.eventos?.length > 0 && (
+                <div className="filter-group">
+                  <label>{t('filters.event')}</label>
+                  <SearchableSelect
+                    value={filters.evento}
+                    onChange={(v) => handleChange('evento', v)}
+                    options={translateOptions(filtros.eventos, 'filters.events')}
+                    placeholder={t('filters.allEvents')}
+                  />
+                </div>
+              )}
+            </div>
+          </details>
+        )}
+
+        {/* PANEL 4: OTROS (siempre visible, sin desplegable) */}
+        <div className="filter-panel-flat">
           <div className="filter-group filter-checkbox">
             <label>
               <input

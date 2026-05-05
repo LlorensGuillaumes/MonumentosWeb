@@ -26,47 +26,100 @@
 /* Filters */
 .curated-filters {
   margin-bottom: 1.5rem;
-}
-
-.curated-search-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-.curated-search {
-  flex: 1;
-  max-width: 500px;
-  min-width: 0;
-}
-
-/* Toggle button — only visible on mobile */
-.curated-toggle-btn {
-  display: none;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.55rem 0.85rem;
   background: var(--bg-card);
-  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+/* Top filter row: search + country + sort */
+.curated-filter-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  align-items: end;
+}
+
+.curated-search input {
+  width: 100%;
+  padding: 0.6rem 1rem;
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  transition: all 0.15s;
+  font-size: 0.95rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  height: 40px;
+  box-sizing: border-box;
 }
 
-.curated-toggle-btn:hover {
+.curated-search input:focus {
+  outline: none;
   border-color: var(--accent);
-  color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.curated-toggle-badge {
+.curated-filter-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.curated-filter-cell label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Multi-select panels (theme, era) */
+.curated-multi-panel {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  background: var(--bg-card);
+  transition: border-color 0.15s;
+}
+
+.curated-multi-panel[open] {
+  border-color: var(--accent);
+}
+
+.curated-multi-panel summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  position: relative;
+}
+
+.curated-multi-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.curated-multi-panel summary::after {
+  content: '';
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--text-secondary);
+  border-bottom: 2px solid var(--text-secondary);
+  transform: rotate(-45deg);
+  transition: transform 0.2s;
+}
+
+.curated-multi-panel[open] > summary::after {
+  transform: rotate(45deg);
+}
+
+.curated-multi-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -80,68 +133,34 @@
   font-weight: 700;
 }
 
-.curated-advanced {
-  display: block;
-}
-
-.curated-search input {
-  width: 100%;
-  max-width: 500px;
-  padding: 0.6rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background: var(--bg-card);
-  color: var(--text-primary);
-  display: block;
-  margin: 0 auto;
-}
-
-.curated-search input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.curated-filter-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.75rem;
-}
-
-.curated-country-pills,
-.curated-theme-pills {
+.curated-pills-row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  padding: 0.25rem 0.85rem 0.85rem;
 }
 
-.curated-theme-pills {
-  margin-top: 0.5rem;
-}
-
-.country-pill,
-.theme-pill {
-  padding: 0.35rem 0.75rem;
+.theme-pill,
+.era-pill {
+  padding: 0.3rem 0.7rem;
   border: 1px solid var(--border-color);
   border-radius: 20px;
   background: var(--bg-card);
   color: var(--text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   white-space: nowrap;
 }
 
-.country-pill:hover,
-.theme-pill:hover {
+.theme-pill:hover,
+.era-pill:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.country-pill.active,
-.theme-pill.active {
+.theme-pill.active,
+.era-pill.active {
   background: var(--accent);
   color: white;
   border-color: var(--accent);
@@ -155,6 +174,51 @@
   margin-bottom: 1rem;
   font-size: 0.85rem;
   color: var(--text-secondary);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.curated-results-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* View toggle (grid/map) */
+.curated-view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.view-toggle-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.view-toggle-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+.view-toggle-btn svg {
+  flex-shrink: 0;
 }
 
 .curated-results-info .btn-link {
@@ -298,33 +362,21 @@
     grid-template-columns: 1fr;
   }
 
-  .curated-theme-pills {
-    gap: 0.3rem;
+  .curated-filter-grid {
+    grid-template-columns: 1fr;
   }
 
-  .theme-pill {
+  .theme-pill,
+  .era-pill {
     font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.55rem;
   }
+}
 
-  /* Show toggle button, hide advanced filters by default */
-  .curated-toggle-btn {
-    display: inline-flex;
-  }
-
-  .curated-advanced {
-    display: none;
-  }
-
-  .curated-advanced.open {
-    display: block;
-    animation: curated-expand 0.2s ease-out;
-  }
-
-  @keyframes curated-expand {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* Featured badge ⭐ */
+.curated-card-featured-badge {
+  font-size: 0.85rem;
+  line-height: 1;
 }
 
 /* ===== Cultural Route Badge (inline in curated cards) ===== */

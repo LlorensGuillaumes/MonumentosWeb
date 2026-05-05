@@ -120,7 +120,8 @@
 }
 
 .settings-dropdown-floating .language-menu {
-  right: auto;
-  left: 0;
-  min-width: 200px;
+  right: 0 !important;
+  left: auto !important;
+  min-width: 170px;
+  max-width: calc(100vw - 2.5rem);
 }

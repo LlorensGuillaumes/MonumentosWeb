@@ -67,8 +67,8 @@ export const getMunicipios = (params = {}) =>
 
 // ============== WIKIPEDIA ==============
 
-export const getWikipediaExtract = (id) =>
-  api.get(`/monumentos/${id}/wikipedia`).then(r => r.data).catch(() => null);
+export const getWikipediaExtract = (id, lang) =>
+  api.get(`/monumentos/${id}/wikipedia`, { params: lang ? { lang } : {} }).then(r => r.data).catch(() => null);
 
 // ============== AUTH ==============
 
@@ -403,8 +403,8 @@ export const getSocialAccounts = () =>
 
 // ============== RUTAS CULTURALES ==============
 
-export const getRutasCulturales = () =>
-  api.get('/rutas-culturales').then(r => r.data);
+export const getRutasCulturales = (lang) =>
+  api.get('/rutas-culturales', { params: lang ? { lang } : {} }).then(r => r.data);
 
 export const getRutaCultural = (slug) =>
   api.get(`/rutas-culturales/${slug}`).then(r => r.data);

@@ -78,7 +78,8 @@ function MapEvents({ onBoundsChange }) {
   const map = useMap();
 
   useEffect(() => {
-    const handler = () => {
+    let timeout = null;
+    const fireBounds = () => {
       const bounds = map.getBounds();
       const zoom = map.getZoom();
       callbackRef.current?.({
@@ -89,24 +90,47 @@ function MapEvents({ onBoundsChange }) {
         zoom,
       });
     };
-    map.on('moveend', handler);
-    return () => map.off('moveend', handler);
+    // Debounce para coalescer múltiples moveend en un único callback
+    const debouncedHandler = () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(fireBounds, 250);
+    };
+    map.on('moveend', debouncedHandler);
+    // Dispara la carga inicial al montar (con un pequeño delay para evitar duplicados con StrictMode)
+    timeout = setTimeout(fireBounds, 100);
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      map.off('moveend', debouncedHandler);
+    };
   }, [map]);
 
   return null;
 }
 
 export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null }) {
-  const [markers, setMarkers] = useState([]);
-  const [ccaaMarkers, setCCAAMarkers] = useState([]);
+  const { mapBounds: savedMapBounds, setMapBounds, mapMarkers: cachedMarkers, mapCCAAMarkers: cachedCCAA, mapViewMode: cachedViewMode, setMapCache } = useApp();
+  // Restauramos cache anterior para que al volver del detalle se vean los marcadores aunque la query nueva falle
+  const [markers, setMarkers] = useState(() => cachedMarkers || []);
+  const [ccaaMarkers, setCCAAMarkers] = useState(() => cachedCCAA || []);
   const [loading, setLoading] = useState(false);
-  const [currentBounds, setCurrentBounds] = useState(null);
-  const [zoom, setZoom] = useState(6);
-  const [viewMode, setViewMode] = useState('ccaa'); // 'ccaa' o 'detail'
+  const [currentBounds, setCurrentBounds] = useState(savedMapBounds || null);
+  const [zoom, setZoom] = useState(savedMapBounds?.zoom || 6);
+  const [viewMode, setViewMode] = useState(() => {
+    if (cachedViewMode) return cachedViewMode;
+    if (showCCAASummary && savedMapBounds?.zoom >= 7) return 'detail';
+    return 'ccaa';
+  });
+
+  // Persistir markers en context para restaurarlos al volver del detalle
+  useEffect(() => {
+    if (markers.length > 0 || ccaaMarkers.length > 0) {
+      setMapCache({ mapMarkers: markers, mapCCAAMarkers: ccaaMarkers, mapViewMode: viewMode });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markers, ccaaMarkers, viewMode]);
   const navigate = useNavigate();
   const loadingRef = useRef(false);
   const { t } = useTranslation();
-  const { mapBounds: savedMapBounds, setMapBounds } = useApp();
 
   // Centro según país seleccionado en filtros
   const getDefaultView = () => {
@@ -128,52 +152,88 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
   };
   const { center: defaultCenter, zoom: defaultZoom } = getInitialView();
 
+  // Token incremental para descartar respuestas obsoletas si se solapan peticiones
+  const loadTokenRef = useRef(0);
   const loadMarkers = useCallback(async (bbox, currentZoom) => {
-    if (loadingRef.current) return;
-    loadingRef.current = true;
+    const myToken = ++loadTokenRef.current;
     setLoading(true);
 
     try {
       const params = { ...filters };
 
-      // Ajustar límite según zoom
-      // Zoom bajo = menos detalle, zoom alto = más detalle
-      if (currentZoom >= 10) {
-        params.limit = 10000;
-      } else if (currentZoom >= 8) {
-        params.limit = 5000;
-      } else if (currentZoom >= 6) {
+      // Ajustar límite según zoom (proporcional al área visible)
+      if (currentZoom >= 16) {
+        params.limit = 200;
+      } else if (currentZoom >= 13) {
+        params.limit = 1000;
+      } else if (currentZoom >= 10) {
         params.limit = 3000;
+      } else if (currentZoom >= 8) {
+        params.limit = 4000;
+      } else if (currentZoom >= 6) {
+        params.limit = 2500;
       } else {
         params.limit = 1500;
       }
 
-      // Siempre usar bbox para cargar solo lo visible
       if (bbox) {
         params.bbox = `${bbox.minLon},${bbox.minLat},${bbox.maxLon},${bbox.maxLat}`;
       }
 
-      const geojson = await getGeoJSON(params);
-      setMarkers(geojson.features || []);
+      // Reintento si recibe 429 (rate limit Render): hasta 2 reintentos con backoff exponencial
+      let geojson;
+      let attempt = 0;
+      while (true) {
+        try {
+          geojson = await getGeoJSON(params);
+          break;
+        } catch (err) {
+          if (err.response?.status === 429 && attempt < 2 && myToken === loadTokenRef.current) {
+            attempt++;
+            await new Promise(r => setTimeout(r, 1500 * attempt));
+            if (myToken !== loadTokenRef.current) return;
+          } else {
+            throw err;
+          }
+        }
+      }
+      // Solo aplicar si esta petición sigue siendo la más reciente
+      if (myToken === loadTokenRef.current) {
+        setMarkers(geojson.features || []);
+      }
     } catch (err) {
       console.error('Error loading markers:', err);
     } finally {
-      setLoading(false);
-      loadingRef.current = false;
+      if (myToken === loadTokenRef.current) {
+        setLoading(false);
+      }
     }
   }, [filters]);
 
-  // Cargar resumen de CCAA/regiones
+  // Cargar resumen de CCAA/regiones (con todos los filtros activos)
+  const ccaaTokenRef = useRef(0);
   const loadCCAAResumen = useCallback(async () => {
+    const myToken = ++ccaaTokenRef.current;
     try {
-      const params = {};
-      if (filters.pais) params.pais = filters.pais;
-      const geojson = await getCCAAResumen(params);
-      setCCAAMarkers(geojson.features || []);
+      let geojson;
+      try {
+        geojson = await getCCAAResumen(filters);
+      } catch (err) {
+        if (err.response?.status === 429 && myToken === ccaaTokenRef.current) {
+          await new Promise(r => setTimeout(r, 1500));
+          if (myToken !== ccaaTokenRef.current) return;
+          geojson = await getCCAAResumen(filters);
+        } else {
+          throw err;
+        }
+      }
+      if (myToken === ccaaTokenRef.current) {
+        setCCAAMarkers(geojson.features || []);
+      }
     } catch (err) {
       console.error('Error loading CCAA summary:', err);
     }
-  }, [filters.pais]);
+  }, [filters]);
 
   // Refs para acceder al estado actual dentro de efectos sin añadirlos como dependencia
   const viewModeRef = useRef(viewMode);
@@ -183,29 +243,33 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
 
   // Detectar si hay filtros de contenido activos (no geográficos)
   const hasContentFilters = filters.clasificacion || filters.estilo ||
-    filters.tipo_monumento || filters.periodo || filters.q;
+    filters.tipo_monumento || filters.periodo || filters.q ||
+    filters.evento || filters.evento_padre ||
+    filters.solo_imagen || filters.solo_wikidata;
 
-  // Cargar inicial y recargar al cambiar filtros
+  // Recargar SOLO cuando cambian los filtros (la carga inicial la dispara MapEvents al montar)
+  // Skip primera ejecución para evitar duplicar la carga inicial.
+  const initialMountRef = useRef(true);
   useEffect(() => {
-    // Bounds por defecto cuando no tenemos bounds reales del mapa
-    const fallbackBounds = { minLon: -18.5, minLat: 27, maxLon: 25, maxLat: 52, zoom: defaultZoom };
-    const effectiveBounds = boundsRef.current || fallbackBounds;
+    if (initialMountRef.current) {
+      initialMountRef.current = false;
+      return;
+    }
+    const effectiveBounds = boundsRef.current;
+    if (!effectiveBounds) return;
 
     if (showCCAASummary) {
       if (viewModeRef.current === 'detail') {
-        // Ya en detalle: recargar marcadores con los nuevos filtros
         loadMarkers(effectiveBounds, effectiveBounds.zoom || zoom);
       } else if (hasContentFilters) {
-        // Filtro de contenido aplicado en vista CCAA: cambiar a detalle automáticamente
         setViewMode('detail');
         loadMarkers(effectiveBounds, effectiveBounds.zoom || zoom);
       } else {
-        // Sin filtros de contenido: vista CCAA normal
         loadCCAAResumen();
         setViewMode('ccaa');
       }
     } else {
-      loadMarkers(fallbackBounds, defaultZoom);
+      loadMarkers(effectiveBounds, effectiveBounds.zoom || zoom);
       setViewMode('detail');
     }
   }, [filters, showCCAASummary, loadCCAAResumen]);
@@ -220,18 +284,20 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
       center: [(newBounds.minLat + newBounds.maxLat) / 2, (newBounds.minLon + newBounds.maxLon) / 2],
     });
 
-    // Cambiar de vista CCAA a detalle cuando el zoom es alto
-    if (showCCAASummary && newBounds.zoom >= 7 && viewMode === 'ccaa') {
-      setViewMode('detail');
+    if (showCCAASummary && newBounds.zoom >= 7) {
+      // Vista detalle: siempre cargar marcadores en zoom alto
+      if (viewMode !== 'detail') setViewMode('detail');
       loadMarkers(newBounds, newBounds.zoom);
-    } else if (showCCAASummary && newBounds.zoom < 7 && viewMode === 'detail' && !hasContentFilters) {
-      // Volver a vista CCAA solo si no hay filtros de contenido activos
-      setViewMode('ccaa');
-    } else if (viewMode === 'detail') {
-      // Recargar detalle (cualquier zoom si hay filtros activos, o zoom >= 7 sin filtros)
+    } else if (showCCAASummary && newBounds.zoom < 7 && !hasContentFilters) {
+      // Vista resumen CCAA: volver a CCAA y refrescar conteos
+      if (viewMode !== 'ccaa') setViewMode('ccaa');
+      loadCCAAResumen();
+    } else if (!showCCAASummary || hasContentFilters) {
+      // Sin resumen CCAA o con filtros activos: siempre detalle
+      if (viewMode !== 'detail') setViewMode('detail');
       loadMarkers(newBounds, newBounds.zoom);
     }
-  }, [loadMarkers, showCCAASummary, viewMode, hasContentFilters]);
+  }, [loadMarkers, loadCCAAResumen, showCCAASummary, viewMode, hasContentFilters]);
 
   const handleMarkerClick = (feature) => {
     if (onMarkerClick) {
@@ -299,7 +365,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
           const size = count > 20000 ? 60 : count > 10000 ? 50 : count > 5000 ? 42 : 35;
           return (
             <Marker
-              key={feature.properties.region}
+              key={`${feature.properties.region}-${feature.properties.pais}`}
               position={[
                 feature.geometry.coordinates[1],
                 feature.geometry.coordinates[0],
@@ -404,12 +470,14 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
               <Popup>
                 <div className="popup-content">
                   <h4>{highlight.name}</h4>
-                  <button
-                    className="popup-btn"
-                    onClick={() => navigate(`/monumento/${highlight.id}`)}
-                  >
-                    {t('map.viewDetail')}
-                  </button>
+                  {highlight.id && (
+                    <button
+                      className="popup-btn"
+                      onClick={() => navigate(`/monumento/${highlight.id}`)}
+                    >
+                      {t('map.viewDetail')}
+                    </button>
+                  )}
                 </div>
               </Popup>
             )}

@@ -24,6 +24,9 @@ const initialState = {
     solo_imagen: false,
   },
   mapBounds: null,
+  mapMarkers: null, // cache de markers para restaurar al volver del detalle
+  mapCCAAMarkers: null,
+  mapViewMode: null,
   compareList: [],
   loading: false,
   error: null,
@@ -46,6 +49,8 @@ function reducer(state, action) {
       return { ...state, filters: initialState.filters };
     case 'SET_MAP_BOUNDS':
       return { ...state, mapBounds: action.payload };
+    case 'SET_MAP_CACHE':
+      return { ...state, ...action.payload };
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
@@ -94,17 +99,22 @@ export function AppProvider({ children }) {
     dispatch({ type: 'SET_MAP_BOUNDS', payload: bounds });
   };
 
+  const setMapCache = (cache) => {
+    dispatch({ type: 'SET_MAP_CACHE', payload: cache });
+  };
+
   const addToCompare = (monumento) => dispatch({ type: 'ADD_COMPARE', payload: monumento });
   const removeFromCompare = (id) => dispatch({ type: 'REMOVE_COMPARE', payload: id });
   const clearCompare = () => dispatch({ type: 'CLEAR_COMPARE' });
 
   // Recargar filtros dinámicos según país/región/provincia
-  const reloadFiltros = useCallback(async (pais, region, provincia) => {
+  const reloadFiltros = useCallback(async (pais, region, provincia, eventoPadre) => {
     try {
       const params = {};
       if (pais) params.pais = pais;
       if (region) params.region = region;
       if (provincia) params.provincia = provincia;
+      if (eventoPadre) params.evento_padre = eventoPadre;
       const newFiltros = await getFiltros(params);
       dispatch({ type: 'SET_FILTROS', payload: newFiltros });
     } catch (err) {
@@ -120,6 +130,7 @@ export function AppProvider({ children }) {
         setFilters,
         resetFilters,
         setMapBounds,
+        setMapCache,
         reloadFiltros,
         addToCompare,
         removeFromCompare,

@@ -39,7 +39,7 @@ function StarRating({ value, onChange, readonly, size = '1.3rem' }) {
 
 export default function Detail() {
   const { id } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, isFavorito, toggleFavorito } = useAuth();
   const [monumento, setMonumento] = useState(null);
@@ -106,11 +106,12 @@ export default function Detail() {
     const fetchRelated = async () => {
       try {
         let items = [];
+        // Usar sort=nombre evita el CTE pesado de relevancia (no aporta nada con limit=5)
         if (monumento.estilo) {
-          const data = await getMonumentos({ estilo: monumento.estilo, limit: 5 });
+          const data = await getMonumentos({ estilo: monumento.estilo, limit: 5, sort: 'nombre_asc' });
           items = data.items || [];
         } else if (monumento.categoria && monumento.comunidad_autonoma) {
-          const data = await getMonumentos({ categoria: monumento.categoria, region: monumento.comunidad_autonoma, limit: 5 });
+          const data = await getMonumentos({ categoria: monumento.categoria, region: monumento.comunidad_autonoma, limit: 5, sort: 'nombre_asc' });
           items = data.items || [];
         } else if (monumento.latitud && monumento.longitud) {
           const data = await getMonumentosRadio({ lat: monumento.latitud, lng: monumento.longitud, km: 30, limit: 5 });
@@ -160,15 +161,25 @@ export default function Detail() {
 
   useEffect(() => {
     if (!monumento) return;
-    const needsWikipedia = !monumento.descripcion_completa
-      && (!monumento.wiki_descripcion || monumento.wiki_descripcion.length < 150)
-      && monumento.wikipedia_url;
+    if (monumento.descripcion_completa) return; // SIPCA siempre español, no traducible
+    if (!monumento.wikipedia_url) return;
+    // Detectar idioma de la URL guardada (típicamente "es")
+    const urlLangMatch = monumento.wikipedia_url.match(/^https?:\/\/([a-z]+)\.wikipedia\.org/i);
+    const urlLang = urlLangMatch ? urlLangMatch[1] : 'es';
+    // Llamar Wikipedia si:
+    //   - falta descripción cacheada de longitud razonable, O
+    //   - el idioma activo NO coincide con el idioma de la descripción cacheada
+    const cacheStale = i18n.language !== urlLang;
+    const needsWikipedia = cacheStale ||
+      !monumento.wiki_descripcion ||
+      monumento.wiki_descripcion.length < 150;
     if (!needsWikipedia) return;
     setWikiLoading(true);
-    getWikipediaExtract(monumento.id)
+    setWikiExtract(null); // limpia cualquier extracto previo de otro idioma
+    getWikipediaExtract(monumento.id, i18n.language)
       .then(data => { if (data?.extract) setWikiExtract(data.extract); })
       .finally(() => setWikiLoading(false));
-  }, [monumento]);
+  }, [monumento, i18n.language]);
 
   if (loading) {
     return <DetailSkeleton />;

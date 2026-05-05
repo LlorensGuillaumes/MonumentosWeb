@@ -26,6 +26,34 @@ export const THEMES = [
   { id: 'fortifications', icon: '🛡️', labelKey: 'curatedRoutes.themeFortifications' },
 ];
 
+// Eras (épocas) — ordenadas cronológicamente
+export const ERAS = [
+  { id: 'prehistoric',     icon: '🗿', labelKey: 'curatedRoutes.eraPrehistoric' },
+  { id: 'ancient',         icon: '🏛️', labelKey: 'curatedRoutes.eraAncient' },
+  { id: 'early_medieval',  icon: '⛪', labelKey: 'curatedRoutes.eraEarlyMedieval' },
+  { id: 'medieval',        icon: '🏰', labelKey: 'curatedRoutes.eraMedieval' },
+  { id: 'modern',          icon: '🎭', labelKey: 'curatedRoutes.eraModern' },
+  { id: 'contemporary',    icon: '🏗️', labelKey: 'curatedRoutes.eraContemporary' },
+];
+
+// Mapping theme → era (para clasificación por época sin tocar cada ruta)
+export const ERA_BY_THEME = {
+  megalithic:    'prehistoric',
+  roman:         'ancient',
+  preromanesque: 'early_medieval',
+  islamic:       'early_medieval',
+  romanesque:    'medieval',
+  gothic:        'medieval',
+  mudejar:       'medieval',
+  monasteries:   'medieval',
+  castles:       'medieval',
+  camino:        'medieval',
+  fortifications:'medieval',
+  renaissance:   'modern',
+  palaces:       'modern',
+  modernist:     'contemporary',
+};
+
 export const CURATED_ROUTES = [
   // ===== ROMANESQUE (6) =====
   {
