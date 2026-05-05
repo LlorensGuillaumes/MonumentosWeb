@@ -835,7 +835,9 @@
     "beFirstToRate": "Soyez le premier à évaluer ce monument",
     "beFirstNote": "Soyez le premier à laisser une note",
     "copyLink": "Copier le lien",
-    "linkCopied": "Lien copié"
+    "linkCopied": "Lien copié",
+    "spanishOnly": "Texte disponible uniquement en espagnol",
+    "translateWithGoogle": "Traduire avec Google"
   },
   "map": {
     "loading": "Chargement des monuments...",

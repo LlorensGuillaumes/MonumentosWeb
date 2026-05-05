@@ -835,7 +835,9 @@
     "beFirstToRate": "Izan zaitez monumentu hau baloratzen lehena",
     "beFirstNote": "Izan zaitez ohar bat uzten lehena",
     "copyLink": "Esteka kopiatu",
-    "linkCopied": "Esteka kopiatuta"
+    "linkCopied": "Esteka kopiatuta",
+    "spanishOnly": "Testua gaztelaniaz bakarrik dago eskuragarri",
+    "translateWithGoogle": "Itzuli Googlerekin"
   },
   "map": {
     "loading": "Monumentuak kargatzen...",

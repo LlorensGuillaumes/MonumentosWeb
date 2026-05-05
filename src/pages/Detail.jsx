@@ -383,7 +383,21 @@ export default function Detail() {
             <section className="detail-section">
               <h2>{t('detail.description')}</h2>
               {monumento.descripcion_completa ? (
-                <p>{monumento.descripcion_completa}</p>
+                <>
+                  {i18n.language !== 'es' && (
+                    <div className="lang-notice">
+                      <span>{t('detail.spanishOnly', 'Texto disponible solo en español')}</span>
+                      <a
+                        href={`https://translate.google.com/?sl=es&tl=${i18n.language}&text=${encodeURIComponent(monumento.descripcion_completa)}&op=translate`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t('detail.translateWithGoogle', 'Traducir con Google')} ↗
+                      </a>
+                    </div>
+                  )}
+                  <p>{monumento.descripcion_completa}</p>
+                </>
               ) : wikiExtract ? (
                 <>
                   <p>{wikiExtract}</p>
@@ -408,6 +422,18 @@ export default function Detail() {
           {monumento.sintesis_historica && (
             <section className="detail-section">
               <h2>{t('detail.history')}</h2>
+              {i18n.language !== 'es' && (
+                <div className="lang-notice">
+                  <span>{t('detail.spanishOnly', 'Texto disponible solo en español')}</span>
+                  <a
+                    href={`https://translate.google.com/?sl=es&tl=${i18n.language}&text=${encodeURIComponent(monumento.sintesis_historica)}&op=translate`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('detail.translateWithGoogle', 'Traducir con Google')} ↗
+                  </a>
+                </div>
+              )}
               <p>{monumento.sintesis_historica}</p>
             </section>
           )}

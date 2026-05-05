@@ -835,7 +835,9 @@
     "beFirstToRate": "Sigues el primer en valorar aquest monument",
     "beFirstNote": "Sigues el primer en deixar una nota",
     "copyLink": "Copiar enllaç",
-    "linkCopied": "Enllaç copiat"
+    "linkCopied": "Enllaç copiat",
+    "spanishOnly": "Text disponible només en castellà",
+    "translateWithGoogle": "Tradueix amb Google"
   },
   "map": {
     "loading": "Carregant monuments...",

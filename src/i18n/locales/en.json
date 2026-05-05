@@ -835,7 +835,9 @@
     "beFirstToRate": "Be the first to rate this monument",
     "beFirstNote": "Be the first to leave a note",
     "copyLink": "Copy link",
-    "linkCopied": "Link copied"
+    "linkCopied": "Link copied",
+    "spanishOnly": "Text only available in Spanish",
+    "translateWithGoogle": "Translate with Google"
   },
   "map": {
     "loading": "Loading monuments...",

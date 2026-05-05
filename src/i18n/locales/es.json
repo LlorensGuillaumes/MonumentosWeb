@@ -835,7 +835,9 @@
     "beFirstToRate": "Sé el primero en valorar este monumento",
     "beFirstNote": "Sé el primero en dejar una nota",
     "copyLink": "Copiar enlace",
-    "linkCopied": "Enlace copiado"
+    "linkCopied": "Enlace copiado",
+    "spanishOnly": "Texto disponible solo en español",
+    "translateWithGoogle": "Traducir con Google"
   },
   "map": {
     "loading": "Cargando monumentos...",

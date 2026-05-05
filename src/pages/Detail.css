@@ -377,6 +377,32 @@
   text-decoration: underline;
 }
 
+/* Aviso de texto solo disponible en español */
+.lang-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.55rem 0.85rem;
+  margin-bottom: 0.85rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.lang-notice a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lang-notice a:hover {
+  text-decoration: underline;
+}
+
 .wiki-loading {
   color: var(--text-muted) !important;
   font-style: italic;
