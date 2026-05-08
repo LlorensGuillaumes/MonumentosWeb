@@ -185,10 +185,10 @@
   gap: 0.5rem;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .country-flag {
@@ -199,7 +199,7 @@
   margin-left: auto;
   font-size: 0.85rem;
   font-weight: 400;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .regions-grid {
@@ -209,32 +209,32 @@
 }
 
 .region-card {
-  background: white;
+  background: var(--bg-card);
   padding: 1.25rem;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px var(--shadow);
   text-decoration: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.2s;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
 }
 
 .region-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
+  box-shadow: 0 4px 12px var(--shadow-lg);
+  border-color: var(--accent);
 }
 
 .region-name {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--text-primary);
 }
 
 .region-count {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 /* Features */
