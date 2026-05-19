@@ -1,0 +1,100 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024">
+      <stop offset="0%" stop-color="#1a365d"/>
+      <stop offset="100%" stop-color="#2c5282"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background TRUE CIRCLE -->
+  <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+
+  <!-- Subtle inner ring -->
+  <circle cx="512" cy="512" r="470"
+          stroke="#F8FAFC"
+          stroke-width="2"
+          fill="none"
+          opacity="0.25"/>
+
+  <!-- Gold accent arc at top -->
+  <path d="M 280 200 A 320 320 0 0 1 744 200"
+        stroke="#D6BC7A"
+        stroke-width="4"
+        stroke-linecap="round"
+        fill="none"
+        opacity="0.8"/>
+
+  <!-- Dolmen (left) -->
+  <path d="M260 590 L380 590"
+        stroke="#F8FAFC"
+        stroke-width="14"
+        stroke-linecap="round"/>
+  <path d="M282 590 L295 680"
+        stroke="#F8FAFC"
+        stroke-width="14"
+        stroke-linecap="round"/>
+  <path d="M345 590 L358 680"
+        stroke="#F8FAFC"
+        stroke-width="14"
+        stroke-linecap="round"/>
+
+  <!-- Castle (center) -->
+  <path d="M415 360 L415 600 L605 600 L605 360"
+        stroke="#F8FAFC"
+        stroke-width="12"
+        stroke-linejoin="round"
+        fill="none"/>
+  <path d="M415 360 L437 338 L459 360 L481 338 L503 360 L525 338 L547 360 L569 338 L591 360 L605 360"
+        stroke="#F8FAFC"
+        stroke-width="12"
+        stroke-linejoin="round"
+        fill="none"/>
+  <rect x="490" y="460" width="40" height="140"
+        stroke="#D6BC7A"
+        stroke-width="9"
+        fill="none"
+        rx="4"/>
+
+  <!-- Gothic Cathedral (right) -->
+  <path d="M645 400 L780 400 L780 680 L645 680 Z"
+        stroke="#F8FAFC"
+        stroke-width="12"
+        stroke-linejoin="round"
+        fill="none"/>
+  <path d="M712 260 L645 400 L780 400 Z"
+        stroke="#F8FAFC"
+        stroke-width="12"
+        stroke-linejoin="round"
+        fill="none"/>
+  <circle cx="712" cy="490" r="26"
+          stroke="#D6BC7A"
+          stroke-width="9"
+          fill="none"/>
+  <path d="M687 680 L687 555 Q712 515 737 555 L737 680"
+        stroke="#D6BC7A"
+        stroke-width="9"
+        fill="none"/>
+
+  <!-- Text -->
+  <text x="512"
+        y="820"
+        text-anchor="middle"
+        fill="#F8FAFC"
+        font-size="72"
+        font-family="Montserrat, Arial, sans-serif"
+        font-weight="600"
+        letter-spacing="10">
+    PATRIMONIO
+  </text>
+
+  <text x="512"
+        y="890"
+        text-anchor="middle"
+        fill="#D6BC7A"
+        font-size="42"
+        font-family="Montserrat, Arial, sans-serif"
+        font-weight="400"
+        letter-spacing="14">
+    EUROPEO
+  </text>
+</svg>

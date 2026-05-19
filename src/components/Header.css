@@ -28,7 +28,9 @@
 }
 
 .logo-icon {
-  font-size: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: block;
 }
 
 .nav {
@@ -781,7 +783,8 @@
   }
 
   .logo-icon {
-    font-size: 1.3rem;
+    width: 1.75rem;
+    height: 1.75rem;
   }
 
   .user-btn {

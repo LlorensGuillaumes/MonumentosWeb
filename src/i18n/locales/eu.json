@@ -1,4 +1,10 @@
 {
+  "notfound": {
+    "title": "Orri hau ez dago katalogoan",
+    "text": "Bisitatu duzun URLa ez dago edo lekuz aldatu da. Itzuli hasierara eta jarraitu ondarea aztertzen.",
+    "home": "Hasierara itzuli",
+    "search": "Monumentuak bilatu"
+  },
   "header": {
     "title": "Europako Ondarea",
     "monuments": "monumentu",

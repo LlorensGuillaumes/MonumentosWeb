@@ -41,6 +41,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
+          <img src="/xxss3.svg" alt="Patrimonio Europeo" className="hero-emblem" />
           <h1>{t('home.heroTitle')}</h1>
           <p>
             {t('home.heroSubtitle', { count: stats?.total?.toLocaleString() || '100,000' })}

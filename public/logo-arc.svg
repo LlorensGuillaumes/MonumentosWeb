@@ -1,0 +1,29 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024">
+      <stop offset="0%" stop-color="#1a365d"/>
+      <stop offset="100%" stop-color="#2c5282"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background true circle -->
+  <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+
+  <!-- Gothic pointed arch silhouette -->
+  <path d="M 340 800
+           L 340 480
+           A 172 260 0 0 1 512 220
+           A 172 260 0 0 1 684 480
+           L 684 800 Z"
+        fill="none"
+        stroke="#F8FAFC"
+        stroke-width="48"
+        stroke-linejoin="round"
+        stroke-linecap="round"/>
+
+  <!-- Gold rosette center -->
+  <circle cx="512" cy="520" r="36" fill="#D6BC7A"/>
+
+  <!-- Inner gold ring -->
+  <circle cx="512" cy="520" r="18" fill="url(#bg)"/>
+</svg>

@@ -132,7 +132,7 @@ export default function Header() {
     <header className="header">
       <div className="header-content">
         <Link to="/" className="logo">
-          <span className="logo-icon">🏛️</span>
+          <img src="/logo-arc.svg" alt="" className="logo-icon" />
           <span className="logo-text">{t('header.title')}</span>
         </Link>
 

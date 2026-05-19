@@ -112,13 +112,24 @@
       <input type="color" id="color2" value="#1e3a8a">
     </label>
     <label>
+      Símbolo
+      <select id="logoType">
+        <option value="emblema" selected>Emblema Patrimonio</option>
+        <option value="arc">Arc gòtic</option>
+        <option value="pe">Monograma PE</option>
+        <option value="emoji">Emoji / letra (personalizado)</option>
+      </select>
+    </label>
+  </div>
+  <div class="row" id="emojiRow" style="display:none">
+    <label>
       Emoji / letra
       <input type="text" id="emoji" value="🏛️" maxlength="4">
     </label>
   </div>
   <div class="row">
     <label>
-      Tamaño del emoji (%)
+      Tamaño del símbolo (%)
       <input type="range" id="emojiSize" min="40" max="95" value="70">
     </label>
   </div>
@@ -138,13 +149,73 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+// Patrimonio Europeo logo variants (inlined so the tool works offline / via file://)
+const LOGO_SVGS = {
+  emblema: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#1a365d"/>
+        <stop offset="100%" stop-color="#2c5282"/>
+      </linearGradient>
+    </defs>
+    <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+    <circle cx="512" cy="512" r="470" stroke="#F8FAFC" stroke-width="2" fill="none" opacity="0.25"/>
+    <path d="M 280 200 A 320 320 0 0 1 744 200" stroke="#D6BC7A" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.8"/>
+    <path d="M260 590 L380 590" stroke="#F8FAFC" stroke-width="14" stroke-linecap="round"/>
+    <path d="M282 590 L295 680" stroke="#F8FAFC" stroke-width="14" stroke-linecap="round"/>
+    <path d="M345 590 L358 680" stroke="#F8FAFC" stroke-width="14" stroke-linecap="round"/>
+    <path d="M415 360 L415 600 L605 600 L605 360" stroke="#F8FAFC" stroke-width="12" stroke-linejoin="round" fill="none"/>
+    <path d="M415 360 L437 338 L459 360 L481 338 L503 360 L525 338 L547 360 L569 338 L591 360 L605 360" stroke="#F8FAFC" stroke-width="12" stroke-linejoin="round" fill="none"/>
+    <rect x="490" y="460" width="40" height="140" stroke="#D6BC7A" stroke-width="9" fill="none" rx="4"/>
+    <path d="M645 400 L780 400 L780 680 L645 680 Z" stroke="#F8FAFC" stroke-width="12" stroke-linejoin="round" fill="none"/>
+    <path d="M712 260 L645 400 L780 400 Z" stroke="#F8FAFC" stroke-width="12" stroke-linejoin="round" fill="none"/>
+    <circle cx="712" cy="490" r="26" stroke="#D6BC7A" stroke-width="9" fill="none"/>
+    <path d="M687 680 L687 555 Q712 515 737 555 L737 680" stroke="#D6BC7A" stroke-width="9" fill="none"/>
+    <text x="512" y="820" text-anchor="middle" fill="#F8FAFC" font-size="72" font-family="Montserrat, Arial, sans-serif" font-weight="600" letter-spacing="10">PATRIMONIO</text>
+    <text x="512" y="890" text-anchor="middle" fill="#D6BC7A" font-size="42" font-family="Montserrat, Arial, sans-serif" font-weight="400" letter-spacing="14">EUROPEO</text>
+  </svg>`,
+  arc: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#1a365d"/>
+        <stop offset="100%" stop-color="#2c5282"/>
+      </linearGradient>
+    </defs>
+    <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+    <path d="M 340 800 L 340 480 A 172 260 0 0 1 512 220 A 172 260 0 0 1 684 480 L 684 800 Z" fill="none" stroke="#F8FAFC" stroke-width="48" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="512" cy="520" r="36" fill="#D6BC7A"/>
+    <circle cx="512" cy="520" r="18" fill="url(#bg)"/>
+  </svg>`,
+  pe: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#1a365d"/>
+        <stop offset="100%" stop-color="#2c5282"/>
+      </linearGradient>
+    </defs>
+    <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+    <text x="512" y="680" text-anchor="middle" fill="#F8FAFC" font-size="560" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" letter-spacing="-30">PE</text>
+    <rect x="362" y="780" width="300" height="14" fill="#D6BC7A" rx="7"/>
+  </svg>`,
+};
+
+// Pre-load each logo as an Image so render() can draw synchronously after first load
+const LOGO_IMAGES = {};
+for (const [key, svgText] of Object.entries(LOGO_SVGS)) {
+  const img = new Image();
+  img.onload = () => render();
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+  LOGO_IMAGES[key] = img;
+}
+
 function render() {
   const size = parseInt(document.getElementById('size').value);
   const style = document.getElementById('style').value;
   const color1 = document.getElementById('color1').value;
   const color2 = document.getElementById('color2').value;
+  const logoType = document.getElementById('logoType').value;
   const emoji = document.getElementById('emoji').value || '🏛️';
-  const emojiPct = parseInt(document.getElementById('emojiSize').value) / 100;
+  const symbolPct = parseInt(document.getElementById('emojiSize').value) / 100;
 
   canvas.width = size;
   canvas.height = size;
@@ -189,12 +260,19 @@ function render() {
     ctx.restore();
   }
 
-  // Emoji centered
-  const fontSize = Math.floor(size * emojiPct);
-  ctx.font = `${fontSize}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(emoji, size / 2, size / 2 + fontSize * 0.05);
+  // Symbol centered (SVG logo or emoji fallback)
+  const symbolSize = Math.floor(size * symbolPct);
+  if (logoType === 'emoji') {
+    ctx.font = `${symbolSize}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, size / 2, size / 2 + symbolSize * 0.05);
+  } else {
+    const img = LOGO_IMAGES[logoType];
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, (size - symbolSize) / 2, (size - symbolSize) / 2, symbolSize, symbolSize);
+    }
+  }
 }
 
 function download(format) {
@@ -224,8 +302,14 @@ function download(format) {
 }
 
 // Listeners
-['size', 'style', 'color1', 'color2', 'emoji', 'emojiSize'].forEach(id => {
+['size', 'style', 'color1', 'color2', 'emoji', 'emojiSize', 'logoType'].forEach(id => {
   document.getElementById(id).addEventListener('input', render);
+});
+
+// Toggle visibility of the emoji input row based on the selected symbol type
+document.getElementById('logoType').addEventListener('change', () => {
+  const isEmoji = document.getElementById('logoType').value === 'emoji';
+  document.getElementById('emojiRow').style.display = isEmoji ? 'flex' : 'none';
 });
 
 render();

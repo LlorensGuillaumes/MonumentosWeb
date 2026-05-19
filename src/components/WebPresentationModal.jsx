@@ -79,14 +79,68 @@ All data comes from official sources: Wikidata, IAPH Andalucía, DIBA Barcelona,
   },
 };
 
+// Brand emblem with 3 buildings (dolmen + castle + cathedral). Positioned at (x, y) top-left.
+// Caller must include LOGO_GRADIENT_DEF inside the parent <defs>.
+function buildLogoSvg(x, y, size) {
+  const scale = size / 1024;
+  return `<g transform="translate(${x}, ${y}) scale(${scale})">
+    <circle cx="512" cy="512" r="512" fill="url(#logo-bg)"/>
+    <circle cx="512" cy="512" r="490" stroke="#F8FAFC" stroke-width="6" fill="none" opacity="0.35"/>
+    <path d="M 280 200 A 320 320 0 0 1 744 200" stroke="#D6BC7A" stroke-width="14" stroke-linecap="round" fill="none" opacity="0.85"/>
+    <path d="M260 590 L380 590" stroke="#F8FAFC" stroke-width="26" stroke-linecap="round"/>
+    <path d="M282 590 L295 680" stroke="#F8FAFC" stroke-width="26" stroke-linecap="round"/>
+    <path d="M345 590 L358 680" stroke="#F8FAFC" stroke-width="26" stroke-linecap="round"/>
+    <path d="M415 360 L415 600 L605 600 L605 360" stroke="#F8FAFC" stroke-width="22" stroke-linejoin="round" fill="none"/>
+    <path d="M415 360 L437 338 L459 360 L481 338 L503 360 L525 338 L547 360 L569 338 L591 360 L605 360" stroke="#F8FAFC" stroke-width="22" stroke-linejoin="round" fill="none"/>
+    <rect x="488" y="460" width="44" height="140" stroke="#D6BC7A" stroke-width="18" fill="none" rx="4"/>
+    <path d="M645 400 L780 400 L780 680 L645 680 Z" stroke="#F8FAFC" stroke-width="22" stroke-linejoin="round" fill="none"/>
+    <path d="M712 260 L645 400 L780 400 Z" stroke="#F8FAFC" stroke-width="22" stroke-linejoin="round" fill="none"/>
+    <circle cx="712" cy="490" r="28" stroke="#D6BC7A" stroke-width="18" fill="none"/>
+    <path d="M687 680 L687 555 Q712 515 737 555 L737 680" stroke="#D6BC7A" stroke-width="18" fill="none"/>
+  </g>`;
+}
+
+// Gradient def to embed inside <defs> of the parent SVG.
+const LOGO_GRADIENT_DEF = `<linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0%" stop-color="#1a365d"/>
+  <stop offset="100%" stop-color="#2c5282"/>
+</linearGradient>`;
+
+// Persist user choices across sessions
+const LS_KEY = 'wpm:prefs:v1';
+function loadPrefs() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
 export default function WebPresentationModal({ onClose }) {
+  const initialPrefs = loadPrefs();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [palette, setPalette] = useState('azul');
-  const [format, setFormat] = useState('square');
-  const [lang, setLang] = useState('es');
+  const [palette, setPalette] = useState(initialPrefs.palette || 'azul');
+  const [format, setFormat] = useState(initialPrefs.format || 'square');
+  const [lang, setLang] = useState(initialPrefs.lang || 'es');
   const [copied, setCopied] = useState('');
   const previewRef = useRef(null);
+
+  // Persist preferences whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({ palette, format, lang }));
+    } catch { /* localStorage might be disabled */ }
+  }, [palette, format, lang]);
+
+  // Close on ESC
+  useEffect(() => {
+    const handleKey = e => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [onClose]);
 
   useEffect(() => {
     (async () => {
@@ -117,35 +171,53 @@ export default function WebPresentationModal({ onClose }) {
 
     if (isCover) return buildCoverSvg(p, f, lang, total, paises, conImagen);
 
-    // Scale text sizes per format
-    const titleSize = isLandscape ? 46 : isStory ? 82 : 70;
-    const titleLineH = Math.round(titleSize * 1.1);
-    const subSize = isLandscape ? 22 : 32;
-    const statNumSize = isLandscape ? 48 : isStory ? 88 : 76;
-    const statLabelSize = isLandscape ? 18 : 24;
-    const urlSize = isLandscape ? 22 : 30;
+    // Sizes
+    const logoSize = isLandscape ? 130 : isStory ? 380 : 260;
+    const brandSize = isLandscape ? 18 : 28;
+    const titleSize = isLandscape ? 38 : isStory ? 90 : 68;
+    const titleLineH = Math.round(titleSize * 1.05);
+    const subSize = isLandscape ? 18 : 30;
+    const statNumSize = isLandscape ? 38 : isStory ? 78 : 64;
+    const statLabelSize = isLandscape ? 14 : isStory ? 24 : 20;
+    const urlSize = isLandscape ? 20 : isStory ? 36 : 30;
 
     const cx = f.w / 2;
 
-    // Layout positions (logoY = baseline of the emoji text)
-    const logoY = isStory ? 270 : isLandscape ? 120 : 165;
-    const brandY = isStory ? 310 : isLandscape ? 150 : 200;
-    const titleY = isStory ? 510 : isLandscape ? 240 : 370;
+    // Vertical rhythm (stacked top to bottom)
+    const logoTop = isLandscape ? 30 : isStory ? 140 : 80;
+    const brandY = logoTop + logoSize + (isLandscape ? 30 : 60);
+    const dividerY = brandY + (isLandscape ? 14 : 24);
+    const titleY = dividerY + (isLandscape ? 44 : isStory ? 130 : 96);
     const titleY2 = titleY + titleLineH;
-    const subY = titleY2 + subSize + 30;
-    const statsY = isStory ? 1320 : isLandscape ? 440 : 800;
-    const urlY = f.h - (isLandscape ? 60 : isStory ? 160 : 110);
+    const subY = titleY2 + subSize + (isLandscape ? 12 : 28);
 
-    // Stats block
-    const gap = isLandscape ? 200 : isStory ? 310 : 290;
-    const stat = (x, num, label) => `
-      <text x="${x}" y="${statsY}" text-anchor="middle" font-family="Georgia, serif" font-size="${statNumSize}" font-weight="bold" fill="${p.accent}">${num}</text>
-      <text x="${x}" y="${statsY + statLabelSize + 18}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${statLabelSize}" fill="${p.textMuted}">${label}</text>
-    `;
+    // Stat cards (positioned just below subtitle)
+    // cardW must comfortably fit a 6-7 digit number ("258.000") at statNumSize × 0.55 per char
+    const cardW = isLandscape ? 220 : isStory ? 320 : 310;
+    const cardH = isLandscape ? 110 : isStory ? 240 : 170;
+    const cardGap = isLandscape ? 20 : isStory ? 30 : 24;
+    const cardsTotalW = cardW * 3 + cardGap * 2;
+    const cardsLeft = cx - cardsTotalW / 2;
+    const cardsTop = subY + (isLandscape ? 18 : isStory ? 120 : 40);
+    const cardsBottom = cardsTop + cardH;
 
-    const stats1x = cx - gap;
-    const stats2x = cx;
-    const stats3x = cx + gap;
+    // URL pill flows after cards
+    const urlY = isStory ? Math.max(cardsBottom + 120, f.h - 180) : cardsBottom + (isLandscape ? 50 : 80);
+
+    const statCard = (i, num, label) => {
+      const x = cardsLeft + i * (cardW + cardGap);
+      const y = cardsTop;
+      return `
+        <rect x="${x}" y="${y}" width="${cardW}" height="${cardH}" rx="${isLandscape ? 16 : 22}"
+              fill="${p.accent}" opacity="0.10"/>
+        <rect x="${x}" y="${y}" width="${cardW}" height="${cardH}" rx="${isLandscape ? 16 : 22}"
+              fill="none" stroke="${p.accent}" stroke-width="2" opacity="0.45"/>
+        <text x="${x + cardW / 2}" y="${y + cardH * 0.55}" text-anchor="middle"
+              font-family="Georgia, serif" font-size="${statNumSize}" font-weight="bold" fill="${p.accent}">${num}</text>
+        <text x="${x + cardW / 2}" y="${y + cardH * 0.85}" text-anchor="middle"
+              font-family="Arial, sans-serif" font-size="${statLabelSize}" fill="${p.textMuted}" letter-spacing="2">${label}</text>
+      `;
+    };
 
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${f.w}" height="${f.h}" viewBox="0 0 ${f.w} ${f.h}">
       <defs>
@@ -154,32 +226,53 @@ export default function WebPresentationModal({ onClose }) {
           <stop offset="100%" stop-color="${p.bgTo}"/>
         </linearGradient>
         <radialGradient id="glow" cx="50%" cy="0%" r="80%">
-          <stop offset="0%" stop-color="${p.accent}" stop-opacity="0.25"/>
+          <stop offset="0%" stop-color="${p.accent}" stop-opacity="0.22"/>
           <stop offset="100%" stop-color="${p.accent}" stop-opacity="0"/>
         </radialGradient>
+        <radialGradient id="glow2" cx="50%" cy="100%" r="70%">
+          <stop offset="0%" stop-color="${p.accent}" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="${p.accent}" stop-opacity="0"/>
+        </radialGradient>
+        ${LOGO_GRADIENT_DEF}
       </defs>
       <rect width="${f.w}" height="${f.h}" fill="url(#bg)"/>
       <rect width="${f.w}" height="${f.h}" fill="url(#glow)"/>
+      <rect width="${f.w}" height="${f.h}" fill="url(#glow2)"/>
 
-      <!-- Logo: classical building emoji (same as navbar) -->
-      <text x="${cx}" y="${logoY}" text-anchor="middle" font-size="${isLandscape ? 110 : isStory ? 180 : 150}" font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji','EmojiOne Color','Twemoji Mozilla',sans-serif">🏛️</text>
+      <!-- Brand logo (emblem) -->
+      ${buildLogoSvg(cx - logoSize / 2, logoTop, logoSize)}
 
-      <!-- Brand -->
-      <text x="${cx}" y="${brandY + (isLandscape ? 20 : 40)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${isLandscape ? 20 : 28}" font-weight="600" fill="${p.textMuted}" letter-spacing="4">PATRIMONIO EUROPEO</text>
+      <!-- Brand text -->
+      <text x="${cx}" y="${brandY}" text-anchor="middle"
+            font-family="Arial, sans-serif" font-size="${brandSize}" font-weight="700"
+            fill="${p.text}" letter-spacing="${isLandscape ? 6 : 8}">PATRIMONIO EUROPEO</text>
 
-      <!-- Title (2 lines) -->
-      <text x="${cx}" y="${titleY}" text-anchor="middle" font-family="Georgia, serif" font-size="${titleSize}" font-weight="bold" fill="${p.text}">${escapeXml(copy.headlineLines[0])}</text>
-      <text x="${cx}" y="${titleY2}" text-anchor="middle" font-family="Georgia, serif" font-size="${titleSize}" font-weight="bold" fill="${p.text}">${escapeXml(copy.headlineLines[1])}</text>
-      <text x="${cx}" y="${subY}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${subSize}" fill="${p.textMuted}">${lang === 'es' ? 'España · Francia · Italia · Portugal' : 'Spain · France · Italy · Portugal'}</text>
+      <!-- Gold accent divider -->
+      <line x1="${cx - (isLandscape ? 90 : 130)}" y1="${dividerY}" x2="${cx + (isLandscape ? 90 : 130)}" y2="${dividerY}"
+            stroke="${p.accent}" stroke-width="2" opacity="0.7"/>
 
-      <!-- Stats -->
-      ${stat(stats1x, total, lang === 'es' ? 'monumentos' : 'monuments')}
-      ${stat(stats2x, paises, lang === 'es' ? 'países' : 'countries')}
-      ${stat(stats3x, conImagen, lang === 'es' ? 'con fotos' : 'with photos')}
+      <!-- Title (2 lines, italic-style serif) -->
+      <text x="${cx}" y="${titleY}" text-anchor="middle"
+            font-family="Georgia, serif" font-size="${titleSize}" font-weight="bold" fill="${p.text}">${escapeXml(copy.headlineLines[0])}</text>
+      <text x="${cx}" y="${titleY2}" text-anchor="middle"
+            font-family="Georgia, serif" font-size="${titleSize}" font-weight="bold" fill="${p.text}">${escapeXml(copy.headlineLines[1])}</text>
+
+      <!-- Subtitle / countries -->
+      <text x="${cx}" y="${subY}" text-anchor="middle"
+            font-family="Arial, sans-serif" font-size="${subSize}" fill="${p.textMuted}" letter-spacing="2">${lang === 'es' ? 'España · Italia · Francia · Portugal' : 'Spain · Italy · France · Portugal'}</text>
+
+      <!-- Stat cards -->
+      ${statCard(0, total, lang === 'es' ? 'MONUMENTOS' : 'MONUMENTS')}
+      ${statCard(1, paises, lang === 'es' ? 'PAÍSES' : 'COUNTRIES')}
+      ${statCard(2, conImagen, lang === 'es' ? 'CON FOTOS' : 'WITH PHOTOS')}
 
       <!-- URL pill -->
-      <rect x="${cx - (isLandscape ? 280 : 360)}" y="${urlY - urlSize + 4}" width="${isLandscape ? 560 : 720}" height="${urlSize + 28}" rx="${(urlSize + 28) / 2}" fill="${p.accent}" opacity="0.18"/>
-      <text x="${cx}" y="${urlY + 12}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${urlSize}" font-weight="bold" fill="${p.accent}">patrimonio-europeo.netlify.app</text>
+      <rect x="${cx - (isLandscape ? 290 : 380)}" y="${urlY - urlSize - 4}" width="${isLandscape ? 580 : 760}" height="${urlSize + 32}" rx="${(urlSize + 32) / 2}"
+            fill="${p.accent}" opacity="0.18"/>
+      <rect x="${cx - (isLandscape ? 290 : 380)}" y="${urlY - urlSize - 4}" width="${isLandscape ? 580 : 760}" height="${urlSize + 32}" rx="${(urlSize + 32) / 2}"
+            fill="none" stroke="${p.accent}" stroke-width="1.5" opacity="0.5"/>
+      <text x="${cx}" y="${urlY + 14}" text-anchor="middle"
+            font-family="Arial, sans-serif" font-size="${urlSize}" font-weight="bold" fill="${p.accent}" letter-spacing="1">patrimonio-europeo.netlify.app</text>
     </svg>`;
   };
 
@@ -246,17 +339,26 @@ export default function WebPresentationModal({ onClose }) {
     setTimeout(() => setCopied(''), 2000);
   };
 
+  const currentFormat = FORMATS[format];
+  const formatDim = currentFormat ? `${currentFormat.w} × ${currentFormat.h} px` : '';
+
   return (
     <div className="wpm-overlay" onClick={onClose}>
       <div className="wpm-modal" onClick={e => e.stopPropagation()}>
         <div className="wpm-header">
-          <h2>Presentación de la web</h2>
-          <button className="wpm-close" onClick={onClose}>&times;</button>
+          <div className="wpm-header-text">
+            <h2>Generador de contenido</h2>
+            <p>Crea tarjetas para redes sociales con las estadísticas en vivo del catálogo</p>
+          </div>
+          <button className="wpm-close" onClick={onClose} aria-label="Cerrar">×</button>
         </div>
 
         <div className="wpm-body">
           {loading ? (
-            <div className="wpm-loading">Cargando estadísticas...</div>
+            <div className="wpm-loading">
+              <div className="wpm-skeleton" />
+              <span>Cargando estadísticas del catálogo…</span>
+            </div>
           ) : (
             <>
               <div className="wpm-preview-area">
@@ -265,7 +367,7 @@ export default function WebPresentationModal({ onClose }) {
                     <img
                       ref={previewRef}
                       src={svgDataUrl}
-                      alt="Presentación"
+                      alt="Vista previa"
                       className="wpm-preview-img"
                     />
                   )}
@@ -274,7 +376,7 @@ export default function WebPresentationModal({ onClose }) {
 
               <div className="wpm-controls">
                 <div className="wpm-control-group">
-                  <label>Formato</label>
+                  <label>Formato {formatDim && <span className="wpm-hint">· {formatDim}</span>}</label>
                   <div className="wpm-chips">
                     {Object.entries(FORMATS).map(([key, f]) => (
                       <button
@@ -289,7 +391,7 @@ export default function WebPresentationModal({ onClose }) {
                 </div>
 
                 <div className="wpm-control-group">
-                  <label>Paleta</label>
+                  <label>Paleta de colores</label>
                   <div className="wpm-chips">
                     {Object.entries(PALETTES).map(([key, pal]) => (
                       <button
@@ -308,7 +410,7 @@ export default function WebPresentationModal({ onClose }) {
                 </div>
 
                 <div className="wpm-control-group">
-                  <label>Idioma del texto</label>
+                  <label>Idioma</label>
                   <div className="wpm-chips">
                     <button
                       className={`wpm-chip ${lang === 'es' ? 'active' : ''}`}
@@ -327,28 +429,35 @@ export default function WebPresentationModal({ onClose }) {
 
                 <div className="wpm-download-row">
                   <button className="wpm-btn wpm-btn-primary" onClick={downloadPng}>
-                    ⬇ Descargar PNG
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Descargar PNG
                   </button>
                   <button className="wpm-btn wpm-btn-secondary" onClick={downloadSvg}>
-                    ⬇ Descargar SVG
+                    SVG
                   </button>
                 </div>
 
                 <div className="wpm-control-group">
-                  <label>Texto del post (copia y pega en Instagram/Facebook)</label>
+                  <label>Texto del post</label>
                   <textarea
                     className="wpm-textarea"
                     value={fullText}
                     readOnly
-                    rows={14}
+                    rows={10}
                   />
                   <div className="wpm-text-actions">
-                    <span className="wpm-char-count">{fullText.length} caracteres · max 2200 en Instagram</span>
+                    <span className="wpm-char-count">
+                      <strong>{fullText.length}</strong> caracteres · Instagram máx. 2200 · Twitter máx. 280
+                    </span>
                     <button
                       className={`wpm-btn wpm-btn-secondary ${copied === 'tags' ? 'copied' : ''}`}
                       onClick={handleCopyHashtags}
                     >
-                      {copied === 'tags' ? '✓ Copiado' : 'Copiar hashtags'}
+                      {copied === 'tags' ? '✓ Hashtags copiados' : 'Solo hashtags'}
                     </button>
                     <button
                       className={`wpm-btn wpm-btn-primary ${copied === 'text' ? 'copied' : ''}`}
@@ -417,13 +526,14 @@ function buildCoverSvg(p, f, lang, total, paises, conImagen) {
         <stop offset="0%" stop-color="${p.accent}" stop-opacity="0.15"/>
         <stop offset="100%" stop-color="${p.accent}" stop-opacity="0"/>
       </radialGradient>
+      ${LOGO_GRADIENT_DEF}
     </defs>
     <rect width="${f.w}" height="${f.h}" fill="url(#bg)"/>
     <rect width="${f.w}" height="${f.h}" fill="url(#glow)"/>
     <rect width="${f.w}" height="${f.h}" fill="url(#glow2)"/>
 
-    <!-- Top-left logo + brand -->
-    <text x="70" y="${logoY}" text-anchor="start" font-size="${logoSize}" font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji','EmojiOne Color','Twemoji Mozilla',sans-serif">🏛️</text>
+    <!-- Top-left brand logo + text -->
+    ${buildLogoSvg(70, logoY - logoSize, logoSize)}
     <text x="175" y="${brandY}" text-anchor="start" font-family="Arial, sans-serif" font-size="${brandSize}" font-weight="700" fill="${p.text}" letter-spacing="3">PATRIMONIO</text>
     <text x="175" y="${brandY + brandSize + 4}" text-anchor="start" font-family="Arial, sans-serif" font-size="${brandSize}" font-weight="700" fill="${p.text}" letter-spacing="3">EUROPEO</text>
 

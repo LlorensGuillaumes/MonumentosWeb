@@ -1,0 +1,37 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024">
+      <stop offset="0%" stop-color="#1a365d"/>
+      <stop offset="100%" stop-color="#2c5282"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background true circle -->
+  <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+
+  <!-- Castle silhouette with crenellation -->
+  <path d="M 280 800
+           L 280 380
+           L 320 380 L 320 330 L 380 330 L 380 380
+           L 440 380 L 440 330 L 500 330 L 500 380
+           L 524 380 L 524 330 L 584 330 L 584 380
+           L 644 380 L 644 330 L 704 330 L 704 380
+           L 744 380
+           L 744 800 Z"
+        fill="#F8FAFC"/>
+
+  <!-- Castle gate (arched door) -->
+  <path d="M 462 800
+           L 462 620
+           Q 462 555 512 555
+           Q 562 555 562 620
+           L 562 800 Z"
+        fill="url(#bg)"/>
+
+  <!-- Gold rosette/banner above gate -->
+  <circle cx="512" cy="490" r="22" fill="#D6BC7A"/>
+
+  <!-- Two windows -->
+  <rect x="340" y="490" width="36" height="62" fill="#D6BC7A" rx="3"/>
+  <rect x="648" y="490" width="36" height="62" fill="#D6BC7A" rx="3"/>
+</svg>

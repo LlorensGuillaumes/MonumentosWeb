@@ -1,4 +1,10 @@
 {
+  "notfound": {
+    "title": "This page is not in our catalogue",
+    "text": "The URL you visited doesn't exist or has moved. Head back to the homepage and keep exploring our heritage.",
+    "home": "Back to home",
+    "search": "Search monuments"
+  },
   "header": {
     "title": "European Heritage",
     "monuments": "monuments",

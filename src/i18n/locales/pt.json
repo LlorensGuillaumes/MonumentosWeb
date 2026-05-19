@@ -1,4 +1,10 @@
 {
+  "notfound": {
+    "title": "Esta página não consta no catálogo",
+    "text": "O URL que visitou não existe ou foi movido. Volte ao início e continue a explorar o património.",
+    "home": "Voltar ao início",
+    "search": "Pesquisar monumentos"
+  },
   "header": {
     "title": "Património Europeu",
     "monuments": "monumentos",

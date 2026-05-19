@@ -1,0 +1,27 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024">
+      <stop offset="0%" stop-color="#1a365d"/>
+      <stop offset="100%" stop-color="#2c5282"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background true circle -->
+  <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+
+  <!-- Capital (top, wider) -->
+  <rect x="330" y="240" width="364" height="40" fill="#F8FAFC" rx="6"/>
+  <rect x="360" y="280" width="304" height="16" fill="#D6BC7A"/>
+
+  <!-- Shaft -->
+  <rect x="392" y="296" width="240" height="436" fill="#F8FAFC"/>
+
+  <!-- Vertical flutes -->
+  <line x1="450" y1="300" x2="450" y2="728" stroke="#1a365d" stroke-width="6" opacity="0.35"/>
+  <line x1="512" y1="300" x2="512" y2="728" stroke="#1a365d" stroke-width="6" opacity="0.35"/>
+  <line x1="574" y1="300" x2="574" y2="728" stroke="#1a365d" stroke-width="6" opacity="0.35"/>
+
+  <!-- Base (bottom, wider) -->
+  <rect x="360" y="732" width="304" height="16" fill="#D6BC7A"/>
+  <rect x="330" y="748" width="364" height="40" fill="#F8FAFC" rx="6"/>
+</svg>

@@ -1,4 +1,10 @@
 {
+  "notfound": {
+    "title": "Aquesta pàgina no consta al catàleg",
+    "text": "La URL que has visitat no existeix o s'ha mogut. Torna a l'inici i continua explorant el patrimoni.",
+    "home": "Tornar a l'inici",
+    "search": "Cercar monuments"
+  },
   "header": {
     "title": "Patrimoni Europeu",
     "monuments": "monuments",
