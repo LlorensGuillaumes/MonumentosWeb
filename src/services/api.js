@@ -409,4 +409,73 @@ export const getRutasCulturales = (lang) =>
 export const getRutaCultural = (slug) =>
   api.get(`/rutas-culturales/${slug}`).then(r => r.data);
 
+// ============== ANALYTICS DE TRAFICO ==============
+
+/**
+ * Envía un evento al backend. No bloquea la UI: si falla, swallow silently.
+ * Anonymous-friendly: si el usuario no está logueado, igualmente se registra.
+ */
+export const trackEvent = (event_type, opts = {}) => {
+  try {
+    const payload = {
+      event_type,
+      url: window.location.pathname + window.location.search,
+      referrer: document.referrer || null,
+      session_id: getSessionId(),
+      ...opts,
+    };
+    // fire-and-forget; keepalive permite enviarlo aunque el usuario navegue
+    return fetch(`${activeBaseURL}/track`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(localStorage.getItem('auth_token')
+          ? { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
+          : {}),
+      },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // never break UX
+    return Promise.resolve();
+  }
+};
+
+// Session ID per agrupar visites d'una mateixa sessió. Generat al primer ús,
+// guardat a sessionStorage (s'esborra en tancar pestanya).
+function getSessionId() {
+  try {
+    const KEY = 'pe_session_id';
+    let id = sessionStorage.getItem(KEY);
+    if (!id) {
+      id = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(KEY, id);
+    }
+    return id;
+  } catch {
+    return null;
+  }
+}
+
+// ============== ADMIN TRAFFIC ANALYTICS ==============
+
+export const getTrafficSummary = (dias = 30) =>
+  api.get('/admin/analytics/traffic/summary', { params: { dias } }).then(r => r.data);
+
+export const getTrafficByDay = (dias = 30) =>
+  api.get('/admin/analytics/traffic/by-day', { params: { dias } }).then(r => r.data);
+
+export const getTrafficTopUrls = (dias = 30, limit = 15) =>
+  api.get('/admin/analytics/traffic/top-urls', { params: { dias, limit } }).then(r => r.data);
+
+export const getTrafficTopReferrers = (dias = 30, limit = 15) =>
+  api.get('/admin/analytics/traffic/top-referrers', { params: { dias, limit } }).then(r => r.data);
+
+export const getTrafficTopMonumentos = (dias = 30, limit = 15) =>
+  api.get('/admin/analytics/traffic/top-monumentos', { params: { dias, limit } }).then(r => r.data);
+
+export const getTrafficTopAcciones = (dias = 30) =>
+  api.get('/admin/analytics/traffic/top-acciones', { params: { dias } }).then(r => r.data);
+
 export default api;

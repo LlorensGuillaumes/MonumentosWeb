@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { useApp } from '../context/AppContext';
-import { getMonumentos } from '../services/api';
+import { getMonumentos, trackEvent } from '../services/api';
 import Filters from '../components/Filters';
 import MonumentoCard from '../components/MonumentoCard';
 import { SearchResultsSkeleton } from '../components/Skeleton';
@@ -72,6 +72,13 @@ export default function Search() {
       setTotal(data.total);
       setTotalPages(data.total_pages);
       setPage(1);
+      // Sólo registrar búsquedas con criterios reales (no la carga inicial vacía)
+      const meaningfulFilters = Object.fromEntries(
+        Object.entries(filters).filter(([, v]) => v && v !== false)
+      );
+      if (Object.keys(meaningfulFilters).length > 0) {
+        trackEvent('search', { metadata: { filters: meaningfulFilters, total: data.total } });
+      }
     } catch (err) {
       console.error('Error searching:', err);
     } finally {

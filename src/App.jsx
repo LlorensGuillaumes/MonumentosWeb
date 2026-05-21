@@ -5,6 +5,7 @@ import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
 import ScrollToTop from './components/ScrollToTop';
+import AnalyticsTracker from './components/AnalyticsTracker';
 import BackToTop from './components/BackToTop';
 import CompareBar from './components/CompareBar';
 import CookieConsent from './components/CookieConsent';
@@ -47,6 +48,7 @@ function App() {
         <AuthProvider>
           <div className="app">
             <ScrollToTop />
+            <AnalyticsTracker />
             <Header />
             <main className="main-content">
               <Suspense fallback={<LazyFallback />}>

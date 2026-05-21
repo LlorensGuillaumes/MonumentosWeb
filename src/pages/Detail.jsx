@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { getMonumento, getMonumentos, getMonumentosRadio, getWikipediaExtract, getValoraciones, addValoracion, getNotasMonumento, addNotaMonumento, deleteNotaMonumento } from '../services/api';
+import { getMonumento, getMonumentos, getMonumentosRadio, getWikipediaExtract, getValoraciones, addValoracion, getNotasMonumento, addNotaMonumento, deleteNotaMonumento, trackEvent } from '../services/api';
 import PhotoUpload from '../components/PhotoUpload';
 import { useAuth } from '../context/AuthContext';
 import { DetailSkeleton } from '../components/Skeleton';
@@ -75,7 +75,10 @@ export default function Detail() {
     setRatings(null);
     setNotas([]);
     getMonumento(id)
-      .then(setMonumento)
+      .then(m => {
+        setMonumento(m);
+        if (m?.id) trackEvent('monument_view', { bien_id: m.id });
+      })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);

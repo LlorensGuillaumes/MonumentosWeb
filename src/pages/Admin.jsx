@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createContacto, getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, updateUsuarioPremium, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory, getSocialAccountsSuggest, markSocialAccountsUsed, getRutasCulturales, getRutaCultural } from '../services/api';
 import { CURATED_ROUTES } from '../data/curatedRoutes';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
+import TrafficAnalyticsCard from '../components/TrafficAnalyticsCard';
 import AdminSettings from '../components/AdminSettings';
 import WebPresentationModal from '../components/WebPresentationModal';
 import './Admin.css';
@@ -1662,7 +1663,10 @@ export default function Admin() {
         )}
 
         {activeSection === 'analytics' && (
-          <AnalyticsDashboard />
+          <>
+            <TrafficAnalyticsCard />
+            <AnalyticsDashboard />
+          </>
         )}
 
         {activeSection === 'tareas' && (

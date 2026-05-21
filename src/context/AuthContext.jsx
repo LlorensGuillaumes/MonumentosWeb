@@ -4,6 +4,7 @@ import {
   authLogin, authRegister, authGoogle, authMe, authUpdate,
   getFavoritoIds, addFavorito, removeFavorito,
   changePassword as apiChangePassword,
+  trackEvent,
 } from '../services/api';
 
 const AuthContext = createContext(null);
@@ -118,8 +119,10 @@ export function AuthProvider({ children }) {
     try {
       if (isFav) {
         await removeFavorito(bienId);
+        trackEvent('favorite_remove', { bien_id: bienId });
       } else {
         await addFavorito(bienId);
+        trackEvent('favorite_add', { bien_id: bienId });
       }
       return !isFav;
     } catch {

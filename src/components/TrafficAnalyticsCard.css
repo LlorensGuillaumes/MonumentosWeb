@@ -1,0 +1,212 @@
+.traffic-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.traffic-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.traffic-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text-primary, #1a365d);
+}
+
+.traffic-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.traffic-dias-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.traffic-dias-btn {
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-card, #fff);
+  border: none;
+  border-right: 1px solid var(--border-color, #e2e8f0);
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.traffic-dias-btn:last-child { border-right: none; }
+.traffic-dias-btn:hover { background: var(--bg-secondary, #f8fafc); }
+
+.traffic-dias-btn.active {
+  background: linear-gradient(135deg, #1a365d, #2c5282);
+  color: white;
+}
+
+.traffic-refresh {
+  padding: 0.4rem 0.9rem;
+  background: var(--bg-secondary, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #4a5568);
+  cursor: pointer;
+}
+
+.traffic-refresh:hover:not(:disabled) {
+  background: var(--bg-card, #fff);
+  border-color: var(--accent, #2c5282);
+}
+
+.traffic-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* KPIs */
+.traffic-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.traffic-kpi {
+  background: linear-gradient(135deg, rgba(26, 54, 93, 0.05), rgba(44, 82, 130, 0.05));
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.traffic-kpi-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a365d);
+  line-height: 1.1;
+}
+
+.traffic-kpi-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #64748b);
+  margin-top: 0.25rem;
+}
+
+.traffic-kpi-sub {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 0.2rem;
+}
+
+/* Sections */
+.traffic-section {
+  margin-top: 1.5rem;
+}
+
+.traffic-section h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: var(--text-primary, #1a365d);
+  font-weight: 600;
+}
+
+/* Grid 2 cols */
+.traffic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 900px) {
+  .traffic-grid { grid-template-columns: 1fr; }
+}
+
+/* Tables */
+.traffic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.traffic-table th {
+  text-align: left;
+  padding: 0.5rem 0.5rem;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary, #64748b);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.traffic-table td {
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+  color: var(--text-primary, #1a202c);
+  vertical-align: top;
+}
+
+.traffic-table tr:hover td {
+  background: var(--bg-secondary, #f8fafc);
+}
+
+.traffic-url {
+  font-family: 'Menlo', 'Monaco', monospace;
+  font-size: 0.78rem;
+  word-break: break-all;
+  color: var(--text-secondary, #4a5568);
+}
+
+.traffic-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.traffic-monument-name { font-weight: 500; }
+.traffic-monument-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 0.15rem;
+}
+
+.traffic-action {
+  font-family: 'Menlo', 'Monaco', monospace;
+  font-size: 0.82rem;
+  color: var(--accent, #2c5282);
+}
+
+/* States */
+.traffic-loading,
+.traffic-error,
+.traffic-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.9rem;
+}
+
+.traffic-error { color: #e53e3e; }
+
+.traffic-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #1a365d, #2c5282);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
