@@ -9,8 +9,6 @@ import {
 } from '../services/api';
 import './TrafficAnalyticsCard.css';
 
-const DIAS_OPTIONS = [7, 30, 90];
-
 export default function TrafficAnalyticsCard() {
   const [dias, setDias] = useState(30);
   const [summary, setSummary] = useState(null);
@@ -56,78 +54,82 @@ export default function TrafficAnalyticsCard() {
   }, [fetchAll]);
 
   if (loading && !summary) {
-    return (
-      <div className="traffic-card">
-        <div className="traffic-loading">Cargando estadísticas de tráfico…</div>
-      </div>
-    );
+    return <div className="analytics-loading">Cargando estadísticas de tráfico…</div>;
   }
 
   if (error) {
     return (
-      <div className="traffic-card">
-        <div className="traffic-error">Error: {error}</div>
-        <button className="traffic-btn" onClick={fetchAll}>Reintentar</button>
+      <div className="analytics-chart-card">
+        <div className="chart-empty">Error: {error}</div>
+        <button className="analytics-refresh" onClick={fetchAll}>Reintentar</button>
       </div>
     );
   }
 
   return (
-    <div className="traffic-card">
-      <div className="traffic-header">
+    <div className="traffic-dashboard">
+      <div className="analytics-header traffic-section-header">
         <h2>Tráfico de la web</h2>
         <div className="traffic-controls">
-          <div className="traffic-dias-toggle">
-            {DIAS_OPTIONS.map(d => (
-              <button
-                key={d}
-                className={`traffic-dias-btn ${dias === d ? 'active' : ''}`}
-                onClick={() => setDias(d)}
-              >
-                {d}d
-              </button>
-            ))}
-          </div>
-          <button className="traffic-refresh" onClick={fetchAll} disabled={loading}>
-            {loading ? '…' : '↻ Actualizar'}
+          <select value={dias} onChange={e => setDias(Number(e.target.value))}>
+            <option value={7}>7 días</option>
+            <option value={30}>30 días</option>
+            <option value={90}>90 días</option>
+          </select>
+          <button className="analytics-refresh" onClick={fetchAll} disabled={loading}>
+            {loading ? 'Cargando...' : 'Actualizar'}
           </button>
         </div>
       </div>
 
-      {/* KPIs */}
-      <div className="traffic-kpis">
-        <KpiBox label="Páginas vistas" value={summary?.total_pageviews} sub={`${summary?.pageviews_hoy ?? 0} hoy`} />
-        <KpiBox label="Visitantes únicos" value={summary?.unique_visitors} sub={`incl. anónimos`} />
-        <KpiBox label="Usuarios logueados" value={summary?.unique_users_logged} sub={`distintos`} />
-        <KpiBox label="Eventos totales" value={summary?.total_events} sub={`${summary?.events_hoy ?? 0} hoy`} />
+      {/* KPIs reuses kpi-card styling */}
+      <div className="analytics-kpis traffic-kpis-row">
+        <div className="kpi-card kpi-today">
+          <span className="kpi-value">{(summary?.total_pageviews ?? 0).toLocaleString('es-ES')}</span>
+          <span className="kpi-label">Páginas vistas</span>
+        </div>
+        <div className="kpi-card">
+          <span className="kpi-value">{(summary?.unique_visitors ?? 0).toLocaleString('es-ES')}</span>
+          <span className="kpi-label">Visitantes únicos</span>
+        </div>
+        <div className="kpi-card kpi-new">
+          <span className="kpi-value">{(summary?.unique_users_logged ?? 0).toLocaleString('es-ES')}</span>
+          <span className="kpi-label">Usuarios logueados</span>
+        </div>
+        <div className="kpi-card">
+          <span className="kpi-value">{(summary?.total_events ?? 0).toLocaleString('es-ES')}</span>
+          <span className="kpi-label">Eventos totales</span>
+        </div>
       </div>
 
-      {/* Line chart by day */}
-      <div className="traffic-section">
-        <h3>Evolución diaria</h3>
-        {byDay.length === 0 ? (
-          <p className="traffic-empty">Aún no hay datos en este rango.</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={byDay} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="pageviews" stroke="#2c5282" name="Pageviews" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="uniques" stroke="#D6BC7A" name="Únicos" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="users_logged" stroke="#48bb78" name="Logueados" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
-      </div>
+      {/* Charts grid reuses analytics-charts-grid */}
+      <div className="analytics-charts-grid">
+        {/* Line chart wide */}
+        <div className="analytics-chart-card chart-wide">
+          <h3>Evolución diaria</h3>
+          {byDay.length === 0 ? (
+            <div className="chart-empty">Aún no hay datos en este rango.</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={260}>
+              <LineChart data={byDay} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#edf2f7" />
+                <XAxis dataKey="label" fontSize={12} tick={{ fill: '#718096' }} />
+                <YAxis fontSize={12} tick={{ fill: '#718096' }} allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="pageviews" stroke="#2b6cb0" name="Pageviews" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="uniques" stroke="#ed8936" name="Únicos" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="users_logged" stroke="#48bb78" name="Logueados" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
 
-      {/* Two-column tables */}
-      <div className="traffic-grid">
-        <Section title="Top páginas">
+        {/* Top URLs */}
+        <div className="analytics-chart-card">
+          <h3>Top páginas</h3>
           {topUrls.length === 0 ? (
-            <p className="traffic-empty">Sin datos.</p>
+            <div className="chart-empty">Sin datos.</div>
           ) : (
             <table className="traffic-table">
               <thead><tr><th>URL</th><th>Vistas</th><th>Únicos</th></tr></thead>
@@ -142,11 +144,13 @@ export default function TrafficAnalyticsCard() {
               </tbody>
             </table>
           )}
-        </Section>
+        </div>
 
-        <Section title="Referrers externos">
+        {/* Referrers */}
+        <div className="analytics-chart-card">
+          <h3>Referrers externos</h3>
           {topReferrers.length === 0 ? (
-            <p className="traffic-empty">Sin referrers externos.</p>
+            <div className="chart-empty">Sin referrers externos.</div>
           ) : (
             <table className="traffic-table">
               <thead><tr><th>Origen</th><th>Visitas</th></tr></thead>
@@ -160,11 +164,13 @@ export default function TrafficAnalyticsCard() {
               </tbody>
             </table>
           )}
-        </Section>
+        </div>
 
-        <Section title="Top monumentos vistos">
+        {/* Top monumentos */}
+        <div className="analytics-chart-card">
+          <h3>Top monumentos vistos</h3>
           {topMonumentos.length === 0 ? (
-            <p className="traffic-empty">Sin datos (event_type = monument_view).</p>
+            <div className="chart-empty">Sin datos (event_type = monument_view).</div>
           ) : (
             <table className="traffic-table">
               <thead><tr><th>Monumento</th><th>Vistas</th></tr></thead>
@@ -183,11 +189,13 @@ export default function TrafficAnalyticsCard() {
               </tbody>
             </table>
           )}
-        </Section>
+        </div>
 
-        <Section title="Acciones (no pageviews)">
+        {/* Acciones */}
+        <div className="analytics-chart-card">
+          <h3>Acciones (no pageviews)</h3>
           {topAcciones.length === 0 ? (
-            <p className="traffic-empty">Sin acciones registradas todavía.</p>
+            <div className="chart-empty">Sin acciones registradas todavía.</div>
           ) : (
             <table className="traffic-table">
               <thead><tr><th>Acción</th><th>Total</th><th>Usuarios</th></tr></thead>
@@ -202,62 +210,44 @@ export default function TrafficAnalyticsCard() {
               </tbody>
             </table>
           )}
-        </Section>
-      </div>
+        </div>
 
-      {/* Country + device breakdown */}
-      <div className="traffic-grid">
-        <Section title="Por país">
+        {/* Country breakdown */}
+        <div className="analytics-chart-card chart-small">
+          <h3>Por país</h3>
           {(!summary?.by_country || summary.by_country.length === 0) ? (
-            <p className="traffic-empty">Sin datos (requiere proxy con CF-IPCountry).</p>
+            <div className="chart-empty">Sin datos (requiere proxy con CF-IPCountry).</div>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={summary.by_country} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="country" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#edf2f7" />
+                <XAxis dataKey="country" fontSize={12} tick={{ fill: '#718096' }} />
+                <YAxis fontSize={12} tick={{ fill: '#718096' }} allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="n" fill="#2c5282" />
+                <Bar dataKey="n" fill="#2b6cb0" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
-        </Section>
+        </div>
 
-        <Section title="Por dispositivo">
+        {/* Device breakdown */}
+        <div className="analytics-chart-card chart-small">
+          <h3>Por dispositivo</h3>
           {(!summary?.by_device || summary.by_device.length === 0) ? (
-            <p className="traffic-empty">Sin datos.</p>
+            <div className="chart-empty">Sin datos.</div>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={summary.by_device} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="device" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#edf2f7" />
+                <XAxis dataKey="device" fontSize={12} tick={{ fill: '#718096' }} />
+                <YAxis fontSize={12} tick={{ fill: '#718096' }} allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="n" fill="#D6BC7A" />
+                <Bar dataKey="n" fill="#ed8936" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
-        </Section>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function KpiBox({ label, value, sub }) {
-  return (
-    <div className="traffic-kpi">
-      <div className="traffic-kpi-value">{(value ?? 0).toLocaleString('es-ES')}</div>
-      <div className="traffic-kpi-label">{label}</div>
-      {sub && <div className="traffic-kpi-sub">{sub}</div>}
-    </div>
-  );
-}
-
-function Section({ title, children }) {
-  return (
-    <div className="traffic-section">
-      <h3>{title}</h3>
-      {children}
     </div>
   );
 }

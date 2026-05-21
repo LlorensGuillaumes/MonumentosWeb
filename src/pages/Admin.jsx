@@ -1664,8 +1664,8 @@ export default function Admin() {
 
         {activeSection === 'analytics' && (
           <>
-            <TrafficAnalyticsCard />
             <AnalyticsDashboard />
+            <TrafficAnalyticsCard />
           </>
         )}
 

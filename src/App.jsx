@@ -54,9 +54,11 @@ function App() {
               <Suspense fallback={<LazyFallback />}>
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/buscar" element={<RequireAuth><Search /></RequireAuth>} />
-                  <Route path="/monumento/:id" element={<RequireAuth><Detail /></RequireAuth>} />
-                  <Route path="/mapa" element={<RequireAuth><MapPage /></RequireAuth>} />
+                  {/* Contenido público: cualquiera puede explorar el catálogo,
+                      las fichas y el mapa sin necesidad de registrarse */}
+                  <Route path="/buscar" element={<Search />} />
+                  <Route path="/monumento/:id" element={<Detail />} />
+                  <Route path="/mapa" element={<MapPage />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/favoritos" element={<RequireAuth><Favoritos /></RequireAuth>} />
                   <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />

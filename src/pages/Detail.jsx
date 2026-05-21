@@ -262,7 +262,10 @@ export default function Detail() {
               className={`fav-btn ${isFavorito(monumento.id) ? 'fav-active' : ''}`}
               disabled={favLoading}
               onClick={async () => {
-                if (!user) { navigate('/login'); return; }
+                if (!user) {
+                  navigate(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
+                  return;
+                }
                 setFavLoading(true);
                 await toggleFavorito(monumento.id);
                 setFavLoading(false);

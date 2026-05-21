@@ -200,6 +200,18 @@ export default function Header() {
           ) : (
             <>
               <Link
+                to="/buscar"
+                className={`nav-link ${location.pathname === '/buscar' ? 'active' : ''}`}
+              >
+                {t('nav.search')}
+              </Link>
+              <Link
+                to="/mapa"
+                className={`nav-link ${location.pathname === '/mapa' ? 'active' : ''}`}
+              >
+                {t('nav.map')}
+              </Link>
+              <Link
                 to="/rutas-curadas"
                 className={`nav-link ${location.pathname.startsWith('/rutas-curadas') ? 'active' : ''}`}
               >
