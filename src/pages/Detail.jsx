@@ -201,10 +201,13 @@ export default function Detail() {
   }
 
   const hasLocation = monumento.latitud && monumento.longitud;
-  const allImages = [
+  // Separar galería actual (Wikidata, Commons, DIBA, etc.) de la histórica (Europeana)
+  const todasImagenes = [
     ...(monumento.imagen_url ? [{ url: monumento.imagen_url, titulo: monumento.denominacion, fuente: 'wikidata' }] : []),
     ...(monumento.imagenes || []),
   ];
+  const allImages = todasImagenes.filter(img => img.fuente !== 'europeana');
+  const imagesHistoricas = todasImagenes.filter(img => img.fuente === 'europeana');
 
   const metaDesc = [monumento.categoria, monumento.municipio, monumento.provincia, monumento.comunidad_autonoma].filter(Boolean).join(', ');
 
@@ -392,6 +395,46 @@ export default function Detail() {
                   ))}
                 </div>
               )}
+            </section>
+          )}
+
+          {/* Galería histórica (Europeana) */}
+          {imagesHistoricas.length > 0 && (
+            <section className="detail-section">
+              <h2>📷 {t('detail.galeriaHistorica', 'Galería histórica')}</h2>
+              <p className="galeria-historica-intro">
+                {t('detail.galeriaHistoricaIntro', 'Imágenes y documentos históricos de archivos europeos digitalizados, obtenidos vía Europeana.')}
+              </p>
+              <div className="galeria-historica-grid">
+                {imagesHistoricas.map((img, idx) => {
+                  const meta = typeof img.metadata === 'string' ? JSON.parse(img.metadata) : (img.metadata || {});
+                  return (
+                    <a
+                      key={idx}
+                      href={meta.link || img.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="galeria-historica-item"
+                      title={img.titulo}
+                    >
+                      <img src={img.url} alt={img.titulo} loading="lazy" />
+                      <div className="galeria-historica-caption">
+                        <div className="ghc-title">{img.titulo}</div>
+                        {(img.autor || meta.year) && (
+                          <div className="ghc-meta">
+                            {img.autor}{img.autor && meta.year ? ' · ' : ''}{meta.year || ''}
+                          </div>
+                        )}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+              <p className="galeria-historica-attrib">
+                {t('detail.europeanaAttrib', 'Imágenes vía')}{' '}
+                <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer">Europeana</a>
+                {' · '}{t('detail.copyrightOriginalSource', 'Derechos: archivo de origen')}
+              </p>
             </section>
           )}
 
