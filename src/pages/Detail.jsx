@@ -256,6 +256,20 @@ export default function Detail() {
       <div className="detail-layout">
         {/* Main content */}
         <main className="detail-main">
+          {monumento.heritage_world && (
+            <div className="heritage-world-badge-row">
+              {(monumento.heritage_world === 'unesco' || monumento.heritage_world === 'both') && (
+                <span className="heritage-world-badge unesco" title={t('detail.unescoTooltip', 'Patrimonio de la Humanidad — UNESCO')}>
+                  🏛️ UNESCO
+                </span>
+              )}
+              {(monumento.heritage_world === 'european' || monumento.heritage_world === 'both') && (
+                <span className="heritage-world-badge european" title={t('detail.ehlTooltip', 'Sello de Patrimonio Europeo')}>
+                  🇪🇺 {t('detail.ehlLabel', 'Patrimonio Europeo')}
+                </span>
+              )}
+            </div>
+          )}
           <div className="detail-title-row">
             <h1>{monumento.denominacion}</h1>
             <button
