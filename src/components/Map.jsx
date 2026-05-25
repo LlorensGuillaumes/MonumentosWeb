@@ -404,9 +404,10 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
                 radius={6}
                 pathOptions={{
                   fillColor: getCategoryColor(feature.properties.tipo_monumento, feature.properties.categoria),
-                  fillOpacity: 0.8,
-                  color: '#fff',
+                  fillOpacity: feature.properties.coords_precision === 'municipio' ? 0.35 : 0.8,
+                  color: feature.properties.coords_precision === 'municipio' ? '#888' : '#fff',
                   weight: 1,
+                  dashArray: feature.properties.coords_precision === 'municipio' ? '3,2' : null,
                 }}
                 eventHandlers={{
                   click: () => handleMarkerClick(feature),
@@ -416,6 +417,9 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
                   <div className="popup-content">
                     <h4>{feature.properties.nombre}</h4>
                     <p>{feature.properties.municipio}, {feature.properties.provincia}</p>
+                    {feature.properties.coords_precision === 'municipio' && (
+                      <p className="popup-aviso-aprox">📍 {t('map.ubicAprox', 'Ubicación aproximada (centro del municipio)')}</p>
+                    )}
                     {feature.properties.tipo_monumento && (
                       <span className="popup-tag popup-tag-tipo">{feature.properties.tipo_monumento}</span>
                     )}

@@ -665,6 +665,11 @@ export default function Detail() {
                   </Marker>
                 </MapContainer>
               </div>
+              {monumento.coords_precision === 'municipio' && (
+                <p className="coords-aviso-aprox">
+                  📍 {t('detail.coordsAprox', 'Ubicación aproximada (centro del municipio). El bien se encuentra dentro de este término municipal.')}
+                </p>
+              )}
               <a
                 href={`https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}`}
                 target="_blank"

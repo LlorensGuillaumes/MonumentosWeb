@@ -152,6 +152,16 @@
   color: #64748b;
 }
 
+.popup-aviso-aprox {
+  font-style: italic;
+  color: #a16207 !important;
+  background: #fef9c3;
+  border-left: 3px solid #ca8a04;
+  padding: 0.3rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.72rem !important;
+}
+
 .popup-tag {
   display: inline-block;
   background: #e0f2fe;

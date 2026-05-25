@@ -309,6 +309,18 @@
   color: var(--text-primary);
 }
 
+.coords-aviso-aprox {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #a16207;
+  background: #fef9c3;
+  border-left: 3px solid #ca8a04;
+  padding: 0.5rem 0.7rem;
+  border-radius: 4px;
+  margin: 0.5rem 0 0.75rem 0;
+  line-height: 1.35;
+}
+
 .sidebar-map {
   border-radius: 8px;
   overflow: hidden;
