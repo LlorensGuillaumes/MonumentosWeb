@@ -13,6 +13,20 @@ import './RoutePlanner.css';
 
 const MAX_STOPS = 25;
 
+const COUNTRY_FLAGS = {
+  'España': '🇪🇸',
+  'Italia': '🇮🇹',
+  'Francia': '🇫🇷',
+  'Portugal': '🇵🇹',
+  'Alemania': '🇩🇪',
+  'Reino Unido': '🇬🇧',
+  'Austria': '🇦🇹',
+  'Suiza': '🇨🇭',
+  'Rumanía': '🇷🇴',
+  'Líbano': '🇱🇧',
+  'Túnez': '🇹🇳',
+};
+
 function downloadFile(content, filename, mimeType) {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -114,6 +128,7 @@ export default function RoutePlanner() {
   const [routeData, setRouteData] = useState(null);
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeGeometry, setRouteGeometry] = useState(null);
+  const [showMapsNotice, setShowMapsNotice] = useState(false);
 
   // Save state
   const [routeName, setRouteName] = useState('');
@@ -520,33 +535,34 @@ export default function RoutePlanner() {
     setPhase('route');
   };
 
-  const handleOptimize = async () => {
-    if (selectedMonuments.length < 2) return;
+  // Optimiza la ruta vía backend OSRM y devuelve los monumentos reordenados.
+  // Si falla o no hay reorden, devuelve el orden original.
+  const optimizeIfNeeded = async () => {
+    if (selectedMonuments.length < 2) return selectedMonuments;
     setRouteLoading(true);
     try {
       const paradas = selectedMonuments.map(m => ({
-        id: m.id,
-        latitud: m.latitud,
-        longitud: m.longitud,
+        id: m.id, latitud: m.latitud, longitud: m.longitud,
       }));
       const result = await optimizarRuta(paradas);
       setRouteData(result);
+      if (result.geometria) {
+        setRouteGeometry(result.geometria.coordinates.map(([lng, lat]) => [lat, lng]));
+      }
       if (result.orden_optimizado) {
         const reordered = result.orden_optimizado.map(i => selectedMonuments[i]);
-        // Rebuild the map in optimized order
         const newMap = new Map();
         reordered.forEach(m => newMap.set(m.id, m));
         setSelectedMonumentsMap(newMap);
         setSelected(new Set(reordered.map(m => m.id)));
-      }
-      if (result.geometria) {
-        setRouteGeometry(result.geometria.coordinates.map(([lng, lat]) => [lat, lng]));
+        return reordered;
       }
     } catch (err) {
       console.error('Error optimizing:', err);
     } finally {
       setRouteLoading(false);
     }
+    return selectedMonuments;
   };
 
   const handleBackToSearch = () => {
@@ -554,10 +570,25 @@ export default function RoutePlanner() {
     setFromPredefinedRoute(false); // user is now in free-search mode
   };
 
-  const getGoogleMapsUrl = () => {
-    if (selectedMonuments.length === 0) return '#';
-    const waypoints = selectedMonuments.map(m => `${m.latitud},${m.longitud}`);
-    return `https://www.google.com/maps/dir/${waypoints.join('/')}`;
+  const buildGoogleMapsUrl = (monuments) =>
+    `https://www.google.com/maps/dir/${monuments.map(m => `${m.latitud},${m.longitud}`).join('/')}`;
+
+  // Click en "Abrir en Google Maps":
+  //  - Premium: optimiza primero vía OSRM, luego abre Maps con orden óptimo.
+  //  - No premium: muestra modal de aviso (se abre con orden de selección).
+  const handleOpenGoogleMaps = async () => {
+    if (selectedMonuments.length === 0) return;
+    if (isPremium) {
+      const ordered = await optimizeIfNeeded();
+      window.open(buildGoogleMapsUrl(ordered), '_blank', 'noopener,noreferrer');
+    } else {
+      setShowMapsNotice(true);
+    }
+  };
+
+  const handleOpenMapsNonPremium = () => {
+    setShowMapsNotice(false);
+    window.open(buildGoogleMapsUrl(selectedMonuments), '_blank', 'noopener,noreferrer');
   };
 
   const handleSaveRoute = async () => {
@@ -728,7 +759,10 @@ export default function RoutePlanner() {
                             <SearchableSelect
                               value={pais}
                               onChange={handlePaisChange}
-                              options={filtros.paises}
+                              options={filtros.paises.map(o => ({
+                                ...o,
+                                label: `${COUNTRY_FLAGS[o.value] || '🌍'} ${o.label || o.value}`,
+                              }))}
                               placeholder={t('filters.allCountries')}
                               disabled={filtrosLoading}
                             />
@@ -929,17 +963,17 @@ export default function RoutePlanner() {
                 </div>
               </div>
 
-              {/* Actions: export, optimize, save */}
+              {/* Actions: export, save */}
               <div className="route-step">
                 <div className="route-actions">
-                  <a
-                    href={getGoogleMapsUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={handleOpenGoogleMaps}
+                    disabled={routeLoading || selectedMonuments.length === 0}
                     className="btn btn-primary btn-block"
                   >
-                    {t('routes.openGoogleMaps')}
-                  </a>
+                    {routeLoading ? t('routes.optimizing') : t('routes.openGoogleMaps')}
+                  </button>
                   <div className="route-export-row">
                     <button
                       className="btn btn-outline"
@@ -963,17 +997,9 @@ export default function RoutePlanner() {
                 </div>
               </div>
 
-              {/* Optimize & save — premium */}
+              {/* Save & PDF — premium */}
               <div className="route-step">
                 {!isPremium && <PremiumCTA />}
-
-                <button
-                  className="btn btn-outline btn-block"
-                  onClick={handleOptimize}
-                  disabled={routeLoading || !isPremium}
-                >
-                  {routeLoading ? t('routes.optimizing') : t('routes.optimize')}
-                </button>
 
                 {routeData && (
                   <div className="route-summary">
@@ -1074,6 +1100,26 @@ export default function RoutePlanner() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal aviso non-premium: la optimización es plan premium */}
+      {showMapsNotice && (
+        <div className="route-detail-overlay" onClick={() => setShowMapsNotice(false)}>
+          <div className="route-detail-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <h2 style={{ marginTop: 0 }}>{t('routes.mapsNoticeTitle', 'Ruta con tu orden de paradas')}</h2>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              {t('routes.mapsNoticeBody', 'La ruta se va a generar con el orden en que has añadido las paradas. La optimización automática (ruta más corta) es una funcionalidad del plan Premium.')}
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem' }}>
+              <button className="btn btn-outline" onClick={() => setShowMapsNotice(false)}>
+                {t('routes.cancel', 'Cancelar')}
+              </button>
+              <button className="btn btn-primary" onClick={handleOpenMapsNonPremium}>
+                {t('routes.continueAnyway', 'Continuar')}
+              </button>
+            </div>
           </div>
         </div>
       )}
