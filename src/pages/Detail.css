@@ -389,6 +389,40 @@
   text-decoration: underline;
 }
 
+/* Wikipedia full text expandido + toggle */
+.wiki-fulltext {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.wiki-fulltext p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.wiki-fulltext p:first-letter {
+  /* Marca visual sutil para el primer párrafo */
+}
+
+.wiki-toggle-btn {
+  margin-top: 0.85rem;
+  padding: 0.45rem 0.95rem;
+  background: var(--bg-secondary);
+  color: var(--accent);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.wiki-toggle-btn:hover {
+  background: var(--bg-hover, var(--bg-secondary));
+  border-color: var(--accent);
+}
+
 /* Aviso de texto solo disponible en español */
 .lang-notice {
   display: flex;

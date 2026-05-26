@@ -48,6 +48,8 @@ export default function Detail() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [favLoading, setFavLoading] = useState(false);
   const [wikiExtract, setWikiExtract] = useState(null);
+  const [wikiFullText, setWikiFullText] = useState(null);
+  const [showFullText, setShowFullText] = useState(false);
   const [wikiLoading, setWikiLoading] = useState(false);
 
   // Ratings state
@@ -179,8 +181,15 @@ export default function Detail() {
     if (!needsWikipedia) return;
     setWikiLoading(true);
     setWikiExtract(null); // limpia cualquier extracto previo de otro idioma
+    setWikiFullText(null);
+    setShowFullText(false);
     getWikipediaExtract(monumento.id, i18n.language)
-      .then(data => { if (data?.extract) setWikiExtract(data.extract); })
+      .then(data => {
+        if (data?.extract) setWikiExtract(data.extract);
+        if (data?.full_text && data.full_text.length > (data.extract?.length || 0) + 200) {
+          setWikiFullText(data.full_text);
+        }
+      })
       .finally(() => setWikiLoading(false));
   }, [monumento, i18n.language]);
 
@@ -463,7 +472,26 @@ export default function Detail() {
                 </>
               ) : wikiExtract ? (
                 <>
-                  <p>{wikiExtract}</p>
+                  {showFullText && wikiFullText ? (
+                    <div className="wiki-fulltext">
+                      {wikiFullText.split('\n').filter(p => p.trim()).map((p, i) => (
+                        <p key={i}>{p}</p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>{wikiExtract}</p>
+                  )}
+                  {wikiFullText && (
+                    <button
+                      type="button"
+                      className="wiki-toggle-btn"
+                      onClick={() => setShowFullText(v => !v)}
+                    >
+                      {showFullText
+                        ? t('detail.readLess', 'Mostrar menos') + ' ↑'
+                        : t('detail.readMore', 'Leer más') + ' ↓'}
+                    </button>
+                  )}
                   <p className="wiki-attribution">
                     <a href={monumento.wikipedia_url} target="_blank" rel="noopener noreferrer">
                       {t('detail.sourceWikipedia')}
