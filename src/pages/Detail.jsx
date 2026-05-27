@@ -171,14 +171,10 @@ export default function Detail() {
     // Detectar idioma de la URL guardada (típicamente "es")
     const urlLangMatch = monumento.wikipedia_url.match(/^https?:\/\/([a-z]+)\.wikipedia\.org/i);
     const urlLang = urlLangMatch ? urlLangMatch[1] : 'es';
-    // Llamar Wikipedia si:
-    //   - falta descripción cacheada de longitud razonable, O
-    //   - el idioma activo NO coincide con el idioma de la descripción cacheada
-    const cacheStale = i18n.language !== urlLang;
-    const needsWikipedia = cacheStale ||
-      !monumento.wiki_descripcion ||
-      monumento.wiki_descripcion.length < 150;
-    if (!needsWikipedia) return;
+    // Llamar siempre que haya wikipedia_url: el backend cachea eficientemente y
+    // puede devolver full_text desde la BD secundaria de enriquecimiento (lookup
+    // en ms). Sin esto, los bienes que ya tienen wiki_descripcion >150 chars en
+    // primaria nunca recibirían full_text aunque exista en secundaria.
     setWikiLoading(true);
     setWikiExtract(null); // limpia cualquier extracto previo de otro idioma
     setWikiFullText(null);
