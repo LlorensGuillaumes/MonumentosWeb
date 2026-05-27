@@ -401,8 +401,17 @@
   line-height: 1.6;
 }
 
-.wiki-fulltext p:first-letter {
-  /* Marca visual sutil para el primer párrafo */
+.wiki-fulltext .wiki-section-title {
+  margin: 1.1rem 0 0.2rem 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.25rem;
+}
+
+.wiki-fulltext .wiki-section-title:first-child {
+  margin-top: 0.2rem;
 }
 
 .wiki-toggle-btn {

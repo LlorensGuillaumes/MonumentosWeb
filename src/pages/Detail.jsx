@@ -21,6 +21,30 @@ function formatInception(value, t) {
   return value;
 }
 
+/**
+ * Renderiza el full_text de Wikipedia detectando líneas que parecen títulos de
+ * sección (cortas, sin puntuación final, seguidas de un párrafo extenso) y las
+ * convierte en <h3>. El resto se renderiza como <p>.
+ */
+function renderWikiBlocks(text) {
+  if (!text) return null;
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const elements = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const next = lines[i + 1] || '';
+    const isShort = line.length < 80;
+    const hasEndingPunct = /[.!?:,;)]$/.test(line);
+    const looksLikeHeader = isShort && !hasEndingPunct && next.length > 100;
+    if (looksLikeHeader) {
+      elements.push(<h3 key={i} className="wiki-section-title">{line}</h3>);
+    } else {
+      elements.push(<p key={i}>{line}</p>);
+    }
+  }
+  return elements;
+}
+
 function StarRating({ value, onChange, readonly, size = '1.3rem' }) {
   return (
     <span className="star-rating" style={{ fontSize: size }}>
@@ -49,6 +73,7 @@ export default function Detail() {
   const [favLoading, setFavLoading] = useState(false);
   const [wikiExtract, setWikiExtract] = useState(null);
   const [wikiFullText, setWikiFullText] = useState(null);
+  const [wikiFullTextLang, setWikiFullTextLang] = useState(null);
   const [showFullText, setShowFullText] = useState(false);
   const [wikiLoading, setWikiLoading] = useState(false);
 
@@ -178,12 +203,16 @@ export default function Detail() {
     setWikiLoading(true);
     setWikiExtract(null); // limpia cualquier extracto previo de otro idioma
     setWikiFullText(null);
+    setWikiFullTextLang(null);
     setShowFullText(false);
     getWikipediaExtract(monumento.id, i18n.language)
       .then(data => {
         if (data?.extract) setWikiExtract(data.extract);
         if (data?.full_text && data.full_text.length > (data.extract?.length || 0) + 200) {
           setWikiFullText(data.full_text);
+          // Si el backend marca full_text_lang, es porque el full_text está en otro idioma
+          // distinto al del extract corto (típicamente español cuando se pide ca/en/...)
+          setWikiFullTextLang(data.full_text_lang || data.lang || null);
         }
       })
       .finally(() => setWikiLoading(false));
@@ -469,11 +498,23 @@ export default function Detail() {
               ) : wikiExtract ? (
                 <>
                   {showFullText && wikiFullText ? (
-                    <div className="wiki-fulltext">
-                      {wikiFullText.split('\n').filter(p => p.trim()).map((p, i) => (
-                        <p key={i}>{p}</p>
-                      ))}
-                    </div>
+                    <>
+                      {wikiFullTextLang && wikiFullTextLang !== i18n.language && (
+                        <div className="lang-notice">
+                          <span>{t('detail.fullTextOtherLang', `Texto extendido disponible en ${wikiFullTextLang === 'es' ? 'español' : wikiFullTextLang}`)}</span>
+                          <a
+                            href={`https://translate.google.com/?sl=${wikiFullTextLang}&tl=${i18n.language}&text=${encodeURIComponent(wikiFullText.slice(0, 4500))}&op=translate`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {t('detail.translateWithGoogle', 'Traducir con Google')} ↗
+                          </a>
+                        </div>
+                      )}
+                      <div className="wiki-fulltext">
+                        {renderWikiBlocks(wikiFullText)}
+                      </div>
+                    </>
                   ) : (
                     <p>{wikiExtract}</p>
                   )}

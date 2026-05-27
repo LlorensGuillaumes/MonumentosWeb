@@ -63,11 +63,11 @@ export default function LanguageSelector() {
         type="button"
         className="language-trigger"
         onClick={() => setOpen(o => !o)}
-        aria-label="Seleccionar idioma"
+        aria-label={`Idioma: ${current.label}`}
+        title={current.label}
         aria-expanded={open}
       >
         <span className="lang-flag">{current.flag}</span>
-        <span className="lang-code">{current.code.toUpperCase()}</span>
         <svg className="lang-arrow" width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
           <path d="M0 0l5 6 5-6z" />
         </svg>

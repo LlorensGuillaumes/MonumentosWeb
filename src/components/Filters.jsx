@@ -5,6 +5,22 @@ import SearchableSelect from './SearchableSelect';
 import SearchAutocomplete from './SearchAutocomplete';
 import './Filters.css';
 
+// Banderas para los selects de país. Se prepende al label visible (search
+// sigue funcionando con el nombre y con el código del país).
+const COUNTRY_FLAGS = {
+  'España': '🇪🇸',
+  'Italia': '🇮🇹',
+  'Francia': '🇫🇷',
+  'Portugal': '🇵🇹',
+  'Alemania': '🇩🇪',
+  'Reino Unido': '🇬🇧',
+  'Austria': '🇦🇹',
+  'Suiza': '🇨🇭',
+  'Rumanía': '🇷🇴',
+  'Líbano': '🇱🇧',
+  'Túnez': '🇹🇳',
+};
+
 export default function Filters({ onSearch, onMonumentSelect }) {
   const { filters, filtros, setFilter, resetFilters, reloadFiltros } = useApp();
   const { t } = useTranslation();
@@ -218,7 +234,10 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                 <SearchableSelect
                   value={filters.pais}
                   onChange={handlePaisChange}
-                  options={translateOptions(filtros.paises, 'filters.countries')}
+                  options={translateOptions(filtros.paises, 'filters.countries').map(o => ({
+                    ...o,
+                    label: `${COUNTRY_FLAGS[o.value] || '🌍'} ${o.label}`,
+                  }))}
                   placeholder={t('filters.allCountries')}
                 />
               </div>
