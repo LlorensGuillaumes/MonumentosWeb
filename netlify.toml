@@ -19,3 +19,20 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Security headers para todas las rutas
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Evita clickjacking (no permitir embeber en iframes)
+    X-Frame-Options = "DENY"
+    # Evita MIME sniffing
+    X-Content-Type-Options = "nosniff"
+    # Política de referrer estricta: no envía referrer al cambiar de origen
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # HSTS: forzar HTTPS durante 1 año (incluye subdominios, allow preload)
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    # Permissions-Policy: deshabilita features que no usamos
+    Permissions-Policy = "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)"
+    # Cross-Origin-Opener-Policy para aislamiento de pestañas
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
