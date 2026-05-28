@@ -843,7 +843,17 @@
     "copyLink": "Copiar ligazón",
     "linkCopied": "Ligazón copiada",
     "spanishOnly": "Texto dispoñible só en castelán",
-    "translateWithGoogle": "Traducir con Google"
+    "translateWithGoogle": "Traducir con Google",
+    "coordsAprox": "Localización aproximada (centro do municipio). O ben atópase dentro deste termo municipal.",
+    "unescoTooltip": "Patrimonio da Humanidade — UNESCO",
+    "ehlTooltip": "Selo de Patrimonio Europeo",
+    "ehlLabel": "Patrimonio Europeo",
+    "galeriaHistorica": "Galería histórica",
+    "galeriaHistoricaIntro": "Imaxes e documentos históricos de arquivos europeos dixitalizados, obtidos vía Europeana.",
+    "europeanaAttrib": "Imaxes vía",
+    "copyrightOriginalSource": "Dereitos: arquivo de orixe",
+    "readMore": "Ler máis",
+    "readLess": "Mostrar menos"
   },
   "map": {
     "loading": "Cargando monumentos...",
@@ -862,7 +872,8 @@
       "ethnologic": "Etnolóxico",
       "infrastructure": "Infraestrutura",
       "others": "Outros"
-    }
+    },
+    "ubicAprox": "Localización aproximada (centro do municipio)"
   },
   "select": {
     "typeToSeeMore": "Escribe para ver os {{count}} restantes...",
@@ -1045,7 +1056,11 @@
     "stopNumber": "Parada {{n}}",
     "removeStop": "Quitar",
     "backToSearch": "Volver a buscar",
-    "stops": "paradas"
+    "stops": "paradas",
+    "mapsNoticeTitle": "Ruta coa túa orde de paradas",
+    "mapsNoticeBody": "A ruta xerarase na orde en que engadiches as paradas. A optimización automática (ruta máis curta) é unha funcionalidade do plan Premium.",
+    "cancel": "Cancelar",
+    "continueAnyway": "Continuar"
   },
   "myRoutes": {
     "title": "As miñas rutas",

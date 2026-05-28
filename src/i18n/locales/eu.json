@@ -843,7 +843,17 @@
     "copyLink": "Esteka kopiatu",
     "linkCopied": "Esteka kopiatuta",
     "spanishOnly": "Testua gaztelaniaz bakarrik dago eskuragarri",
-    "translateWithGoogle": "Itzuli Googlerekin"
+    "translateWithGoogle": "Itzuli Googlerekin",
+    "coordsAprox": "Kokapen gutxi gorabeherakoa (udalerriaren erdialdea). Ondarea udalerri honetan dago.",
+    "unescoTooltip": "Gizateriaren Ondarea — UNESCO",
+    "ehlTooltip": "Europako Ondarearen Zigilua",
+    "ehlLabel": "Europako Ondarea",
+    "galeriaHistorica": "Galeria historikoa",
+    "galeriaHistoricaIntro": "Europako artxibo digitalizatuetako irudi eta dokumentu historikoak, Europeana bidez lortuta.",
+    "europeanaAttrib": "Irudiak honen bidez:",
+    "copyrightOriginalSource": "Eskubideak: jatorrizko artxiboa",
+    "readMore": "Irakurri gehiago",
+    "readLess": "Erakutsi gutxiago"
   },
   "map": {
     "loading": "Monumentuak kargatzen...",
@@ -862,7 +872,8 @@
       "ethnologic": "Etnologikoa",
       "infrastructure": "Azpiegitura",
       "others": "Besteak"
-    }
+    },
+    "ubicAprox": "Kokapen gutxi gorabeherakoa (udalerriaren erdialdea)"
   },
   "select": {
     "typeToSeeMore": "Idatzi gainerako {{count}}ak ikusteko...",
@@ -1045,7 +1056,11 @@
     "stopNumber": "Geltokia {{n}}",
     "removeStop": "Kendu",
     "backToSearch": "Bilaketa itzuli",
-    "stops": "geltokiak"
+    "stops": "geltokiak",
+    "mapsNoticeTitle": "Geldialdien ordenarekin ibilbidea",
+    "mapsNoticeBody": "Ibilbidea geldialdiak gehitu dituzun ordenan sortuko da. Optimizazio automatikoa (ibilbide laburrena) Premium planeko funtzio bat da.",
+    "cancel": "Ezeztatu",
+    "continueAnyway": "Jarraitu"
   },
   "myRoutes": {
     "title": "Nire ibilbideak",

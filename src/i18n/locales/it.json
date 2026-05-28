@@ -87,7 +87,8 @@
     "noResults": "Nessun monumento trovato",
     "noResultsHint": "Prova a modificare i filtri di ricerca",
     "sortAZ": "A-Z",
-    "sortZA": "Z-A"
+    "sortZA": "Z-A",
+    "relevance": "Rilevanza"
   },
   "filters": {
     "search": "Cerca",
@@ -842,7 +843,17 @@
     "copyLink": "Copia link",
     "linkCopied": "Link copiato",
     "spanishOnly": "Testo disponibile solo in spagnolo",
-    "translateWithGoogle": "Traduci con Google"
+    "translateWithGoogle": "Traduci con Google",
+    "coordsAprox": "Posizione approssimativa (centro del comune). Il bene si trova in questo territorio comunale.",
+    "unescoTooltip": "Patrimonio dell'Umanità — UNESCO",
+    "ehlTooltip": "Marchio del Patrimonio Europeo",
+    "ehlLabel": "Patrimonio Europeo",
+    "galeriaHistorica": "Galleria storica",
+    "galeriaHistoricaIntro": "Immagini e documenti storici di archivi europei digitalizzati, ottenuti tramite Europeana.",
+    "europeanaAttrib": "Immagini tramite",
+    "copyrightOriginalSource": "Diritti: archivio originale",
+    "readMore": "Leggi di più",
+    "readLess": "Mostra meno"
   },
   "map": {
     "loading": "Caricamento monumenti...",
@@ -861,7 +872,8 @@
       "ethnologic": "Etnologico",
       "infrastructure": "Infrastruttura",
       "others": "Altri"
-    }
+    },
+    "ubicAprox": "Posizione approssimativa (centro del comune)"
   },
   "select": {
     "typeToSeeMore": "Digita per vedere i {{count}} restanti...",
@@ -1044,7 +1056,11 @@
     "stopNumber": "Tappa {{n}}",
     "removeStop": "Rimuovi",
     "backToSearch": "Torna alla ricerca",
-    "stops": "tappe"
+    "stops": "tappe",
+    "mapsNoticeTitle": "Itinerario con il tuo ordine di tappe",
+    "mapsNoticeBody": "L'itinerario verrà generato nell'ordine in cui hai aggiunto le tappe. L'ottimizzazione automatica (percorso più breve) è una funzionalità del piano Premium.",
+    "cancel": "Annulla",
+    "continueAnyway": "Continua"
   },
   "myRoutes": {
     "title": "I miei percorsi",

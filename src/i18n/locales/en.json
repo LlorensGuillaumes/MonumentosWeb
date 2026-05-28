@@ -843,7 +843,17 @@
     "copyLink": "Copy link",
     "linkCopied": "Link copied",
     "spanishOnly": "Text only available in Spanish",
-    "translateWithGoogle": "Translate with Google"
+    "translateWithGoogle": "Translate with Google",
+    "coordsAprox": "Approximate location (center of the municipality). The property is within this municipal area.",
+    "unescoTooltip": "World Heritage Site — UNESCO",
+    "ehlTooltip": "European Heritage Label",
+    "ehlLabel": "European Heritage",
+    "galeriaHistorica": "Historical gallery",
+    "galeriaHistoricaIntro": "Historical images and documents from digitized European archives, obtained via Europeana.",
+    "europeanaAttrib": "Images via",
+    "copyrightOriginalSource": "Rights: source archive",
+    "readMore": "Read more",
+    "readLess": "Show less"
   },
   "map": {
     "loading": "Loading monuments...",
@@ -862,7 +872,8 @@
       "ethnologic": "Ethnological",
       "infrastructure": "Infrastructure",
       "others": "Others"
-    }
+    },
+    "ubicAprox": "Approximate location (center of the municipality)"
   },
   "select": {
     "typeToSeeMore": "Type to see {{count}} more...",
@@ -1045,7 +1056,11 @@
     "stopNumber": "Stop {{n}}",
     "removeStop": "Remove",
     "backToSearch": "Back to search",
-    "stops": "stops"
+    "stops": "stops",
+    "mapsNoticeTitle": "Route with your stop order",
+    "mapsNoticeBody": "The route will be generated in the order you added the stops. Automatic optimization (shortest route) is a Premium plan feature.",
+    "cancel": "Cancel",
+    "continueAnyway": "Continue"
   },
   "myRoutes": {
     "title": "My routes",

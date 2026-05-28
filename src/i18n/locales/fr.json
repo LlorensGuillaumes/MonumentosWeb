@@ -843,7 +843,17 @@
     "copyLink": "Copier le lien",
     "linkCopied": "Lien copié",
     "spanishOnly": "Texte disponible uniquement en espagnol",
-    "translateWithGoogle": "Traduire avec Google"
+    "translateWithGoogle": "Traduire avec Google",
+    "coordsAprox": "Localisation approximative (centre de la commune). Le bien se trouve dans cette commune.",
+    "unescoTooltip": "Patrimoine mondial — UNESCO",
+    "ehlTooltip": "Label du patrimoine européen",
+    "ehlLabel": "Patrimoine européen",
+    "galeriaHistorica": "Galerie historique",
+    "galeriaHistoricaIntro": "Images et documents historiques issus d'archives européennes numérisées, obtenus via Europeana.",
+    "europeanaAttrib": "Images via",
+    "copyrightOriginalSource": "Droits : archive d'origine",
+    "readMore": "Lire plus",
+    "readLess": "Afficher moins"
   },
   "map": {
     "loading": "Chargement des monuments...",
@@ -862,7 +872,8 @@
       "ethnologic": "Ethnologique",
       "infrastructure": "Infrastructure",
       "others": "Autres"
-    }
+    },
+    "ubicAprox": "Localisation approximative (centre de la commune)"
   },
   "select": {
     "typeToSeeMore": "Tapez pour voir les {{count}} restants...",
@@ -1045,7 +1056,11 @@
     "stopNumber": "Arrêt {{n}}",
     "removeStop": "Retirer",
     "backToSearch": "Retour à la recherche",
-    "stops": "arrêts"
+    "stops": "arrêts",
+    "mapsNoticeTitle": "Itinéraire dans l'ordre de vos arrêts",
+    "mapsNoticeBody": "L'itinéraire sera généré dans l'ordre où vous avez ajouté les arrêts. L'optimisation automatique (itinéraire le plus court) est une fonctionnalité du plan Premium.",
+    "cancel": "Annuler",
+    "continueAnyway": "Continuer"
   },
   "myRoutes": {
     "title": "Mes itinéraires",

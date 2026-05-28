@@ -843,7 +843,17 @@
     "copyLink": "Copiar enllaç",
     "linkCopied": "Enllaç copiat",
     "spanishOnly": "Text disponible només en castellà",
-    "translateWithGoogle": "Tradueix amb Google"
+    "translateWithGoogle": "Tradueix amb Google",
+    "coordsAprox": "Ubicació aproximada (centre del municipi). El bé es troba dins d'aquest terme municipal.",
+    "unescoTooltip": "Patrimoni de la Humanitat — UNESCO",
+    "ehlTooltip": "Segell de Patrimoni Europeu",
+    "ehlLabel": "Patrimoni Europeu",
+    "galeriaHistorica": "Galeria històrica",
+    "galeriaHistoricaIntro": "Imatges i documents històrics d'arxius europeus digitalitzats, obtinguts via Europeana.",
+    "europeanaAttrib": "Imatges via",
+    "copyrightOriginalSource": "Drets: arxiu d'origen",
+    "readMore": "Llegir més",
+    "readLess": "Mostrar menys"
   },
   "map": {
     "loading": "Carregant monuments...",
@@ -862,7 +872,8 @@
       "ethnologic": "Etnològic",
       "infrastructure": "Infraestructura",
       "others": "Altres"
-    }
+    },
+    "ubicAprox": "Ubicació aproximada (centre del municipi)"
   },
   "select": {
     "typeToSeeMore": "Escriviu per veure els {{count}} restants...",
@@ -1045,7 +1056,11 @@
     "stopNumber": "Parada {{n}}",
     "removeStop": "Treure",
     "backToSearch": "Tornar a cercar",
-    "stops": "parades"
+    "stops": "parades",
+    "mapsNoticeTitle": "Ruta amb el teu ordre de parades",
+    "mapsNoticeBody": "La ruta es generarà amb l'ordre en què has afegit les parades. L'optimització automàtica (ruta més curta) és una funcionalitat del pla Premium.",
+    "cancel": "Cancel·lar",
+    "continueAnyway": "Continuar"
   },
   "myRoutes": {
     "title": "Les meves rutes",

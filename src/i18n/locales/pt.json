@@ -843,7 +843,17 @@
     "copyLink": "Copiar link",
     "linkCopied": "Link copiado",
     "spanishOnly": "Texto disponível apenas em espanhol",
-    "translateWithGoogle": "Traduzir com Google"
+    "translateWithGoogle": "Traduzir com Google",
+    "coordsAprox": "Localização aproximada (centro do município). O bem encontra-se neste termo municipal.",
+    "unescoTooltip": "Património Mundial — UNESCO",
+    "ehlTooltip": "Marca do Património Europeu",
+    "ehlLabel": "Património Europeu",
+    "galeriaHistorica": "Galeria histórica",
+    "galeriaHistoricaIntro": "Imagens e documentos históricos de arquivos europeus digitalizados, obtidos via Europeana.",
+    "europeanaAttrib": "Imagens via",
+    "copyrightOriginalSource": "Direitos: arquivo original",
+    "readMore": "Ler mais",
+    "readLess": "Mostrar menos"
   },
   "map": {
     "loading": "A carregar monumentos...",
@@ -862,7 +872,8 @@
       "ethnologic": "Etnológico",
       "infrastructure": "Infraestrutura",
       "others": "Outros"
-    }
+    },
+    "ubicAprox": "Localização aproximada (centro do município)"
   },
   "select": {
     "typeToSeeMore": "Escreva para ver os {{count}} restantes...",
@@ -1045,7 +1056,11 @@
     "stopNumber": "Paragem {{n}}",
     "removeStop": "Remover",
     "backToSearch": "Voltar à pesquisa",
-    "stops": "paragens"
+    "stops": "paragens",
+    "mapsNoticeTitle": "Rota com a sua ordem de paragens",
+    "mapsNoticeBody": "A rota será gerada na ordem em que adicionou as paragens. A otimização automática (rota mais curta) é uma funcionalidade do plano Premium.",
+    "cancel": "Cancelar",
+    "continueAnyway": "Continuar"
   },
   "myRoutes": {
     "title": "As minhas rotas",
