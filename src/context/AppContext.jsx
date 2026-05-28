@@ -18,6 +18,11 @@ const initialState = {
     periodo: '',
     evento: '',
     clasificacion: '',
+    // Oleada B — propiedades Wikidata estructuradas
+    propietario: '',
+    religion: '',
+    dedicado_a: '',
+    parte_de: '',
     q: '',
     solo_coords: true,
     solo_wikidata: false,

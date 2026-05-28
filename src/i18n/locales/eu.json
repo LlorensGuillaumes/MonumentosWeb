@@ -776,7 +776,17 @@
       "Q66344": "Revolución Industrial",
       "Q166713": "postinpresionismo",
       "Q8065": "hondamen natural"
-    }
+    },
+    "panelWikidata": "Propietate gehigarriak",
+    "wikidataNotice": "Wikidata-rekin aberastutako datuak dituzten ondareei bakarrik aplikatzen zaie. Datu hori ez duten ondareak ez dira agertuko emaitzetan iragazki hauek erabiltzean.",
+    "religion": "Erlijioa",
+    "allReligions": "Erlijio guztiak",
+    "dedicatedTo": "Honi eskainia",
+    "allDedications": "Eskaintza guztiak",
+    "partOf": "Honen zatia",
+    "allPartsOf": "Edozein multzo",
+    "owner": "Jabea",
+    "allOwners": "Jabe guztiak"
   },
   "detail": {
     "loading": "Monumentua kargatzen...",

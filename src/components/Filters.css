@@ -240,6 +240,17 @@
   line-height: 1;
 }
 
+.filter-panel-notice {
+  padding: 0.5rem 0.95rem;
+  margin: 0 0.5rem 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #64748b);
+  background: var(--bg-secondary, #f8fafc);
+  border-left: 3px solid var(--accent, #1a365d);
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
 .filter-panel > .filters-row {
   padding: 0.25rem 0.95rem 0.95rem;
   margin-bottom: 0;

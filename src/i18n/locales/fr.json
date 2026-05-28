@@ -776,7 +776,17 @@
       "Q66344": "Revolución Industrial",
       "Q166713": "postimpressionnisme",
       "Q8065": "catastrophe naturelle"
-    }
+    },
+    "panelWikidata": "Propriétés supplémentaires",
+    "wikidataNotice": "Applicable uniquement aux biens avec des données enrichies de Wikidata. Les biens sans cette donnée n'apparaîtront pas dans les résultats en utilisant ces filtres.",
+    "religion": "Religion",
+    "allReligions": "Toutes les religions",
+    "dedicatedTo": "Dédié à",
+    "allDedications": "Toutes les dédicaces",
+    "partOf": "Partie de",
+    "allPartsOf": "Tout ensemble",
+    "owner": "Propriétaire",
+    "allOwners": "Tous les propriétaires"
   },
   "detail": {
     "loading": "Chargement du monument...",

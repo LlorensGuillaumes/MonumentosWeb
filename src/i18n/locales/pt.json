@@ -776,7 +776,17 @@
       "Q66344": "Revolución Industrial",
       "Q166713": "Pós-impressionismo",
       "Q8065": "desastre natural"
-    }
+    },
+    "panelWikidata": "Propriedades adicionais",
+    "wikidataNotice": "Aplicável apenas a bens com dados enriquecidos do Wikidata. Os bens sem este dado não aparecerão nos resultados ao usar estes filtros.",
+    "religion": "Religião",
+    "allReligions": "Todas as religiões",
+    "dedicatedTo": "Dedicado a",
+    "allDedications": "Todas as dedicações",
+    "partOf": "Parte de",
+    "allPartsOf": "Qualquer conjunto",
+    "owner": "Proprietário",
+    "allOwners": "Todos os proprietários"
   },
   "detail": {
     "loading": "A carregar monumento...",

@@ -776,7 +776,17 @@
       "Q66344": "Revolución Industrial",
       "Q166713": "postimpresionismo",
       "Q8065": "catástrofe natural"
-    }
+    },
+    "panelWikidata": "Propiedades adicionais",
+    "wikidataNotice": "Aplicable só a bens con datos enriquecidos de Wikidata. Os bens sen este dato non aparecerán nos resultados ao usar estes filtros.",
+    "religion": "Relixión",
+    "allReligions": "Todas as relixións",
+    "dedicatedTo": "Dedicado a",
+    "allDedications": "Todas as advocacións",
+    "partOf": "Parte de",
+    "allPartsOf": "Calquera conxunto",
+    "owner": "Propietario",
+    "allOwners": "Todos os propietarios"
   },
   "detail": {
     "loading": "Cargando monumento...",

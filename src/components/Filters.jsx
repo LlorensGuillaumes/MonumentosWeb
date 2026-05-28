@@ -329,6 +329,65 @@ export default function Filters({ onSearch, onMonumentSelect }) {
           </div>
         </details>
 
+        {/* PANEL: PROPIEDADES WIKIDATA (Oleada B) — solo aparece si hay datos */}
+        {(filtros.religiones?.length > 0 || filtros.dedicaciones?.length > 0 || filtros.partes_de?.length > 0 || filtros.propietarios?.length > 0) && (
+          <details className="filter-panel">
+            <summary className="filter-panel-summary">
+              <span className="filter-panel-icon">⚙️</span>
+              <span>{t('filters.panelWikidata', 'Propiedades adicionales')}</span>
+            </summary>
+            <div className="filter-panel-notice">
+              {t('filters.wikidataNotice', 'Aplicable solo a bienes con datos enriquecidos de Wikidata. Bienes sin este dato no aparecerán en los resultados al usar estos filtros.')}
+            </div>
+            <div className="filters-row">
+              {filtros.religiones?.length > 0 && (
+                <div className="filter-group">
+                  <label>{t('filters.religion', 'Religión')}</label>
+                  <SearchableSelect
+                    value={filters.religion}
+                    onChange={(v) => handleChange('religion', v)}
+                    options={filtros.religiones}
+                    placeholder={t('filters.allReligions', 'Todas las religiones')}
+                  />
+                </div>
+              )}
+              {filtros.dedicaciones?.length > 0 && (
+                <div className="filter-group">
+                  <label>{t('filters.dedicatedTo', 'Dedicado a')}</label>
+                  <SearchableSelect
+                    value={filters.dedicado_a}
+                    onChange={(v) => handleChange('dedicado_a', v)}
+                    options={filtros.dedicaciones}
+                    placeholder={t('filters.allDedications', 'Todas las advocaciones')}
+                  />
+                </div>
+              )}
+              {filtros.partes_de?.length > 0 && (
+                <div className="filter-group">
+                  <label>{t('filters.partOf', 'Parte de')}</label>
+                  <SearchableSelect
+                    value={filters.parte_de}
+                    onChange={(v) => handleChange('parte_de', v)}
+                    options={filtros.partes_de}
+                    placeholder={t('filters.allPartsOf', 'Cualquier conjunto')}
+                  />
+                </div>
+              )}
+              {filtros.propietarios?.length > 0 && (
+                <div className="filter-group">
+                  <label>{t('filters.owner', 'Propietario')}</label>
+                  <SearchableSelect
+                    value={filters.propietario}
+                    onChange={(v) => handleChange('propietario', v)}
+                    options={filtros.propietarios}
+                    placeholder={t('filters.allOwners', 'Todos los propietarios')}
+                  />
+                </div>
+              )}
+            </div>
+          </details>
+        )}
+
         {/* PANEL 3: EVENTOS HISTÓRICOS (colapsado por defecto) */}
         {(filtros.eventos_padres?.length > 0 || filtros.eventos?.length > 0) && (
           <details className="filter-panel">

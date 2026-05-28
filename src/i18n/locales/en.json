@@ -776,7 +776,17 @@
       "Q66344": "Revolución Industrial",
       "Q166713": "Post-impressionism",
       "Q8065": "natural disaster"
-    }
+    },
+    "panelWikidata": "Additional properties",
+    "wikidataNotice": "Applies only to items with Wikidata-enriched data. Items without this data won't appear in results when using these filters.",
+    "religion": "Religion",
+    "allReligions": "All religions",
+    "dedicatedTo": "Dedicated to",
+    "allDedications": "All dedications",
+    "partOf": "Part of",
+    "allPartsOf": "Any set",
+    "owner": "Owner",
+    "allOwners": "All owners"
   },
   "detail": {
     "loading": "Loading monument...",

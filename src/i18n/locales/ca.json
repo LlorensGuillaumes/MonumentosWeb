@@ -776,7 +776,17 @@
       "Q66344": "Revolución Industrial",
       "Q166713": "postimpressionisme",
       "Q8065": "catàstrofe natural"
-    }
+    },
+    "panelWikidata": "Propietats addicionals",
+    "wikidataNotice": "Aplicable només a béns amb dades enriquides de Wikidata. Els béns sense aquesta dada no apareixeran als resultats en utilitzar aquests filtres.",
+    "religion": "Religió",
+    "allReligions": "Totes les religions",
+    "dedicatedTo": "Dedicat a",
+    "allDedications": "Totes les advocacions",
+    "partOf": "Part de",
+    "allPartsOf": "Qualsevol conjunt",
+    "owner": "Propietari",
+    "allOwners": "Tots els propietaris"
   },
   "detail": {
     "loading": "Carregant monument...",
