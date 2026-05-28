@@ -929,7 +929,8 @@
     "resetCodePlaceholder": "Introduce el código recibido",
     "newPasswordLabel": "Nueva contraseña",
     "resetBtn": "Cambiar contraseña",
-    "resetSuccess": "Contraseña cambiada correctamente. Ya puedes iniciar sesión."
+    "resetSuccess": "Contraseña cambiada correctamente. Ya puedes iniciar sesión.",
+    "sessionExpired": "Tu sesión ha caducado. Vuelve a iniciar sesión."
   },
   "favorites": {
     "title": "Mis Favoritos",

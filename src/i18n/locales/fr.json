@@ -929,7 +929,8 @@
     "resetCodePlaceholder": "Entrez le code reçu",
     "newPasswordLabel": "Nouveau mot de passe",
     "resetBtn": "Changer le mot de passe",
-    "resetSuccess": "Mot de passe changé avec succès. Vous pouvez maintenant vous connecter."
+    "resetSuccess": "Mot de passe changé avec succès. Vous pouvez maintenant vous connecter.",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter."
   },
   "favorites": {
     "title": "Mes Favoris",

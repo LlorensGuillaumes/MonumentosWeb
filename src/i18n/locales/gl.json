@@ -929,7 +929,8 @@
     "resetCodePlaceholder": "Introduce o código recibido",
     "newPasswordLabel": "Novo contrasinal",
     "resetBtn": "Cambiar contrasinal",
-    "resetSuccess": "Contrasinal cambiado correctamente. Xa podes iniciar sesión."
+    "resetSuccess": "Contrasinal cambiado correctamente. Xa podes iniciar sesión.",
+    "sessionExpired": "A túa sesión caducou. Volve iniciar sesión."
   },
   "favorites": {
     "title": "Os meus Favoritos",

@@ -12,7 +12,9 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, login, register, loginWithGoogle, loading } = useAuth();
-  const returnTo = new URLSearchParams(location.search).get('returnTo') || '/';
+  const searchParams = new URLSearchParams(location.search);
+  const returnTo = searchParams.get('returnTo') || '/';
+  const sessionExpired = searchParams.get('expired') === '1';
   const [mode, setMode] = useState('login'); // 'login' | 'register' | 'forgot' | 'reset'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -111,6 +113,11 @@ export default function Login() {
            mode === 'login' ? t('auth.loginTitle') : t('auth.registerTitle')}
         </h1>
 
+        {sessionExpired && !error && mode === 'login' && (
+          <div className="login-notice">
+            {t('auth.sessionExpired', 'Tu sesión ha caducado. Vuelve a iniciar sesión.')}
+          </div>
+        )}
         {error && <div className="login-error">{error}</div>}
 
         {/* Forgot password flow */}

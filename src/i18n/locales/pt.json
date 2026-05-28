@@ -929,7 +929,8 @@
     "resetCodePlaceholder": "Introduza o código recebido",
     "newPasswordLabel": "Nova palavra-passe",
     "resetBtn": "Alterar palavra-passe",
-    "resetSuccess": "Palavra-passe alterada com sucesso. Já pode iniciar sessão."
+    "resetSuccess": "Palavra-passe alterada com sucesso. Já pode iniciar sessão.",
+    "sessionExpired": "A sua sessão expirou. Por favor, inicie sessão novamente."
   },
   "favorites": {
     "title": "Os meus Favoritos",

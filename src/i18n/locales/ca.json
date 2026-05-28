@@ -929,7 +929,8 @@
     "resetCodePlaceholder": "Introdueix el codi rebut",
     "newPasswordLabel": "Nova contrasenya",
     "resetBtn": "Canviar contrasenya",
-    "resetSuccess": "Contrasenya canviada correctament. Ja pots iniciar sessió."
+    "resetSuccess": "Contrasenya canviada correctament. Ja pots iniciar sessió.",
+    "sessionExpired": "La teva sessió ha caducat. Torna a iniciar sessió."
   },
   "favorites": {
     "title": "Els meus Preferits",

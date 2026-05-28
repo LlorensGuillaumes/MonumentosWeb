@@ -20,13 +20,24 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor: si 401 limpiar token; si error de red, intentar failover
+// Interceptor: si 401 limpiar token y redirigir a login (si era usuario logueado);
+// si error de red, intentar failover.
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
     if (err.response?.status === 401) {
+      const wasAuthenticated = !!localStorage.getItem('auth_token');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
+
+      // Si estaba logueado y NO estamos ya en /login, redirigir con notice ?expired=1.
+      // Esto evita "UI fantasma" (estado React logueado pero token inválido)
+      // tras rotación de JWT_SECRET, expiración natural o invalidación del backend.
+      if (wasAuthenticated && typeof window !== 'undefined'
+          && !window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login?expired=1';
+        return Promise.reject(err);
+      }
     }
 
     // Failover: error de red (no respuesta del servidor) y tenemos URL de respaldo

@@ -929,7 +929,8 @@
     "resetCodePlaceholder": "Sartu jasotako kodea",
     "newPasswordLabel": "Pasahitz berria",
     "resetBtn": "Pasahitza aldatu",
-    "resetSuccess": "Pasahitza behar bezala aldatu da. Orain saioa has dezakezu."
+    "resetSuccess": "Pasahitza behar bezala aldatu da. Orain saioa has dezakezu.",
+    "sessionExpired": "Zure saioa iraungi da. Mesedez, sartu berriro."
   },
   "favorites": {
     "title": "Nire Gogokoak",
