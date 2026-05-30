@@ -43,6 +43,18 @@ export default function Filters({ onSearch, onMonumentSelect }) {
     setFilter(key, value);
   };
 
+  // Cuando cambia un filtro Oleada B, recargar el resto en cascada
+  const handleOleadaBChange = async (key, value) => {
+    setFilter(key, value);
+    const oleadaB = {
+      religion: key === 'religion' ? value : filters.religion,
+      dedicado_a: key === 'dedicado_a' ? value : filters.dedicado_a,
+      parte_de: key === 'parte_de' ? value : filters.parte_de,
+      propietario: key === 'propietario' ? value : filters.propietario,
+    };
+    await reloadFiltros(filters.pais, filters.region, filters.provincia, filters.evento_padre, oleadaB);
+  };
+
   // Cuando cambia país, resetear todo y recargar filtros
   const handlePaisChange = async (value) => {
     setFilter('pais', value);
@@ -345,7 +357,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                   <label>{t('filters.religion', 'Religión')}</label>
                   <SearchableSelect
                     value={filters.religion}
-                    onChange={(v) => handleChange('religion', v)}
+                    onChange={(v) => handleOleadaBChange('religion', v)}
                     options={filtros.religiones}
                     placeholder={t('filters.allReligions', 'Todas las religiones')}
                   />
@@ -356,7 +368,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                   <label>{t('filters.dedicatedTo', 'Dedicado a')}</label>
                   <SearchableSelect
                     value={filters.dedicado_a}
-                    onChange={(v) => handleChange('dedicado_a', v)}
+                    onChange={(v) => handleOleadaBChange('dedicado_a', v)}
                     options={filtros.dedicaciones}
                     placeholder={t('filters.allDedications', 'Todas las advocaciones')}
                   />
@@ -367,7 +379,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                   <label>{t('filters.partOf', 'Parte de')}</label>
                   <SearchableSelect
                     value={filters.parte_de}
-                    onChange={(v) => handleChange('parte_de', v)}
+                    onChange={(v) => handleOleadaBChange('parte_de', v)}
                     options={filtros.partes_de}
                     placeholder={t('filters.allPartsOf', 'Cualquier conjunto')}
                   />
@@ -378,7 +390,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                   <label>{t('filters.owner', 'Propietario')}</label>
                   <SearchableSelect
                     value={filters.propietario}
-                    onChange={(v) => handleChange('propietario', v)}
+                    onChange={(v) => handleOleadaBChange('propietario', v)}
                     options={filtros.propietarios}
                     placeholder={t('filters.allOwners', 'Todos los propietarios')}
                   />
