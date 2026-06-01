@@ -43,58 +43,37 @@ export default function Filters({ onSearch, onMonumentSelect }) {
     setFilter(key, value);
   };
 
-  // Cuando cambia un filtro Oleada B, recargar el resto en cascada
-  const handleOleadaBChange = async (key, value) => {
-    setFilter(key, value);
-    const oleadaB = {
-      religion: key === 'religion' ? value : filters.religion,
-      dedicado_a: key === 'dedicado_a' ? value : filters.dedicado_a,
-      parte_de: key === 'parte_de' ? value : filters.parte_de,
-      propietario: key === 'propietario' ? value : filters.propietario,
-    };
-    await reloadFiltros(filters.pais, filters.region, filters.provincia, filters.evento_padre, oleadaB);
+  // Cualquier cambio de filtro recarga la cascada con todos los filtros activos
+  const triggerCascada = async (key, value) => {
+    const merged = { ...filters, [key]: value };
+    await reloadFiltros(merged);
   };
 
-  // Cuando cambia país, resetear todo y recargar filtros
+  const handleOleadaBChange = async (key, value) => {
+    setFilter(key, value);
+    await triggerCascada(key, value);
+  };
+
+  // Cuando cambia país, resetear sub-niveles geográficos y recargar
   const handlePaisChange = async (value) => {
     setFilter('pais', value);
     setFilter('region', '');
     setFilter('provincia', '');
     setFilter('municipio', '');
-    setFilter('estilo', '');
-    setFilter('clasificacion', '');
-    setFilter('tipo_monumento', '');
-    setFilter('periodo', '');
-    setFilter('evento', '');
-    setFilter('evento_padre', '');
-    await reloadFiltros(value, '', '');
+    await reloadFiltros({ ...filters, pais: value, region: '', provincia: '', municipio: '' });
   };
 
-  // Cuando cambia región, recargar filtros dinámicos
   const handleRegionChange = async (value) => {
     setFilter('region', value);
     setFilter('provincia', '');
     setFilter('municipio', '');
-    setFilter('estilo', '');
-    setFilter('clasificacion', '');
-    setFilter('tipo_monumento', '');
-    setFilter('periodo', '');
-    setFilter('evento', '');
-    setFilter('evento_padre', '');
-    await reloadFiltros(filters.pais, value, '');
+    await reloadFiltros({ ...filters, region: value, provincia: '', municipio: '' });
   };
 
-  // Cuando cambia provincia, recargar filtros dinámicos
   const handleProvinciaChange = async (value) => {
     setFilter('provincia', value);
     setFilter('municipio', '');
-    setFilter('estilo', '');
-    setFilter('clasificacion', '');
-    setFilter('tipo_monumento', '');
-    setFilter('periodo', '');
-    setFilter('evento', '');
-    setFilter('evento_padre', '');
-    await reloadFiltros(filters.pais, filters.region, value);
+    await reloadFiltros({ ...filters, provincia: value, municipio: '' });
   };
 
   // Cuando cambia municipio
@@ -114,14 +93,26 @@ export default function Filters({ onSearch, onMonumentSelect }) {
   ];
 
   // Clasificación y tipo_monumento son mutuamente excluyentes
-  const handleClasificacionChange = (value) => {
+  const handleClasificacionChange = async (value) => {
     setFilter('clasificacion', value);
     if (value) setFilter('tipo_monumento', '');
+    await reloadFiltros({ ...filters, clasificacion: value, tipo_monumento: value ? '' : filters.tipo_monumento });
   };
 
-  const handleTipoMonumentoChange = (value) => {
+  const handleTipoMonumentoChange = async (value) => {
     setFilter('tipo_monumento', value);
     if (value) setFilter('clasificacion', '');
+    await reloadFiltros({ ...filters, tipo_monumento: value, clasificacion: value ? '' : filters.clasificacion });
+  };
+
+  const handleEstiloChange = async (value) => {
+    setFilter('estilo', value);
+    await triggerCascada('estilo', value);
+  };
+
+  const handlePeriodoChange = async (value) => {
+    setFilter('periodo', value);
+    await triggerCascada('periodo', value);
   };
 
   const handleSubmit = (e) => {
@@ -322,7 +313,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                 <label>{t('filters.period')}</label>
                 <SearchableSelect
                   value={filters.periodo}
-                  onChange={(v) => handleChange('periodo', v)}
+                  onChange={handlePeriodoChange}
                   options={translateOptions(filtros.periodos, 'filters.periods')}
                   placeholder={t('filters.allPeriods')}
                 />
@@ -333,7 +324,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
               <label>{t('filters.style')}</label>
               <SearchableSelect
                 value={filters.estilo}
-                onChange={(v) => handleChange('estilo', v)}
+                onChange={handleEstiloChange}
                 options={filtros.estilos}
                 placeholder={t('filters.allStyles')}
               />
@@ -414,9 +405,9 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                   <SearchableSelect
                     value={filters.evento_padre}
                     onChange={async (v) => {
-                      handleChange('evento_padre', v);
-                      if (v) handleChange('evento', '');
-                      await reloadFiltros(filters.pais, filters.region, filters.provincia, v);
+                      setFilter('evento_padre', v);
+                      if (v) setFilter('evento', '');
+                      await reloadFiltros({ ...filters, evento_padre: v, evento: v ? '' : filters.evento });
                     }}
                     options={translateOptions(filtros.eventos_padres, 'filters.events')}
                     placeholder={t('filters.allEventCategories')}
@@ -429,7 +420,10 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                   <label>{t('filters.event')}</label>
                   <SearchableSelect
                     value={filters.evento}
-                    onChange={(v) => handleChange('evento', v)}
+                    onChange={async (v) => {
+                      setFilter('evento', v);
+                      await reloadFiltros({ ...filters, evento: v });
+                    }}
                     options={translateOptions(filtros.eventos, 'filters.events')}
                     placeholder={t('filters.allEvents')}
                   />

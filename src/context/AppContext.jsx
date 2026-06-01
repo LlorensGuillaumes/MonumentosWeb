@@ -112,18 +112,14 @@ export function AppProvider({ children }) {
   const removeFromCompare = (id) => dispatch({ type: 'REMOVE_COMPARE', payload: id });
   const clearCompare = () => dispatch({ type: 'CLEAR_COMPARE' });
 
-  // Recargar filtros dinámicos según país/región/provincia + cascada Oleada B
-  const reloadFiltros = useCallback(async (pais, region, provincia, eventoPadre, oleadaB = {}) => {
+  // Recargar filtros dinámicos: cascada bidireccional con TODOS los filtros activos
+  const reloadFiltros = useCallback(async (filters) => {
     try {
       const params = {};
-      if (pais) params.pais = pais;
-      if (region) params.region = region;
-      if (provincia) params.provincia = provincia;
-      if (eventoPadre) params.evento_padre = eventoPadre;
-      if (oleadaB.religion) params.religion = oleadaB.religion;
-      if (oleadaB.dedicado_a) params.dedicado_a = oleadaB.dedicado_a;
-      if (oleadaB.parte_de) params.parte_de = oleadaB.parte_de;
-      if (oleadaB.propietario) params.propietario = oleadaB.propietario;
+      const keys = ['pais','region','provincia','clasificacion','tipo_monumento','estilo','periodo','evento','evento_padre','religion','dedicado_a','parte_de','propietario'];
+      for (const key of keys) {
+        if (filters?.[key]) params[key] = filters[key];
+      }
       const newFiltros = await getFiltros(params);
       dispatch({ type: 'SET_FILTROS', payload: newFiltros });
     } catch (err) {
