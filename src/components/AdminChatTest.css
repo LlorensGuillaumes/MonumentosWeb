@@ -103,6 +103,25 @@
 .chat-msg-sources a { color: var(--accent, #3b82f6); text-decoration: none; }
 .chat-msg-sources a:hover { text-decoration: underline; }
 
+.chat-msg-tools {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border-color, #ddd);
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.chat-tool-chip {
+  background: rgba(99, 102, 241, 0.1);
+  color: #5b5be0;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 0.7rem;
+}
+
 .chat-msg-meta {
   margin-top: 0.5rem;
   font-size: 0.7rem;
