@@ -109,18 +109,6 @@ export default function AdminChatTest() {
                 </ul>
               </div>
             )}
-            {m.tools_used?.length > 0 && (
-              <div className="chat-msg-tools">
-                <strong>Tools usadas:</strong>
-                {m.tools_used.map((t, i) => (
-                  <span key={i} className="chat-tool-chip" title={JSON.stringify(t.args)}>
-                    {t.name}({Object.entries(t.args || {}).map(([k, v]) => `${k}=${v}`).join(', ')})
-                    {t.count != null && ` → ${t.count}`}
-                    {t.error && ` ⚠️`}
-                  </span>
-                ))}
-              </div>
-            )}
             {m.meta && (
               <div className="chat-msg-meta">
                 {m.meta.model && <span>modelo: {m.meta.model}</span>}
