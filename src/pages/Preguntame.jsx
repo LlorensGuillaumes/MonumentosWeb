@@ -66,6 +66,20 @@ function FitBounds({ points }) {
   return null;
 }
 
+// react-leaflet: si el contenedor cambia de visible (tabs móvil),
+// el mapa cree que mide 0px y no carga las tiles. Invalidate al tocar tab.
+function InvalidateOnTab({ activeTab }) {
+  const map = useMap();
+  useEffect(() => {
+    if (activeTab === 'map') {
+      // Pequeño delay para esperar a que el contenedor termine la transición CSS
+      const t = setTimeout(() => map.invalidateSize(), 80);
+      return () => clearTimeout(t);
+    }
+  }, [activeTab, map]);
+  return null;
+}
+
 const INITIAL_SYSTEM = (t) => ({
   role: 'system',
   content: t('preguntame.systemHint', 'Pregúntame qué visitar en una zona, sobre un monumento, autor, periodo arquitectónico, ruta cultural…'),
@@ -122,7 +136,8 @@ export default function Preguntame() {
         const ctxRes = await api.get(`/monumentos/radio`, {
           params: { lat: centerLat, lng: centerLng, km: 60, limit: 200 },
         });
-        const ctx = (ctxRes.data?.monumentos || ctxRes.data || [])
+        const rawCtx = ctxRes.data?.items || ctxRes.data?.monumentos || ctxRes.data || [];
+        const ctx = (Array.isArray(rawCtx) ? rawCtx : [])
           .filter(m => m.latitud != null && m.longitud != null)
           .filter(m => !ids.includes(m.id));
         setContexto(ctx);
@@ -259,6 +274,7 @@ export default function Preguntame() {
               </Marker>
             ))}
             <FitBounds points={highlights.map(h => ({ lat: h.lat, lng: h.lng }))} />
+            <InvalidateOnTab activeTab={mobileTab} />
           </MapContainer>
         </div>
 

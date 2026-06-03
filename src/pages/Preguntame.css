@@ -52,7 +52,7 @@
   min-height: 0;
   background: #d8e2eb;
 }
-.preguntame-map :global(.leaflet-container) { height: 100%; }
+.preguntame-map .leaflet-container { height: 100%; width: 100%; }
 
 .preguntame-chat {
   display: flex;
