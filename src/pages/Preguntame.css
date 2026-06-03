@@ -87,6 +87,34 @@
   background: var(--bg-hover, #f3f4f6);
 }
 
+.preguntame-modo {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0,0,0,0.02);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+.preguntame-modo button {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.82rem;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  color: var(--text-secondary, #4b5563);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.preguntame-modo button:hover {
+  border-color: var(--accent, #3b82f6);
+}
+.preguntame-modo button.active {
+  background: var(--accent, #3b82f6);
+  color: white;
+  border-color: var(--accent, #3b82f6);
+  font-weight: 600;
+}
+
 .preguntame-window {
   flex: 1;
   overflow-y: auto;

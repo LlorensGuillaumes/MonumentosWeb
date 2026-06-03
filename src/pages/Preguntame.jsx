@@ -102,6 +102,7 @@ export default function Preguntame() {
   const [highlights, setHighlights] = useState([]); // [{id, lat, lng, denominacion, tipo, n}]
   const [contexto, setContexto] = useState([]); // monumentos del entorno
   const [mobileTab, setMobileTab] = useState('chat');
+  const [modo, setModo] = useState('mixto'); // imprescindibles | mixto | descubre
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -157,7 +158,7 @@ export default function Preguntame() {
     setMessages(prev => [...prev, { role: 'user', content: q }]);
     setLoading(true);
     try {
-      const res = await api.post('/admin/chat', { question: q });
+      const res = await api.post('/admin/chat', { question: q, modo });
       const data = res.data;
       const ans = data.answer || t('preguntame.noResponse', '(sin respuesta)');
       setMessages(prev => [
@@ -283,6 +284,33 @@ export default function Preguntame() {
             <h2>{t('nav.askMe')}</h2>
             <button className="preguntame-reset" onClick={reset}>
               {t('preguntame.reset', 'Reiniciar')}
+            </button>
+          </div>
+
+          <div className="preguntame-modo">
+            <button
+              type="button"
+              className={modo === 'imprescindibles' ? 'active' : ''}
+              onClick={() => setModo('imprescindibles')}
+              title={t('preguntame.modeMustSeeHint', 'UNESCO y los más famosos. Ideal para primer viaje.')}
+            >
+              {t('preguntame.modeMustSee', 'Imprescindibles')}
+            </button>
+            <button
+              type="button"
+              className={modo === 'mixto' ? 'active' : ''}
+              onClick={() => setModo('mixto')}
+              title={t('preguntame.modeMixedHint', 'Equilibrio entre canónicos y joyas locales.')}
+            >
+              {t('preguntame.modeMixed', 'Mixto')}
+            </button>
+            <button
+              type="button"
+              className={modo === 'descubre' ? 'active' : ''}
+              onClick={() => setModo('descubre')}
+              title={t('preguntame.modeDiscoverHint', 'Joyas locales menos conocidas, lo que NO sale en las guías.')}
+            >
+              {t('preguntame.modeDiscover', 'Descubre')}
             </button>
           </div>
 

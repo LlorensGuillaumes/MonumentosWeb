@@ -191,6 +191,12 @@ export default function Header() {
                 )}
               </div>
               <Link
+                to="/autores"
+                className={`nav-link ${location.pathname === '/autores' ? 'active' : ''}`}
+              >
+                {t('nav.authors')}
+              </Link>
+              <Link
                 to="/favoritos"
                 className={`nav-icon-link ${location.pathname === '/favoritos' ? 'active' : ''} ${favoritoIds.size > 0 ? 'has-favs' : ''}`}
                 title={t('nav.favorites')}
