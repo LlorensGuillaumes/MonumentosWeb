@@ -32,6 +32,7 @@ const CuratedRoutes = lazy(() => import('./pages/CuratedRoutes'));
 const CuratedRouteDetail = lazy(() => import('./pages/CuratedRouteDetail'));
 const CulturalRouteDetail = lazy(() => import('./pages/CulturalRouteDetail'));
 const Autores = lazy(() => import('./pages/Autores'));
+const Preguntame = lazy(() => import('./pages/Preguntame'));
 const Diary = lazy(() => import('./pages/Diary'));
 const UserStats = lazy(() => import('./pages/UserStats'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -76,6 +77,7 @@ function App() {
                   <Route path="/rutas-curadas/:id" element={<CuratedRouteDetail />} />
                   <Route path="/rutas-culturales/:slug" element={<CulturalRouteDetail />} />
                   <Route path="/autores" element={<Autores />} />
+                  <Route path="/preguntame" element={<RequireAuth><Preguntame /></RequireAuth>} />
                   <Route path="/contacto" element={<Contact />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

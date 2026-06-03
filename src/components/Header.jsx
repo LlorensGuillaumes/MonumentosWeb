@@ -140,12 +140,20 @@ export default function Header() {
 
         <nav className="nav">
           {user?.rol === 'admin' && (
-            <Link
-              to="/admin"
-              className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
-            >
-              Admin
-            </Link>
+            <>
+              <Link
+                to="/admin"
+                className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+              >
+                Admin
+              </Link>
+              <Link
+                to="/preguntame"
+                className={`nav-link ${location.pathname === '/preguntame' ? 'active' : ''}`}
+              >
+                {t('nav.askMe')}
+              </Link>
+            </>
           )}
           <Link
             to="/"

@@ -4,7 +4,6 @@ import { CURATED_ROUTES } from '../data/curatedRoutes';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
 import TrafficAnalyticsCard from '../components/TrafficAnalyticsCard';
 import AdminSettings from '../components/AdminSettings';
-import AdminChatTest from '../components/AdminChatTest';
 import WebPresentationModal from '../components/WebPresentationModal';
 import './Admin.css';
 
@@ -1246,13 +1245,6 @@ export default function Admin() {
           >
             <span className="admin-nav-icon">⚙️</span>
             Configuración
-          </button>
-          <button
-            className={`admin-nav-item ${activeSection === 'chat-test' ? 'active' : ''}`}
-            onClick={() => setActiveSection('chat-test')}
-          >
-            <span className="admin-nav-icon">🤖</span>
-            Chat test
           </button>
         </nav>
       </aside>
@@ -2724,8 +2716,6 @@ export default function Admin() {
       )}
 
       {activeSection === 'settings' && <AdminSettings />}
-
-      {activeSection === 'chat-test' && <AdminChatTest />}
 
       {showWebPresentation && (
         <WebPresentationModal onClose={() => setShowWebPresentation(false)} />
