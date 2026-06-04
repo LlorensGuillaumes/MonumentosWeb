@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import Map from '../components/Map';
+import MapView from '../components/Map';
 import api from '../services/api';
 import './Preguntame.css';
 
@@ -27,7 +27,7 @@ export default function Preguntame() {
   const [error, setError] = useState(null);
   const [highlights, setHighlights] = useState([]); // [{id, lat, lng, denominacion, tipo, n}]
   const [mobileTab, setMobileTab] = useState('chat');
-  const [modo, setModo] = useState('mixto'); // imprescindibles | mixto | descubre
+  const [modo, setModo] = useState('descubre'); // imprescindibles | mixto | descubre
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -139,7 +139,7 @@ export default function Preguntame() {
 
       <div className={`preguntame-layout ${mobileTab === 'map' ? 'mobile-show-map' : 'mobile-show-chat'}`}>
         <div className="preguntame-map">
-          <Map
+          <MapView
             filters={{}}
             height="100%"
             showCCAASummary={true}
