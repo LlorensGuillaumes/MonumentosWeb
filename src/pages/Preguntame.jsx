@@ -68,7 +68,12 @@ export default function Preguntame() {
     setMessages(prev => [...prev, { role: 'user', content: q }]);
     setLoading(true);
     try {
-      const res = await api.post('/admin/chat', { question: q, modo });
+      // Envía los últimos 10 turnos para que el LLM mantenga contexto entre preguntas
+      const history = messages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .slice(-10)
+        .map(m => ({ role: m.role, content: m.content }));
+      const res = await api.post('/admin/chat', { question: q, modo, history });
       const data = res.data;
       const ans = data.answer || t('preguntame.noResponse', '(sin respuesta)');
       setMessages(prev => [
