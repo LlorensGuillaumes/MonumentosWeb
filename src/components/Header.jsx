@@ -170,6 +170,12 @@ export default function Header() {
                 {t('nav.search')}
               </Link>
               <Link
+                to="/autores"
+                className={`nav-link ${location.pathname === '/autores' ? 'active' : ''}`}
+              >
+                {t('nav.authors')}
+              </Link>
+              <Link
                 to="/mapa"
                 className={`nav-link ${location.pathname === '/mapa' ? 'active' : ''}`}
               >
@@ -190,12 +196,6 @@ export default function Header() {
                   </div>
                 )}
               </div>
-              <Link
-                to="/autores"
-                className={`nav-link ${location.pathname === '/autores' ? 'active' : ''}`}
-              >
-                {t('nav.authors')}
-              </Link>
               <Link
                 to="/favoritos"
                 className={`nav-icon-link ${location.pathname === '/favoritos' ? 'active' : ''} ${favoritoIds.size > 0 ? 'has-favs' : ''}`}

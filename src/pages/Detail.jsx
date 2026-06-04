@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { getMonumento, getMonumentos, getMonumentosRadio, getWikipediaExtract, getValoraciones, addValoracion, getNotasMonumento, addNotaMonumento, deleteNotaMonumento, trackEvent } from '../services/api';
+import api, { getMonumento, getMonumentos, getMonumentosRadio, getWikipediaExtract, getValoraciones, addValoracion, getNotasMonumento, addNotaMonumento, deleteNotaMonumento, trackEvent } from '../services/api';
 import PhotoUpload from '../components/PhotoUpload';
 import { useAuth } from '../context/AuthContext';
 import { DetailSkeleton } from '../components/Skeleton';
@@ -65,7 +65,9 @@ export default function Detail() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { user, isFavorito, toggleFavorito } = useAuth();
+  const { user, isFavorito, toggleFavorito, isCurator } = useAuth();
+  const [excluirChat, setExcluirChat] = useState(false);
+  const [excluirSaving, setExcluirSaving] = useState(false);
   const [monumento, setMonumento] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -104,6 +106,7 @@ export default function Detail() {
     getMonumento(id)
       .then(m => {
         setMonumento(m);
+        setExcluirChat(!!m?.excluir_chat);
         if (m?.id) trackEvent('monument_view', { bien_id: m.id });
       })
       .catch(err => setError(err.message))
@@ -402,6 +405,37 @@ export default function Detail() {
               <span className="tag tag-heritage">{monumento.heritage_label}</span>
             )}
           </div>
+
+          {/* Curador (admin/colaborador): excluir del chat por defecto */}
+          {isCurator && (
+            <div className="curator-controls">
+              <label className="curator-toggle">
+                <input
+                  type="checkbox"
+                  checked={excluirChat}
+                  disabled={excluirSaving}
+                  onChange={async (e) => {
+                    const next = e.target.checked;
+                    setExcluirSaving(true);
+                    const prev = excluirChat;
+                    setExcluirChat(next);
+                    try {
+                      await api.patch(`/bienes/${monumento.id}/excluir-chat`, { excluir: next });
+                    } catch (err) {
+                      setExcluirChat(prev);
+                      alert(err.response?.data?.error || err.message);
+                    } finally {
+                      setExcluirSaving(false);
+                    }
+                  }}
+                />
+                <span>{t('detail.excludeFromChat', 'Ocultar este monumento del chat')}</span>
+              </label>
+              <small className="curator-help">
+                {t('detail.excludeFromChatHelp', 'Por defecto no aparecerá en sugerencias del chat. Sí aparecerá si el usuario pide explícitamente el tipo.')}
+              </small>
+            </div>
+          )}
 
           {/* Images gallery */}
           {allImages.length > 0 && (

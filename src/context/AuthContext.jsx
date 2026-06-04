@@ -152,6 +152,8 @@ export function AuthProvider({ children }) {
         loading,
         favoritoIds,
         isPremium,
+        isAdmin: user?.rol === 'admin',
+        isCurator: user?.rol === 'admin' || user?.rol === 'colaborador',
         login,
         register,
         loginWithGoogle,

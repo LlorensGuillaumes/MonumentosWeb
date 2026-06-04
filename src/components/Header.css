@@ -9,12 +9,13 @@
 }
 
 .header-content {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 60px;
+  gap: 0.75rem;
 }
 
 .logo {
@@ -801,4 +802,25 @@
     padding: 0.35rem 0.55rem;
     font-size: 0.75rem;
   }
+}
+
+/* Navbar responsive — evita que se rompa a 2 filas en idiomas largos (FR/IT/DE) cuando admin tiene todos los items visibles */
+@media (max-width: 1400px) {
+  .header-content { gap: 0.5rem; padding: 0 0.75rem; }
+  .nav { gap: 0.15rem; }
+  .nav-link, .nav-dropdown-btn {
+    padding: 0.4rem 0.55rem;
+    font-size: 0.92rem;
+    gap: 0.25rem;
+  }
+  .logo-text { font-size: 1.05rem; }
+  .stats-badge { font-size: 0.78rem; padding: 0.25rem 0.55rem; }
+}
+@media (max-width: 1180px) {
+  .nav-link, .nav-dropdown-btn {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.85rem;
+  }
+  .logo-text { display: none; }
+  .stats-badge { display: none; }
 }

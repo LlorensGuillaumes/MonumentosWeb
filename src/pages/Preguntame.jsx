@@ -28,6 +28,7 @@ export default function Preguntame() {
   const [highlights, setHighlights] = useState([]); // [{id, lat, lng, denominacion, tipo, n}]
   const [mobileTab, setMobileTab] = useState('chat');
   const [modo, setModo] = useState('descubre'); // imprescindibles | mixto | descubre
+  const [mapFilters, setMapFilters] = useState({}); // filtros tipológicos del mapa
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -140,11 +141,13 @@ export default function Preguntame() {
       <div className={`preguntame-layout ${mobileTab === 'map' ? 'mobile-show-map' : 'mobile-show-chat'}`}>
         <div className="preguntame-map">
           <MapView
-            filters={{}}
+            filters={mapFilters}
             height="100%"
             showCCAASummary={true}
             extraMarkers={highlights}
             fitToExtra={true}
+            showFilters={true}
+            onFiltersChange={setMapFilters}
           />
         </div>
 
@@ -187,7 +190,11 @@ export default function Preguntame() {
             {messages.map((m, i) => (
               <div key={i} className={`pgm-msg pgm-msg-${m.role}`}>
                 {m.role === 'user' && <div className="pgm-msg-role">{t('preguntame.you', 'Tú')}</div>}
-                {m.role === 'assistant' && <div className="pgm-msg-role">{t('preguntame.assistant', 'Asistente')}</div>}
+                {m.role === 'assistant' && (
+                  <div className="pgm-msg-role">
+                    <img src="/logo-arc.svg" alt="" className="pgm-msg-logo" />
+                  </div>
+                )}
                 {m.role === 'error' && <div className="pgm-msg-role">⚠️</div>}
                 <div className="pgm-msg-content">
                   {m.role === 'assistant' ? renderAnswer(m.content) : m.content}
@@ -202,7 +209,9 @@ export default function Preguntame() {
             ))}
             {loading && (
               <div className="pgm-msg pgm-msg-assistant">
-                <div className="pgm-msg-role">{t('preguntame.assistant', 'Asistente')}</div>
+                <div className="pgm-msg-role">
+                  <img src="/logo-arc.svg" alt="" className="pgm-msg-logo" />
+                </div>
                 <div className="pgm-msg-content"><em>{t('preguntame.thinking', 'Pensando…')}</em></div>
               </div>
             )}

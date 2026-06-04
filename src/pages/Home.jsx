@@ -57,6 +57,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CTA Pregúntame — solo si admin (alpha) */}
+      {user?.rol === 'admin' && (
+        <section className="home-cta-preguntame">
+          <div className="home-cta-inner">
+            <div className="home-cta-text">
+              <h2>🤖 {t('preguntame.homeCtaTitle', 'Pregúntame qué visitar')}</h2>
+              <p>{t('preguntame.homeCtaText', 'Itinerarios y descubrimientos personalizados con IA sobre nuestro catálogo de 316k monumentos.')}</p>
+            </div>
+            <Link to="/preguntame" className="btn btn-primary btn-lg">
+              {t('preguntame.homeCtaBtn', 'Probar ahora')}
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* CTA Banner for non-logged users */}
       {!user && (
         <section className="cta-banner">

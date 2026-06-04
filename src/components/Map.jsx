@@ -124,7 +124,7 @@ function FitExtraBounds({ points }) {
   return null;
 }
 
-export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null, extraMarkers = [], fitToExtra = false }) {
+export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null, extraMarkers = [], fitToExtra = false, showFilters = false, onFiltersChange = null }) {
   const { mapBounds: savedMapBounds, setMapBounds, mapMarkers: cachedMarkers, mapCCAAMarkers: cachedCCAA, mapViewMode: cachedViewMode, setMapCache } = useApp();
   // Restauramos cache anterior para que al volver del detalle se vean los marcadores aunque la query nueva falle
   const [markers, setMarkers] = useState(() => cachedMarkers || []);
@@ -550,6 +550,35 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
           { key: 'otros', color: '#3b82f6', label: 'map.legend.others' },
         ];
         const selected = (filters.clasificacion || '').split(',').filter(Boolean);
+        // Si showFilters=true: chips clickables que disparan onFiltersChange.
+        // Si no: leyenda estática (comportamiento clásico).
+        if (showFilters && onFiltersChange) {
+          const toggle = (key) => {
+            const set = new Set(selected);
+            if (set.has(key)) set.delete(key);
+            else set.add(key);
+            onFiltersChange({ ...filters, clasificacion: Array.from(set).join(',') });
+          };
+          return (
+            <div className="map-legend map-legend-filters">
+              {ALL_LEGEND.map(l => {
+                const isActive = selected.length === 0 || selected.includes(l.key);
+                return (
+                  <button
+                    key={l.key}
+                    type="button"
+                    className={`legend-item legend-chip ${isActive ? 'active' : 'inactive'}`}
+                    onClick={() => toggle(l.key)}
+                    style={isActive ? { borderColor: l.color } : undefined}
+                  >
+                    <span className="legend-dot" style={{ background: l.color }}></span>
+                    {t(l.label)}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        }
         const visible = selected.length > 0
           ? ALL_LEGEND.filter(l => selected.includes(l.key))
           : ALL_LEGEND;

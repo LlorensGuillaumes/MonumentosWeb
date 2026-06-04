@@ -79,6 +79,13 @@
 }
 .autores-list li:hover {
   background: var(--bg-hover, #f9fafb);
+  color: var(--text-primary, #1a202c);
+}
+.autores-list li:hover .autor-nombre {
+  color: var(--text-primary, #1a202c);
+}
+.autores-list li:hover .autor-meta {
+  color: var(--text-secondary, #6b7280);
 }
 .autores-list li.active {
   background: rgba(59, 130, 246, 0.1);

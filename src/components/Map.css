@@ -349,3 +349,26 @@
   transform: rotate(45deg);
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Chips de filtro clickables (usado por /preguntame) */
+.map-legend-filters { flex-wrap: wrap; gap: 0.25rem; max-width: calc(100% - 1rem); }
+.legend-chip {
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  background: rgba(255,255,255,0.92);
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: #1a202c;
+  transition: all 0.15s;
+}
+.legend-chip:hover { background: white; }
+.legend-chip.inactive {
+  opacity: 0.4;
+  border-color: transparent !important;
+}
+[data-theme="dark"] .legend-chip {
+  background: rgba(30, 41, 59, 0.92);
+  color: #e2e8f0;
+}
