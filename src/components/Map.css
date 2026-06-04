@@ -327,3 +327,25 @@
     font-size: 7px;
   }
 }
+
+/* Marcadores numerados (usado por /preguntame) */
+.extra-num-wrapper { background: transparent !important; border: none !important; }
+.extra-num-marker {
+  width: 34px;
+  height: 42px;
+  background: #dc2626;
+  border: 2px solid white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.extra-num-marker span {
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transform: rotate(45deg);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}

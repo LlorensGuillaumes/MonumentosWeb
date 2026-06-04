@@ -107,7 +107,24 @@ function MapEvents({ onBoundsChange }) {
   return null;
 }
 
-export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null }) {
+// Componente helper: hace fitBounds cuando cambian los markers extra (citados por el chat).
+function FitExtraBounds({ points }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!points || points.length === 0) return;
+    const valid = points.filter(p => p.lat != null && p.lng != null);
+    if (valid.length === 0) return;
+    if (valid.length === 1) {
+      map.flyTo([valid[0].lat, valid[0].lng], 12, { duration: 0.8 });
+      return;
+    }
+    const bounds = L.latLngBounds(valid.map(p => [p.lat, p.lng]));
+    map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 11, duration: 0.8 });
+  }, [points, map]);
+  return null;
+}
+
+export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null, extraMarkers = [], fitToExtra = false }) {
   const { mapBounds: savedMapBounds, setMapBounds, mapMarkers: cachedMarkers, mapCCAAMarkers: cachedCCAA, mapViewMode: cachedViewMode, setMapCache } = useApp();
   // Restauramos cache anterior para que al volver del detalle se vean los marcadores aunque la query nueva falle
   const [markers, setMarkers] = useState(() => cachedMarkers || []);
@@ -487,6 +504,39 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
             )}
           </Marker>
         )}
+
+        {/* Marcadores numerados extra (usado por /preguntame para los #id citados por el chat) */}
+        {extraMarkers.map((m) => {
+          if (m.lat == null || m.lng == null) return null;
+          return (
+            <Marker
+              key={`extra-${m.id}`}
+              position={[m.lat, m.lng]}
+              icon={L.divIcon({
+                className: 'extra-num-wrapper',
+                html: `<div class="extra-num-marker"><span>${m.n}</span></div>`,
+                iconSize: [34, 42],
+                iconAnchor: [17, 42],
+              })}
+              zIndexOffset={2000}
+            >
+              <Popup>
+                <div className="popup-content">
+                  <h4>{m.n}. {m.denominacion}</h4>
+                  {m.municipio && <p style={{ margin: 0, fontSize: '0.85em', color: '#6b7280' }}>{m.municipio}</p>}
+                  <button
+                    className="popup-btn"
+                    onClick={() => navigate(`/monumento/${m.id}`)}
+                  >
+                    {t('map.viewDetail')}
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
+        {fitToExtra && <FitExtraBounds points={extraMarkers} />}
       </MapContainer>
 
       {(() => {
