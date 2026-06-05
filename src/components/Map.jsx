@@ -124,11 +124,12 @@ function FitExtraBounds({ points }) {
   return null;
 }
 
-export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null, extraMarkers = [], fitToExtra = false, showFilters = false, onFiltersChange = null }) {
+export default function Map({ filters = {}, height = '500px', onMarkerClick, showCCAASummary = true, flyTo = null, highlight = null, extraMarkers = [], fitToExtra = false, showFilters = false, onFiltersChange = null, onlyExtraMarkers = false }) {
   const { mapBounds: savedMapBounds, setMapBounds, mapMarkers: cachedMarkers, mapCCAAMarkers: cachedCCAA, mapViewMode: cachedViewMode, setMapCache } = useApp();
   // Restauramos cache anterior para que al volver del detalle se vean los marcadores aunque la query nueva falle
-  const [markers, setMarkers] = useState(() => cachedMarkers || []);
-  const [ccaaMarkers, setCCAAMarkers] = useState(() => cachedCCAA || []);
+  // En modo onlyExtraMarkers no se muestra catálogo base.
+  const [markers, setMarkers] = useState(() => onlyExtraMarkers ? [] : (cachedMarkers || []));
+  const [ccaaMarkers, setCCAAMarkers] = useState(() => onlyExtraMarkers ? [] : (cachedCCAA || []));
   const [loading, setLoading] = useState(false);
   const [currentBounds, setCurrentBounds] = useState(savedMapBounds || null);
   const [zoom, setZoom] = useState(savedMapBounds?.zoom || 6);
@@ -140,11 +141,21 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
 
   // Persistir markers en context para restaurarlos al volver del detalle
   useEffect(() => {
+    if (onlyExtraMarkers) return;
     if (markers.length > 0 || ccaaMarkers.length > 0) {
       setMapCache({ mapMarkers: markers, mapCCAAMarkers: ccaaMarkers, mapViewMode: viewMode });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markers, ccaaMarkers, viewMode]);
+
+  // En modo onlyExtraMarkers, mantén markers/ccaa vacíos siempre (sobrescribe cualquier restauración accidental)
+  useEffect(() => {
+    if (onlyExtraMarkers) {
+      setMarkers([]);
+      setCCAAMarkers([]);
+      setViewMode('detail');
+    }
+  }, [onlyExtraMarkers]);
   const navigate = useNavigate();
   const loadingRef = useRef(false);
   const { t } = useTranslation();
@@ -172,6 +183,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
   // Token incremental para descartar respuestas obsoletas si se solapan peticiones
   const loadTokenRef = useRef(0);
   const loadMarkers = useCallback(async (bbox, currentZoom) => {
+    if (onlyExtraMarkers) return;
     const myToken = ++loadTokenRef.current;
     setLoading(true);
 
@@ -230,6 +242,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
   // Cargar resumen de CCAA/regiones (con todos los filtros activos)
   const ccaaTokenRef = useRef(0);
   const loadCCAAResumen = useCallback(async () => {
+    if (onlyExtraMarkers) return;
     const myToken = ++ccaaTokenRef.current;
     try {
       let geojson;
@@ -377,7 +390,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
         <FlyToHandler flyTo={flyTo} />
 
         {/* Vista resumen CCAA */}
-        {viewMode === 'ccaa' && ccaaMarkers.map((feature) => {
+        {!onlyExtraMarkers && viewMode === 'ccaa' && ccaaMarkers.map((feature) => {
           const count = feature.properties.total;
           const size = count > 20000 ? 60 : count > 10000 ? 50 : count > 5000 ? 42 : 35;
           return (
@@ -409,7 +422,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
         })}
 
         {/* Vista detalle con clustering */}
-        {viewMode === 'detail' && (
+        {!onlyExtraMarkers && viewMode === 'detail' && (
           <MarkerClusterGroup {...clusterOptions}>
             {markers.map((feature) => (
               <CircleMarker
@@ -508,21 +521,24 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
         {/* Marcadores numerados extra (usado por /preguntame para los #id citados por el chat) */}
         {extraMarkers.map((m) => {
           if (m.lat == null || m.lng == null) return null;
+          const numbered = m.n != null;
           return (
             <Marker
               key={`extra-${m.id}`}
               position={[m.lat, m.lng]}
               icon={L.divIcon({
-                className: 'extra-num-wrapper',
-                html: `<div class="extra-num-marker"><span>${m.n}</span></div>`,
-                iconSize: [34, 42],
-                iconAnchor: [17, 42],
+                className: numbered ? 'extra-num-wrapper' : 'extra-pin-wrapper',
+                html: numbered
+                  ? `<div class="extra-num-marker"><span>${m.n}</span></div>`
+                  : `<div class="extra-pin-marker"></div>`,
+                iconSize: numbered ? [34, 42] : [22, 30],
+                iconAnchor: numbered ? [17, 42] : [11, 30],
               })}
               zIndexOffset={2000}
             >
               <Popup>
                 <div className="popup-content">
-                  <h4>{m.n}. {m.denominacion}</h4>
+                  <h4>{numbered ? `${m.n}. ` : ''}{m.denominacion}</h4>
                   {m.municipio && <p style={{ margin: 0, fontSize: '0.85em', color: '#6b7280' }}>{m.municipio}</p>}
                   <button
                     className="popup-btn"

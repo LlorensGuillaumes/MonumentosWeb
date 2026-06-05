@@ -1,16 +1,41 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
+import MapView from '../components/Map';
 import './Autores.css';
 
 export default function Autores() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [q, setQ] = useState('');
   const [personas, setPersonas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedQid, setSelectedQid] = useState(null);
+  const [selectedQid, setSelectedQid] = useState(searchParams.get('qid'));
+  const [selectedNombre, setSelectedNombre] = useState('');
   const [bienes, setBienes] = useState([]);
   const [loadingBienes, setLoadingBienes] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+
+  const mapMarkers = useMemo(() =>
+    bienes
+      .filter(b => b.latitud != null && b.longitud != null)
+      .map((b, i) => ({
+        id: b.id,
+        n: i + 1,
+        lat: b.latitud,
+        lng: b.longitud,
+        denominacion: b.denominacion,
+        municipio: b.municipio,
+        tipo: b.tipo_monumento,
+      })),
+    [bienes]);
+
+  // Mapa id → número de marker, per mostrar al llistat
+  const idToN = useMemo(() => {
+    const m = new Map();
+    mapMarkers.forEach(x => m.set(x.id, x.n));
+    return m;
+  }, [mapMarkers]);
 
   const fetchPersonas = useCallback(async (query) => {
     setLoading(true); setError(null);
@@ -36,9 +61,16 @@ export default function Autores() {
     return () => clearTimeout(handle);
   }, [q, fetchPersonas]);
 
-  const verBienes = async (qid, nombre) => {
+  const verBienes = useCallback(async (qid, nombre, updateUrl = true) => {
     if (!qid) return;
     setSelectedQid(qid);
+    if (nombre) setSelectedNombre(nombre);
+    if (updateUrl) {
+      const next = new URLSearchParams(searchParams);
+      next.set('qid', qid);
+      setSearchParams(next, { replace: true });
+    }
+    setShowMap(false);
     setLoadingBienes(true);
     setBienes([]);
     try {
@@ -49,7 +81,35 @@ export default function Autores() {
     } finally {
       setLoadingBienes(false);
     }
-  };
+  }, [searchParams, setSearchParams]);
+
+  // Si arriba amb ?qid= a la URL (back o link directe), carregar automàticament.
+  // Primera vegada SEMPRE; després, només si canvia el qid de la URL.
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    const qidParam = searchParams.get('qid');
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      if (qidParam) verBienes(qidParam, null, false);
+      return;
+    }
+    if (qidParam && qidParam !== selectedQid) {
+      verBienes(qidParam, null, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Quan tinguem el llistat de personas i un qid seleccionat sense nom, deduïm el nom
+  // i filtrem la cerca al nom de l'autor (sincronitza el camp q amb la fitxa oberta).
+  useEffect(() => {
+    if (selectedQid && !selectedNombre && personas.length > 0) {
+      const found = personas.find(p => p.qid === selectedQid);
+      if (found) {
+        setSelectedNombre(found.nombre);
+        if (!q) setQ(found.nombre);
+      }
+    }
+  }, [personas, selectedQid, selectedNombre, q]);
 
   return (
     <div className="autores-page">
@@ -106,10 +166,37 @@ export default function Autores() {
           {loadingBienes && <div className="autores-loading">Cargando obras…</div>}
           {!loadingBienes && selectedQid && bienes.length > 0 && (
             <>
-              <h3>{bienes.length} obras</h3>
+              <div className="autores-detail-head">
+                <h3>{bienes.length} obras{selectedNombre ? ` de ${selectedNombre}` : ''}</h3>
+                {mapMarkers.length > 0 && (
+                  <button
+                    type="button"
+                    className="autores-map-toggle"
+                    onClick={() => setShowMap(s => !s)}
+                  >
+                    {showMap
+                      ? 'Ocultar mapa'
+                      : `Ver en el mapa (${mapMarkers.length})`}
+                  </button>
+                )}
+              </div>
+              {showMap && (
+                <div className="autores-map-wrap">
+                  <MapView
+                    extraMarkers={mapMarkers}
+                    fitToExtra={true}
+                    height="420px"
+                    showCCAASummary={false}
+                    onlyExtraMarkers={true}
+                  />
+                </div>
+              )}
               <ul className="autor-bienes">
                 {bienes.map((b) => (
                   <li key={b.id}>
+                    {idToN.has(b.id) && (
+                      <span className="autor-bien-num">{idToN.get(b.id)}</span>
+                    )}
                     {b.imagen_url && (
                       <img src={b.imagen_url} alt={b.denominacion} loading="lazy" />
                     )}
