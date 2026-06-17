@@ -58,20 +58,37 @@ api.interceptors.response.use(
 
 export const getStats = () => api.get('/stats').then(r => r.data);
 
+// Normaliza filtros antes de enviar al backend:
+// - Arrays vacíos / nulos: omitidos (evita ?key= que algunos backends interpretan raro)
+// - Arrays con elementos: serializados como CSV (más simple y cacheable que ?key[]=a&key[]=b)
+function normalizeFilters(params) {
+  const out = {};
+  for (const [k, v] of Object.entries(params || {})) {
+    if (v === null || v === undefined || v === '') continue;
+    if (Array.isArray(v)) {
+      if (v.length === 0) continue;
+      out[k] = v.join(',');
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
 export const getMonumentos = (params = {}) =>
-  api.get('/monumentos', { params }).then(r => r.data);
+  api.get('/monumentos', { params: normalizeFilters(params) }).then(r => r.data);
 
 export const getMonumento = (id) =>
   api.get(`/monumentos/${id}`).then(r => r.data);
 
 export const getGeoJSON = (params = {}) =>
-  api.get('/geojson', { params }).then(r => r.data);
+  api.get('/geojson', { params: normalizeFilters(params) }).then(r => r.data);
 
 export const getFiltros = (params = {}) =>
-  api.get('/filtros', { params }).then(r => r.data);
+  api.get('/filtros', { params: normalizeFilters(params) }).then(r => r.data);
 
 export const getCCAAResumen = (params = {}) =>
-  api.get('/ccaa-resumen', { params }).then(r => r.data);
+  api.get('/ccaa-resumen', { params: normalizeFilters(params) }).then(r => r.data);
 
 export const getMunicipios = (params = {}) =>
   api.get('/municipios', { params }).then(r => r.data);

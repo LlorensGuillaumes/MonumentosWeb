@@ -3,22 +3,38 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../context/AppContext';
 import SearchableSelect from './SearchableSelect';
 import SearchAutocomplete from './SearchAutocomplete';
+import flagEs from '../assets/flags/es.jpg';
+import flagIt from '../assets/flags/it.jpg';
+import flagFr from '../assets/flags/fr.jpg';
+import flagPt from '../assets/flags/pt.jpg';
+import flagDe from '../assets/flags/de.jpg';
+import flagGb from '../assets/flags/en.jpg';      // Reaprofitem la Union Jack del selector d'idioma
+import flagAt from '../assets/flags/at.jpg';
+import flagCh from '../assets/flags/ch.jpg';
+import flagRo from '../assets/flags/ro.jpg';
+import flagLb from '../assets/flags/lb.jpg';
+import flagTn from '../assets/flags/tn.jpg';
+import flagUs from '../assets/flags/us.jpg';
+import flagMx from '../assets/flags/mx.jpg';
 import './Filters.css';
 
-// Banderas para los selects de país. Se prepende al label visible (search
-// sigue funcionando con el nombre y con el código del país).
+// Mapeig pais (valor BD) -> imatge bandera. Quan s'amplii la BD amb nous països,
+// afegir aquí el nou par + copiar imatge a src/assets/flags/.
+// Vegeu Documentacion/22_Frontend_Components.md per al procediment complet.
 const COUNTRY_FLAGS = {
-  'España': '🇪🇸',
-  'Italia': '🇮🇹',
-  'Francia': '🇫🇷',
-  'Portugal': '🇵🇹',
-  'Alemania': '🇩🇪',
-  'Reino Unido': '🇬🇧',
-  'Austria': '🇦🇹',
-  'Suiza': '🇨🇭',
-  'Rumanía': '🇷🇴',
-  'Líbano': '🇱🇧',
-  'Túnez': '🇹🇳',
+  'España': flagEs,
+  'Italia': flagIt,
+  'Francia': flagFr,
+  'Portugal': flagPt,
+  'Alemania': flagDe,
+  'Reino Unido': flagGb,
+  'Austria': flagAt,
+  'Suiza': flagCh,
+  'Rumanía': flagRo,
+  'Líbano': flagLb,
+  'Túnez': flagTn,
+  'Estados Unidos': flagUs,
+  'México': flagMx,
 };
 
 export default function Filters({ onSearch, onMonumentSelect }) {
@@ -188,7 +204,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
     filters.pais, filters.region, filters.provincia, filters.municipio,
     filters.clasificacion, filters.tipo_monumento, filters.periodo,
     filters.evento, filters.evento_padre, filters.estilo,
-  ].filter(Boolean).length + (filters.solo_wikidata ? 1 : 0) + (filters.solo_imagen ? 1 : 0);
+  ].filter(Boolean).length + (filters.solo_wikidata ? 1 : 0) + (filters.solo_imagen ? 1 : 0) + ((filters.hn_listas || []).length > 0 ? 1 : 0);
 
   return (
     <form className="filters" onSubmit={handleSubmit}>
@@ -239,7 +255,7 @@ export default function Filters({ onSearch, onMonumentSelect }) {
                   onChange={handlePaisChange}
                   options={translateOptions(filtros.paises, 'filters.countries').map(o => ({
                     ...o,
-                    label: `${COUNTRY_FLAGS[o.value] || '🌍'} ${o.label}`,
+                    flag: COUNTRY_FLAGS[o.value] || null,
                   }))}
                   placeholder={t('filters.allCountries')}
                 />
@@ -455,6 +471,37 @@ export default function Filters({ onSearch, onMonumentSelect }) {
               />
               {t('filters.onlyImage')}
             </label>
+          </div>
+
+          <div className="filter-group filter-hn-listas">
+            <label className="filter-hn-label">
+              🛡️ {t('filters.hnListsLabel', 'Lista Roja de Hispania Nostra')}
+            </label>
+            <div className="hn-pills">
+              {[
+                { id: 'roja', label: t('filters.hnRoja', 'Roja'), cls: 'hn-pill-roja' },
+                { id: 'verde', label: t('filters.hnVerde', 'Verde'), cls: 'hn-pill-verde' },
+                { id: 'negra', label: t('filters.hnNegra', 'Negra'), cls: 'hn-pill-negra' },
+              ].map(p => {
+                const active = (filters.hn_listas || []).includes(p.id);
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`hn-pill ${p.cls} ${active ? 'active' : ''}`}
+                    onClick={() => {
+                      const curr = filters.hn_listas || [];
+                      const next = active ? curr.filter(x => x !== p.id) : [...curr, p.id];
+                      handleChange('hn_listas', next);
+                    }}
+                    aria-pressed={active}
+                  >
+                    <span className="hn-pill-dot" />
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

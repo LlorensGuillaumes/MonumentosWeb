@@ -51,6 +51,7 @@ export default function SearchableSelect({ value, onChange, options = [], placeh
 
   const selectedOption = options.find(o => o.value === value);
   const selectedLabel = selectedOption?.label || selectedOption?.value || '';
+  const selectedFlag = selectedOption?.flag;
 
   const handleSelect = useCallback((val) => {
     onChange(val);
@@ -103,6 +104,7 @@ export default function SearchableSelect({ value, onChange, options = [], placeh
           />
         ) : (
           <span className={`searchable-select-value ${!value ? 'placeholder' : ''}`}>
+            {selectedFlag && <img className="searchable-select-flag" src={selectedFlag} alt="" />}
             {selectedLabel || placeholder}
           </span>
         )}
@@ -131,7 +133,8 @@ export default function SearchableSelect({ value, onChange, options = [], placeh
                   className={`searchable-select-option ${o.value === value ? 'selected' : ''}`}
                   onClick={() => handleSelect(o.value)}
                 >
-                  {o.label || o.value}
+                  {o.flag && <img className="searchable-select-flag" src={o.flag} alt="" />}
+                  <span className="searchable-select-option-label">{o.label || o.value}</span>
                   {o.count != null && (
                     <span className="searchable-select-count">
                       {o.count.toLocaleString()}

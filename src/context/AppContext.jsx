@@ -27,6 +27,10 @@ const initialState = {
     solo_coords: true,
     solo_wikidata: false,
     solo_imagen: false,
+    // Hispania Nostra: array d'identificadors de llista actius. Buit = no filtre HN.
+    // Valors possibles: 'roja', 'verde', 'negra' (multi-select).
+    // Backward-compat backend: si arriba ?solo_hispania_nostra=true a la URL, el backend ho tracta com totes 3 llistes.
+    hn_listas: [],
   },
   mapBounds: null,
   mapMarkers: null, // cache de markers para restaurar al volver del detalle

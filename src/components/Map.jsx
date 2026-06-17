@@ -59,6 +59,34 @@ const getCategoryColor = (tipoMonumento, categoria) => {
   return '#3b82f6';
 };
 
+// Override Hispania Nostra per als 3 casos de sinèrgia (mateix mapping que a Detail.jsx)
+const HN_SYNERGY_OVERRIDE_MAP = {
+  230187: 'verde',  // Palacio de Rubalcava
+  24724: 'negra',   // Torre del río de la Miel
+  24718: 'negra',   // Abrigo del río de la Miel A
+  78209: 'roja',    // Castillo de Tejeda — té heritage_label real
+};
+
+// Detecta a quina llista HN pertany el bien (Roja / Verde / Negra).
+// Prioritat: 1) override sinèrgia hardcoded · 2) camp hn_lista pre-calculat al backend · 3) regex sobre heritage_label/tipo/categoria
+const getHNListType = (props) => {
+  if (!props) return null;
+  if (HN_SYNERGY_OVERRIDE_MAP[props.id]) return HN_SYNERGY_OVERRIDE_MAP[props.id];
+  if (props.hn_lista && ['roja','verde','negra'].includes(props.hn_lista)) return props.hn_lista;
+  const fields = [props.heritage_label, props.tipo, props.categoria].filter(Boolean);
+  for (const f of fields) {
+    const m = f.toLowerCase().match(/lista\s+(roja|verde|verda|negra)/);
+    if (m) return m[1] === 'verda' ? 'verde' : m[1];
+  }
+  return null;
+};
+
+const HN_COLORS = {
+  roja: '#dc2626',
+  verde: '#16a34a',
+  negra: '#1f2937',
+};
+
 // Componente que vuela el mapa a una coordenada cuando cambia flyTo
 function FlyToHandler({ flyTo }) {
   const map = useMap();
@@ -275,7 +303,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
   const hasContentFilters = filters.clasificacion || filters.estilo ||
     filters.tipo_monumento || filters.periodo || filters.q ||
     filters.evento || filters.evento_padre ||
-    filters.solo_imagen || filters.solo_wikidata;
+    filters.solo_imagen || filters.solo_wikidata || (filters.hn_listas && filters.hn_listas.length > 0);
 
   // Recargar SOLO cuando cambian los filtros (la carga inicial la dispara MapEvents al montar)
   // Skip primera ejecución para evitar duplicar la carga inicial.
@@ -424,19 +452,24 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
         {/* Vista detalle con clustering */}
         {!onlyExtraMarkers && viewMode === 'detail' && (
           <MarkerClusterGroup {...clusterOptions}>
-            {markers.map((feature) => (
+            {markers.map((feature) => {
+              const hnList = getHNListType(feature.properties);
+              const fillColor = hnList
+                ? HN_COLORS[hnList]
+                : getCategoryColor(feature.properties.tipo_monumento, feature.properties.categoria);
+              return (
               <CircleMarker
                 key={feature.properties.id}
                 center={[
                   feature.geometry.coordinates[1],
                   feature.geometry.coordinates[0],
                 ]}
-                radius={6}
+                radius={hnList ? 9 : 6}
                 pathOptions={{
-                  fillColor: getCategoryColor(feature.properties.tipo_monumento, feature.properties.categoria),
-                  fillOpacity: feature.properties.coords_precision === 'municipio' ? 0.35 : 0.8,
-                  color: feature.properties.coords_precision === 'municipio' ? '#888' : '#fff',
-                  weight: 1,
+                  fillColor,
+                  fillOpacity: hnList ? 0.9 : (feature.properties.coords_precision === 'municipio' ? 0.35 : 0.8),
+                  color: hnList ? '#fff' : (feature.properties.coords_precision === 'municipio' ? '#888' : '#fff'),
+                  weight: hnList ? 2 : 1,
                   dashArray: feature.properties.coords_precision === 'municipio' ? '3,2' : null,
                 }}
                 eventHandlers={{
@@ -477,7 +510,7 @@ export default function Map({ filters = {}, height = '500px', onMarkerClick, sho
                   </div>
                 </Popup>
               </CircleMarker>
-            ))}
+            );})}
           </MarkerClusterGroup>
         )}
 

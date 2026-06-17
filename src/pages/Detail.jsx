@@ -61,6 +61,42 @@ function StarRating({ value, onChange, readonly, size = '1.3rem' }) {
   );
 }
 
+// Override per a casos de sinèrgia Hispania Nostra (preview reunió 18/06).
+// La integració amb HN els actualitzarà automàticament — això simula com es veurà.
+const HN_SYNERGY_OVERRIDE = {
+  230187: 'elemento de la Lista Verde del Patrimonio', // Palacio de Rubalcava — HN: salvat/restaurat
+  24724: 'elemento de la Lista Negra del Patrimonio',  // Torre del río de la Miel — HN: fitxa única Negra
+  24718: 'elemento de la Lista Negra del Patrimonio',  // Abrigo del río de la Miel A — mateix QID
+};
+
+// URLs directes a fitxes Hispania Nostra per a casos coneguts (cas-per-cas mentre no
+// disposem del feed amb tots els slugs). Tots viuen al subdomini listaroja, també si
+// la fitxa ja està a Lista Verde o Negra.
+const HN_FICHA_URL = {
+  230187: 'https://listaroja.hispanianostra.org/ficha/palacio-de-rubalcava/',
+  24724: 'https://listaroja.hispanianostra.org/ficha/torre-de-la-miel-2/',
+  24718: 'https://listaroja.hispanianostra.org/ficha/torre-de-la-miel-2/',
+  78209: 'https://listaroja.hispanianostra.org/ficha/castillo-de-tejeda/',
+};
+
+// Helper: detecta etiquetes Hispania Nostra a qualsevol camp text — el badge dedicat ja les cobreix
+// i les representa amb atribució explícita ("Lista X de Hispania Nostra").
+const isHispaniaNostraLabel = (s) =>
+  !!s && /lista\s+(roja|verde|verda|negra)\s+del\s+patrimonio/i.test(s);
+
+// Retorna 'roja' | 'verde' | 'negra' | null segons quina llista de Hispania Nostra menciona el text.
+const getHispaniaNostraListType = (s) => {
+  if (!s) return null;
+  const m = s.toLowerCase().match(/lista\s+(roja|verde|verda|negra)/);
+  if (!m) return null;
+  return m[1] === 'verda' ? 'verde' : m[1];
+};
+
+// URL de cerca a Hispania Nostra (fallback quan no tenim URL directa a la fitxa).
+// El cercador del subdomini listaroja no funciona — usem el de la web principal.
+const buildHNSearchUrl = (_listType, denominacion) =>
+  `https://www.hispanianostra.org/?s=${encodeURIComponent(denominacion || '')}`;
+
 export default function Detail() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
@@ -74,6 +110,7 @@ export default function Detail() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [favLoading, setFavLoading] = useState(false);
   const [wikiExtract, setWikiExtract] = useState(null);
+  const [wikiExtractLang, setWikiExtractLang] = useState(null);
   const [wikiFullText, setWikiFullText] = useState(null);
   const [wikiFullTextLang, setWikiFullTextLang] = useState(null);
   const [showFullText, setShowFullText] = useState(false);
@@ -205,12 +242,16 @@ export default function Detail() {
     // primaria nunca recibirían full_text aunque exista en secundaria.
     setWikiLoading(true);
     setWikiExtract(null); // limpia cualquier extracto previo de otro idioma
+    setWikiExtractLang(null);
     setWikiFullText(null);
     setWikiFullTextLang(null);
     setShowFullText(false);
     getWikipediaExtract(monumento.id, i18n.language)
       .then(data => {
-        if (data?.extract) setWikiExtract(data.extract);
+        if (data?.extract) {
+          setWikiExtract(data.extract);
+          setWikiExtractLang(data.lang || null);
+        }
         if (data?.full_text && data.full_text.length > (data.extract?.length || 0) + 200) {
           setWikiFullText(data.full_text);
           // Si el backend marca full_text_lang, es porque el full_text está en otro idioma
@@ -386,10 +427,15 @@ export default function Detail() {
 
           {/* Tags */}
           <div className="detail-tags">
-            {monumento.categoria && (
+            {monumento.categoria
+              && !isHispaniaNostraLabel(monumento.categoria)
+              && monumento.categoria !== monumento.heritage_label && (
               <span className="tag tag-category">{monumento.categoria}</span>
             )}
-            {monumento.tipo && (
+            {monumento.tipo
+              && !isHispaniaNostraLabel(monumento.tipo)
+              && monumento.tipo !== monumento.heritage_label
+              && monumento.tipo !== monumento.categoria && (
               <span className="tag tag-type">{monumento.tipo}</span>
             )}
             {monumento.tipo_monumento && (
@@ -401,9 +447,32 @@ export default function Detail() {
             {monumento.periodo && (
               <span className="tag tag-period">{monumento.periodo}</span>
             )}
-            {monumento.heritage_label && (
-              <span className="tag tag-heritage">{monumento.heritage_label}</span>
-            )}
+            {(monumento.heritage_label || HN_SYNERGY_OVERRIDE[parseInt(id)]) && (() => {
+              const rawHL = HN_SYNERGY_OVERRIDE[parseInt(id)] || monumento.heritage_label;
+              const hl = rawHL.toLowerCase();
+              if (hl.includes('lista roja')) {
+                return (
+                  <span className="tag tag-lista-roja" title="Inclòs a la Lista Roja del Patrimonio — en risc (Hispania Nostra)">
+                    Lista Roja de Hispania Nostra
+                  </span>
+                );
+              }
+              if (hl.includes('lista verde') || hl.includes('lista verda')) {
+                return (
+                  <span className="tag tag-lista-verde" title="Inclòs a la Lista Verde del Patrimonio — salvat / restaurat (Hispania Nostra)">
+                    Lista Verde de Hispania Nostra
+                  </span>
+                );
+              }
+              if (hl.includes('lista negra')) {
+                return (
+                  <span className="tag tag-lista-negra" title="Inclòs a la Lista Negra del Patrimonio — desaparegut (Hispania Nostra)">
+                    Lista Negra de Hispania Nostra
+                  </span>
+                );
+              }
+              return <span className="tag tag-heritage">{rawHL}</span>;
+            })()}
           </div>
 
           {/* Curador (admin/colaborador): excluir del chat por defecto */}
@@ -550,7 +619,21 @@ export default function Detail() {
                       </div>
                     </>
                   ) : (
-                    <p>{wikiExtract}</p>
+                    <>
+                      {wikiExtractLang && wikiExtractLang !== i18n.language && (
+                        <div className="lang-notice">
+                          <span>{t('detail.extractOtherLang', `Texto disponible en ${wikiExtractLang === 'es' ? 'español' : wikiExtractLang}`)}</span>
+                          <a
+                            href={`https://translate.google.com/?sl=${wikiExtractLang}&tl=${i18n.language}&text=${encodeURIComponent(wikiExtract)}&op=translate`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {t('detail.translateWithGoogle', 'Traducir con Google')} ↗
+                          </a>
+                        </div>
+                      )}
+                      <p>{wikiExtract}</p>
+                    </>
                   )}
                   {wikiFullText && (
                     <button
@@ -782,7 +865,9 @@ export default function Detail() {
                          t('detail.notaTypeNota')}
                       </span>
                       <span className="nota-author">
-                        {n.usuario_nombre || n.usuario_email}
+                        {user?.id === n.usuario_id
+                          ? (user.nombre || t('detail.notaSelfAuthor'))
+                          : n.usuario_display}
                         {(n.usuario_rol === 'admin' || n.usuario_rol === 'colaborador') && (
                           <span className={`nota-rol-badge nota-rol-${n.usuario_rol}`}>
                             {n.usuario_rol}
@@ -861,6 +946,24 @@ export default function Detail() {
                   🏛️ SIPCA
                 </a>
               )}
+              {(() => {
+                const listType = getHispaniaNostraListType(monumento.heritage_label)
+                  || getHispaniaNostraListType(monumento.tipo)
+                  || getHispaniaNostraListType(monumento.categoria)
+                  || getHispaniaNostraListType(HN_SYNERGY_OVERRIDE[parseInt(id)]);
+                if (!listType) return null;
+                const directUrl = HN_FICHA_URL[parseInt(id)];
+                const url = directUrl || buildHNSearchUrl(listType, monumento.denominacion);
+                const llabel = listType === 'roja' ? 'Roja' : listType === 'verde' ? 'Verde' : 'Negra';
+                const tip = directUrl
+                  ? `Veure fitxa a la Lista ${llabel} de Hispania Nostra`
+                  : `Cercar la fitxa a Hispania Nostra (Lista ${llabel})`;
+                return (
+                  <a href={url} target="_blank" rel="noopener noreferrer" title={tip}>
+                    🛡️ Fitxa a Hispania Nostra ({`Lista ${llabel}`})
+                  </a>
+                );
+              })()}
             </div>
           </div>
 

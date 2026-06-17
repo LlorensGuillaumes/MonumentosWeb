@@ -162,6 +162,40 @@
   color: #9d174d;
 }
 
+/* Lista Roja / Verda / Negra Hispania Nostra — badges destacats */
+.tag-lista-roja,
+.tag-lista-verde,
+.tag-lista-negra {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tag-lr-dot {
+  font-size: 1.1em;
+  line-height: 1;
+}
+.tag-lista-roja {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+.tag-lista-roja .tag-lr-dot { color: #dc2626; }
+.tag-lista-verde {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+.tag-lista-verde .tag-lr-dot { color: #16a34a; }
+.tag-lista-negra {
+  background: #1f2937;
+  color: #f9fafb;
+  border-color: #111827;
+}
+.tag-lista-negra .tag-lr-dot { color: #d1d5db; }
+
 /* Share buttons */
 .detail-share {
   display: flex;

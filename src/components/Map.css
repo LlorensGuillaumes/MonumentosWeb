@@ -208,29 +208,30 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Paleta deliberadament SENSE vermell/verd/negre per a no confondre amb Hispania Nostra */
 .cluster-small {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
   width: 30px;
   height: 30px;
   font-size: 11px;
 }
 
 .cluster-medium {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   width: 38px;
   height: 38px;
   font-size: 12px;
 }
 
 .cluster-large {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
   width: 44px;
   height: 44px;
   font-size: 13px;
 }
 
 .cluster-xlarge {
-  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  background: linear-gradient(135deg, #475569, #334155);
   width: 50px;
   height: 50px;
   font-size: 14px;

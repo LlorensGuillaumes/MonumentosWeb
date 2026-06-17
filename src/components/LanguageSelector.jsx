@@ -1,17 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import flagEs from '../assets/flags/es.jpg';
+import flagEn from '../assets/flags/en.jpg';
+import flagFr from '../assets/flags/fr.jpg';
+import flagPt from '../assets/flags/pt.jpg';
+import flagCa from '../assets/flags/ca.jpg';
+import flagEu from '../assets/flags/eu.jpg';
+import flagGl from '../assets/flags/gl.jpg';
+import flagIt from '../assets/flags/it.jpg';
 import './LanguageSelector.css';
 
 const LANGUAGES = [
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'pt', label: 'Português', flag: '🇵🇹' },
-  { code: 'ca', label: 'Català', flag: '🏴󠁥󠁳󠁣󠁴󠁿' },
-  { code: 'eu', label: 'Euskara', flag: '🏴󠁥󠁳󠁰󠁶󠁿' },
-  { code: 'gl', label: 'Galego', flag: '🏴󠁥󠁳󠁧󠁡󠁿' },
-  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
+  { code: 'es', label: 'Español', flag: flagEs },
+  { code: 'en', label: 'English', flag: flagEn },
+  { code: 'fr', label: 'Français', flag: flagFr },
+  { code: 'pt', label: 'Português', flag: flagPt },
+  { code: 'ca', label: 'Català', flag: flagCa },
+  { code: 'eu', label: 'Euskara', flag: flagEu },
+  { code: 'gl', label: 'Galego', flag: flagGl },
+  { code: 'it', label: 'Italiano', flag: flagIt },
 ];
 
 export default function LanguageSelector() {
@@ -67,7 +75,7 @@ export default function LanguageSelector() {
         title={current.label}
         aria-expanded={open}
       >
-        <span className="lang-flag">{current.flag}</span>
+        <img className="lang-flag" src={current.flag} alt="" />
         <svg className="lang-arrow" width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
           <path d="M0 0l5 6 5-6z" />
         </svg>
@@ -83,7 +91,7 @@ export default function LanguageSelector() {
               className={`language-option ${code === lang ? 'active' : ''}`}
               onClick={() => selectLang(code)}
             >
-              <span className="lang-flag">{flag}</span>
+              <img className="lang-flag" src={flag} alt="" />
               <span className="lang-label">{label}</span>
               {code === lang && (
                 <svg className="lang-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

@@ -64,7 +64,10 @@ export default function Login() {
     try {
       setError(null);
       // Decode JWT to get user info
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
+      // Decode base64url payload preservando UTF-8 (atob por sí solo rompe acentos)
+      const b64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const payload = JSON.parse(new TextDecoder('utf-8').decode(bytes));
       await loginWithGoogle({
         credential: response.credential,
         email: payload.email,
