@@ -64,6 +64,41 @@
   flex: 1;
 }
 
+/* Denominaciones alternativas */
+.detail-alt-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin: 0.5rem 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+}
+.detail-alt-label {
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+.detail-alt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #ede9fe;
+  color: #5b21b6;
+  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.detail-alt-lang {
+  background: #5b21b6;
+  color: white;
+  padding: 0.05rem 0.35rem;
+  border-radius: 8px;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
 .fav-btn {
   background: none;
   border: 2px solid var(--border-color);

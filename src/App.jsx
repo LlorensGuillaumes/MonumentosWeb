@@ -32,10 +32,15 @@ const CuratedRoutes = lazy(() => import('./pages/CuratedRoutes'));
 const CuratedRouteDetail = lazy(() => import('./pages/CuratedRouteDetail'));
 const CulturalRouteDetail = lazy(() => import('./pages/CulturalRouteDetail'));
 const Autores = lazy(() => import('./pages/Autores'));
+const AutorDetail = lazy(() => import('./pages/AutorDetail'));
 const Preguntame = lazy(() => import('./pages/Preguntame'));
 const Diary = lazy(() => import('./pages/Diary'));
 const UserStats = lazy(() => import('./pages/UserStats'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+// Integracions (només local — gitignored). Si no existeix → component nul.
+const Integraciones = lazy(() =>
+  import('./pages/admin/Integraciones').catch(() => ({ default: () => null }))
+);
 
 function LazyFallback() {
   return <div className="loading" style={{ textAlign: 'center', padding: '4rem 2rem', color: '#94a3b8' }}>...</div>;
@@ -60,10 +65,12 @@ function App() {
                       las fichas y el mapa sin necesidad de registrarse */}
                   <Route path="/buscar" element={<Search />} />
                   <Route path="/monumento/:id" element={<Detail />} />
+                  <Route path="/autor/:qid" element={<AutorDetail />} />
                   <Route path="/mapa" element={<MapPage />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/favoritos" element={<RequireAuth><Favoritos /></RequireAuth>} />
                   <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+                  <Route path="/admin/integraciones" element={<RequireAuth><Integraciones /></RequireAuth>} />
                   <Route path="/proponer" element={<RequireAuth><ProposalForm /></RequireAuth>} />
                   <Route path="/mis-propuestas" element={<RequireAuth><MyProposals /></RequireAuth>} />
                   <Route path="/rutas" element={<RequireAuth><RoutePlanner /></RequireAuth>} />

@@ -29,7 +29,9 @@
     "diary": "Journal",
     "myStats": "Mes statistiques",
     "askMe": "Demande-moi",
-    "authors": "Auteurs"
+    "authors": "Auteurs",
+    "figures": "Figures",
+    "dedications": "Patronages"
   },
   "preguntame": {
     "you": "Toi",
@@ -893,7 +895,8 @@
     "europeanaAttrib": "Images via",
     "copyrightOriginalSource": "Droits : archive d'origine",
     "readMore": "Lire plus",
-    "readLess": "Afficher moins"
+    "readLess": "Afficher moins",
+    "alsoKnownAs": "Aussi connu sous le nom de"
   },
   "map": {
     "loading": "Chargement des monuments...",
@@ -1566,5 +1569,48 @@
     "present": "aujourd'hui",
     "early": "début",
     "late": "Fin"
+  },
+  "autores": {
+    "autoresTitle": "Auteurs, architectes et sculpteurs",
+    "autoresSubtitle": "Plus de 8 000 monuments du catalogue ont un auteur identifié (architecte, créateur, designer, etc.)",
+    "autoresPlaceholder": "Rechercher par nom (ex : Gaudí, Palladio, Cañas, Benlliure...)",
+    "autoresTopLabel": "Auteurs",
+    "sortBy": "Trier par",
+    "sortItems": "Nb d'œuvres",
+    "sortName": "Alphabétique",
+    "sortRelevance": "Pertinence",
+    "prevPage": "Précédent",
+    "nextPage": "Suivant",
+    "pageOf": "Page {{page}} sur {{total}}",
+    "autoresPlaceholderText": "Sélectionnez un auteur pour voir ses œuvres au catalogue.",
+    "dedicadosTitle": "Patronages et dédicaces",
+    "dedicadosSubtitle": "Plus de 18 000 monuments du catalogue sont dédiés à quelqu'un (Vierge Marie, Saint Pierre, etc.)",
+    "dedicadosPlaceholder": "Rechercher par nom (ex : Vierge Marie, Saint Georges, Saint Pierre...)",
+    "dedicadosTopLabel": "Patronages",
+    "dedicadosPlaceholderText": "Sélectionnez un patronage pour voir les monuments associés.",
+    "tabAutores": "🎨 Auteurs",
+    "tabDedicados": "✝️ Patronages",
+    "results": "Résultats",
+    "loading": "Chargement…",
+    "noResults": "Aucun résultat",
+    "bienes": "monuments",
+    "loadingObras": "Chargement des œuvres…",
+    "hideMap": "Masquer la carte",
+    "viewMap": "Voir sur la carte",
+    "obrasOf": "{{count}} œuvres de {{name}}",
+    "obrasOnly": "{{count}} œuvres",
+    "dedicadosOf": "{{count}} monuments dédiés à {{name}}",
+    "dedicadosOnly": "{{count}} monuments",
+    "roles": {
+      "arquitecto": "architecte",
+      "escultor": "sculpteur",
+      "advocacion": "patronage",
+      "lleva_nombre_de": "nommé d'après",
+      "sepulcre_de": "tombe de",
+      "propietario": "propriétaire",
+      "encarregant": "commanditaire",
+      "obra_conservada": "œuvre conservée",
+      "personaje_historico": "figure historique"
+    }
   }
 }

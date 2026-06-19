@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { createContacto, getContactos, getContactosStats, updateContacto, getNotasContacto, createNotaContacto, updateNotaContacto, deleteNotaContacto, getTareas, getMonumentos, getMonumento, sendEmails, getEmailStatus, cancelEmail, getUsuarios, updateUsuarioRol, updateUsuarioPremium, getMensajes, getMensajesCount, getMensaje, updateMensaje, deleteMensaje, getMensajeArchivoUrl, getAdminPropuestas, getAdminPropuestasCount, getAdminPropuesta, updateAdminPropuesta, aprobarPropuesta, rechazarPropuesta, searchWikidata, getPropuestaImagenUrl, getSocialHistory, addSocialHistory, getSocialAccountsSuggest, markSocialAccountsUsed, getRutasCulturales, getRutaCultural } from '../services/api';
 import { CURATED_ROUTES } from '../data/curatedRoutes';
 import AnalyticsDashboard from '../components/AnalyticsDashboard';
@@ -1246,6 +1247,14 @@ export default function Admin() {
             <span className="admin-nav-icon">⚙️</span>
             Configuración
           </button>
+          {/* Integraciones: només visible si estem a localhost (dev). A producció no es veu. */}
+          {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
+            <Link to="/admin/integraciones" className="admin-nav-item" style={{ textDecoration: 'none', marginTop: 'auto', background: '#fff7ed', color: '#92400e' }}>
+              <span className="admin-nav-icon">🔌</span>
+              Integraciones
+              <span style={{ marginLeft: 'auto', fontSize: '0.7rem', background: '#fde68a', color: '#854d0e', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>LOCAL</span>
+            </Link>
+          )}
         </nav>
       </aside>
 

@@ -1,0 +1,144 @@
+.autor-detail-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.autor-detail-page .breadcrumb {
+  margin-bottom: 1rem;
+}
+.autor-detail-page .back-btn {
+  background: none;
+  border: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-primary, #1a202c);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.autor-detail-page .back-btn:hover { background: var(--bg-hover, #f9fafb); }
+
+.autor-detail-loading {
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-muted, #6b7280);
+}
+
+/* Cabecera */
+.autor-detail-head {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.autor-detail-img {
+  width: 140px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.autor-detail-meta { flex: 1; min-width: 240px; }
+.autor-detail-meta h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.6rem;
+  color: var(--text-primary, #1a202c);
+}
+.autor-detail-desc {
+  margin: 0 0 0.75rem;
+  color: var(--text-secondary, #4b5563);
+  font-style: italic;
+}
+.autor-detail-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted, #6b7280);
+}
+
+/* Biografía */
+.autor-detail-bio {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.autor-detail-bio h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.15rem;
+  color: var(--text-primary, #1a202c);
+}
+.autor-detail-bio p {
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #374151);
+  white-space: pre-line;
+}
+.autor-detail-bio a {
+  color: var(--accent, #3b82f6);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.autor-detail-bio a:hover { text-decoration: underline; }
+
+/* Obras */
+.autor-detail-obras-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.autor-detail-obras-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--text-primary, #1a202c);
+}
+.autor-detail-map {
+  margin: 0 0 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+.autor-detail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.autor-detail-list li {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+}
+.autor-detail-list img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.autor-detail-list-info { flex: 1; }
+.autor-detail-list-nombre {
+  font-weight: 500;
+  color: var(--accent, #3b82f6);
+  text-decoration: none;
+}
+.autor-detail-list-nombre:hover { text-decoration: underline; }
+.autor-detail-list-meta {
+  font-size: 0.82rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 0.2rem;
+}

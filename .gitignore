@@ -35,3 +35,6 @@ marketing-redes-sociales.md
 
 # Windows artifacts
 nul
+
+# Integracions admin — només local, mai a producció
+src/pages/admin/Integraciones/

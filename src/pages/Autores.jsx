@@ -1,20 +1,63 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigationType } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import MapView from '../components/Map';
 import './Autores.css';
 
 export default function Autores() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const modo = searchParams.get('modo') === 'dedicados' ? 'dedicados' : 'autores';
+  // Estado guardado al abrir una ficha, para restaurar al volver (qid + página + item).
+  // Solo restauramos en navegación POP (volver con back o el botón ← Volver) y en el mismo
+  // modo; en una navegación nueva (PUSH) mostramos la lista limpia. No limpiamos el
+  // sessionStorage aquí (se sobrescribe en cada ficha) para ser robustos a React StrictMode,
+  // que en desarrollo monta el componente dos veces.
+  const navType = useNavigationType();
+  const returnRef = useRef(undefined);
+  if (returnRef.current === undefined) {
+    try { returnRef.current = JSON.parse(sessionStorage.getItem('autores_return') || 'null'); }
+    catch { returnRef.current = null; }
+  }
+  const ret = (navType === 'POP' && returnRef.current && returnRef.current.modo === modo)
+    ? returnRef.current : null;
   const [q, setQ] = useState('');
   const [personas, setPersonas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedQid, setSelectedQid] = useState(searchParams.get('qid'));
+  const [selectedQid, setSelectedQid] = useState(searchParams.get('qid') || (ret && ret.qid) || null);
   const [selectedNombre, setSelectedNombre] = useState('');
   const [bienes, setBienes] = useState([]);
   const [loadingBienes, setLoadingBienes] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const PAGE_SIZE = 10;
+  const [page, setPage] = useState(() => {
+    if (ret && ret.page) return Math.max(1, ret.page);
+    return Math.max(1, parseInt(searchParams.get('page'), 10) || 1);
+  });
+  const [ordenPersonas, setOrdenPersonas] = useState('items'); // 'items' | 'alfabetico'
+  const [ordenBienes, setOrdenBienes] = useState('relevancia'); // 'relevancia' | 'alfabetico'
+  // id del monumento abierto desde aquí, para resaltarlo/scrollear al volver
+  const [visitedId, setVisitedId] = useState(ret ? ret.bienId : null);
+  const detailRef = useRef(null);
+  const fetchedQidRef = useRef(null); // último qid cuyas obras se han pedido (evita recargas/duplicados)
+
+  const labels = modo === 'dedicados' ? {
+    title: t('autores.dedicadosTitle'),
+    subtitle: t('autores.dedicadosSubtitle'),
+    placeholder: t('autores.dedicadosPlaceholder'),
+    topLabel: t('autores.dedicadosTopLabel'),
+    detailHeading: (n, name) => name ? t('autores.dedicadosOf', { count: n, name }) : t('autores.dedicadosOnly', { count: n }),
+    placeholderText: t('autores.dedicadosPlaceholderText'),
+  } : {
+    title: t('autores.autoresTitle'),
+    subtitle: t('autores.autoresSubtitle'),
+    placeholder: t('autores.autoresPlaceholder'),
+    topLabel: t('autores.autoresTopLabel'),
+    detailHeading: (n, name) => name ? t('autores.obrasOf', { count: n, name }) : t('autores.obrasOnly', { count: n }),
+    placeholderText: t('autores.autoresPlaceholderText'),
+  };
 
   const mapMarkers = useMemo(() =>
     bienes
@@ -37,10 +80,22 @@ export default function Autores() {
     return m;
   }, [mapMarkers]);
 
+  // Orden de la lista lateral de personas (en frontend: ya tenemos todas cargadas)
+  const personasOrdenadas = useMemo(() => {
+    const arr = [...personas];
+    if (ordenPersonas === 'alfabetico') {
+      arr.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '', undefined, { sensitivity: 'base' }));
+    } else {
+      arr.sort((a, b) => (b.n_bienes || 0) - (a.n_bienes || 0));
+    }
+    return arr;
+  }, [personas, ordenPersonas]);
+
   const fetchPersonas = useCallback(async (query) => {
     setLoading(true); setError(null);
     try {
-      const params = query ? { q: query, limit: 40 } : { limit: 40 };
+      // Sense límit dur — el backend pot retornar fins a 5000 personas
+      const params = query ? { q: query, modo } : { modo };
       const res = await api.get('/personas', { params });
       setPersonas(res.data.personas || []);
     } catch (err) {
@@ -48,9 +103,33 @@ export default function Autores() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [modo]);
 
-  // Carga inicial: top personas con más bienes
+  // Quan canvia el modo (Autores ↔ Advocaciones), netejar tot l'estat seleccionat.
+  // IMPORTANT: no netejar en el muntatge inicial — així en tornar del detall d'un item
+  // (amb ?qid= a la URL) es restaura la selecció en lloc d'esborrar-la.
+  // Comparar el valor ANTERIOR de modo (robusto a StrictMode, que ejecuta el efecto 2 veces).
+  const prevModoRef = useRef(modo);
+  useEffect(() => {
+    if (prevModoRef.current === modo) return; // mismo modo (montaje o doble efecto): no limpiar
+    prevModoRef.current = modo;
+    setQ('');
+    setSelectedQid(null);
+    setSelectedNombre('');
+    setBienes([]);
+    setShowMap(false);
+    setPage(1);
+    // Treu qid i page de la URL
+    const next = new URLSearchParams(searchParams);
+    if (next.has('qid') || next.has('page')) {
+      next.delete('qid');
+      next.delete('page');
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modo]);
+
+  // Recarrega quan canviï el mode + càrrega inicial
   useEffect(() => { fetchPersonas(''); }, [fetchPersonas]);
 
   // Debounced search
@@ -63,41 +142,61 @@ export default function Autores() {
 
   const verBienes = useCallback(async (qid, nombre, updateUrl = true) => {
     if (!qid) return;
+    fetchedQidRef.current = qid;
     setSelectedQid(qid);
     if (nombre) setSelectedNombre(nombre);
     if (updateUrl) {
       const next = new URLSearchParams(searchParams);
       next.set('qid', qid);
+      next.delete('page'); // nueva selección → empieza en la página 1
       setSearchParams(next, { replace: true });
+      setPage(1);
     }
     setShowMap(false);
     setLoadingBienes(true);
     setBienes([]);
     try {
-      const res = await api.get(`/personas/${qid}/bienes`);
+      const res = await api.get(`/personas/${qid}/bienes`, { params: { orden: ordenBienes } });
       setBienes(res.data.bienes || []);
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     } finally {
       setLoadingBienes(false);
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, ordenBienes]);
 
-  // Si arriba amb ?qid= a la URL (back o link directe), carregar automàticament.
-  // Primera vegada SEMPRE; després, només si canvia el qid de la URL.
-  const initializedRef = useRef(false);
+  // Re-cargar las obras cuando cambia el orden (comparando valor previo, robusto a StrictMode)
+  const prevOrdenBienesRef = useRef(ordenBienes);
+  useEffect(() => {
+    if (prevOrdenBienesRef.current === ordenBienes) return;
+    prevOrdenBienesRef.current = ordenBienes;
+    if (selectedQid) verBienes(selectedQid, selectedNombre, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ordenBienes]);
+
+  // Cargar las obras de la persona indicada en la URL (?qid=). Cubre el montaje inicial,
+  // volver del detalle (tanto navigate(-1) como el back del navegador) y el cambio de qid.
+  // verBienes marca fetchedQidRef, así no recargamos al cambiar de página ni duplicamos.
   useEffect(() => {
     const qidParam = searchParams.get('qid');
-    if (!initializedRef.current) {
-      initializedRef.current = true;
-      if (qidParam) verBienes(qidParam, null, false);
-      return;
-    }
-    if (qidParam && qidParam !== selectedQid) {
+    if (!qidParam) { fetchedQidRef.current = null; return; }
+    if (qidParam !== fetchedQidRef.current && !loadingBienes) {
       verBienes(qidParam, null, false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, loadingBienes]);
+
+  // Al montar tras volver del detalle: sincronizar la URL con el estado guardado (qid + página).
+  // El efecto de arriba se encarga de cargar las obras; page/visitedId ya vienen del estado. Limpiar.
+  useEffect(() => {
+    if (ret && ret.qid) {
+      const next = new URLSearchParams(searchParams);
+      if (next.get('qid') !== ret.qid) next.set('qid', ret.qid);
+      if (ret.page > 1) next.set('page', String(ret.page)); else next.delete('page');
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Quan tinguem el llistat de personas i un qid seleccionat sense nom, deduïm el nom
   // i filtrem la cerca al nom de l'autor (sincronitza el camp q amb la fitxa oberta).
@@ -106,18 +205,45 @@ export default function Autores() {
       const found = personas.find(p => p.qid === selectedQid);
       if (found) {
         setSelectedNombre(found.nombre);
-        if (!q) setQ(found.nombre);
       }
     }
-  }, [personas, selectedQid, selectedNombre, q]);
+  }, [personas, selectedQid, selectedNombre]);
+
+  // Paginación real de las obras (muestra solo los PAGE_SIZE de la página actual)
+  const totalPages = Math.max(1, Math.ceil(bienes.length / PAGE_SIZE));
+  const pageItems = bienes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const goToPage = useCallback((n) => {
+    const target = Math.min(Math.max(1, n), totalPages);
+    setPage(target);
+    const next = new URLSearchParams(searchParams);
+    if (target > 1) next.set('page', String(target)); else next.delete('page');
+    setSearchParams(next, { replace: true });
+    detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [totalPages, searchParams, setSearchParams]);
+
+  // Si la página guardada excede el total al cargar las obras, ajustar
+  useEffect(() => {
+    if (!loadingBienes && bienes.length > 0 && page > totalPages) setPage(totalPages);
+  }, [loadingBienes, bienes.length, totalPages, page]);
+
+  // Al volver del detalle: scroll + resaltado del item visitado (si está en la página actual)
+  useEffect(() => {
+    if (!visitedId || loadingBienes || bienes.length === 0) return;
+    const inPage = pageItems.some(b => b.id === visitedId);
+    if (!inPage) { setVisitedId(null); return; }
+    const el = document.getElementById(`autor-bien-${visitedId}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const tmr = setTimeout(() => setVisitedId(null), 2500);
+    return () => clearTimeout(tmr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bienes, loadingBienes, visitedId]);
 
   return (
     <div className="autores-page">
       <header className="autores-header">
-        <h1>Autores, arquitectos y escultores</h1>
-        <p className="autores-subtitle">
-          Más de 8.000 monumentos del catálogo tienen autor identificado (arquitecto, creador, diseñador, etc.)
-        </p>
+        <h1>{labels.title}</h1>
+        <p className="autores-subtitle">{labels.subtitle}</p>
       </header>
 
       <div className="autores-search">
@@ -125,7 +251,7 @@ export default function Autores() {
           type="text"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar por nombre (ej: Gaudí, Palladio, Cañas, Benlliure...)"
+          placeholder={labels.placeholder}
           autoFocus
         />
       </div>
@@ -134,15 +260,26 @@ export default function Autores() {
 
       <div className="autores-layout">
         <aside className="autores-list">
-          <h3>
-            {q ? `Resultados (${personas.length})` : `Top autores (${personas.length})`}
-          </h3>
-          {loading && <div className="autores-loading">Cargando…</div>}
+          <div className="autores-list-head">
+            <h3>
+              {q ? `${t('autores.results')} (${personas.length})` : `${labels.topLabel} (${personas.length})`}
+            </h3>
+            <select
+              className="autores-sort"
+              value={ordenPersonas}
+              onChange={(e) => setOrdenPersonas(e.target.value)}
+              aria-label={t('autores.sortBy')}
+            >
+              <option value="items">{t('autores.sortItems')}</option>
+              <option value="alfabetico">{t('autores.sortName')}</option>
+            </select>
+          </div>
+          {loading && <div className="autores-loading">{t('autores.loading')}</div>}
           {!loading && personas.length === 0 && (
-            <div className="autores-empty">Sin resultados</div>
+            <div className="autores-empty">{t('autores.noResults')}</div>
           )}
           <ul>
-            {personas.map((p) => (
+            {personasOrdenadas.map((p) => (
               <li
                 key={p.qid || p.nombre}
                 className={selectedQid === p.qid ? 'active' : ''}
@@ -150,35 +287,51 @@ export default function Autores() {
               >
                 <div className="autor-nombre">{p.nombre}</div>
                 <div className="autor-meta">
-                  <span className="autor-count">{p.n_bienes}</span> bienes · {p.roles}
+                  <span className="autor-count">{p.n_bienes}</span> {t('autores.bienes')} · {(p.roles || '').split(',').map(r => t(`autores.roles.${r.trim()}`, r.trim())).join(', ')}
                 </div>
               </li>
             ))}
           </ul>
         </aside>
 
-        <section className="autores-detail">
+        <section className="autores-detail" ref={detailRef}>
           {!selectedQid && (
             <div className="autores-placeholder">
-              Selecciona un autor para ver sus obras en el catálogo.
+              {labels.placeholderText}
             </div>
           )}
-          {loadingBienes && <div className="autores-loading">Cargando obras…</div>}
+          {loadingBienes && <div className="autores-loading">{t('autores.loadingObras')}</div>}
           {!loadingBienes && selectedQid && bienes.length > 0 && (
             <>
               <div className="autores-detail-head">
-                <h3>{bienes.length} obras{selectedNombre ? ` de ${selectedNombre}` : ''}</h3>
-                {mapMarkers.length > 0 && (
-                  <button
-                    type="button"
-                    className="autores-map-toggle"
-                    onClick={() => setShowMap(s => !s)}
+                <h3>{labels.detailHeading(bienes.length, selectedNombre)}</h3>
+                <div className="autores-detail-actions">
+                  {selectedQid && (
+                    <Link to={`/autor/${selectedQid}`} className="autores-ficha-btn">
+                      👤 {t('autorDetail.viewProfile', 'Ver ficha autor')}
+                    </Link>
+                  )}
+                  <select
+                    className="autores-sort"
+                    value={ordenBienes}
+                    onChange={(e) => setOrdenBienes(e.target.value)}
+                    aria-label={t('autores.sortBy')}
                   >
-                    {showMap
-                      ? 'Ocultar mapa'
-                      : `Ver en el mapa (${mapMarkers.length})`}
-                  </button>
-                )}
+                    <option value="relevancia">{t('autores.sortRelevance')}</option>
+                    <option value="alfabetico">{t('autores.sortName')}</option>
+                  </select>
+                  {mapMarkers.length > 0 && (
+                    <button
+                      type="button"
+                      className="autores-map-toggle"
+                      onClick={() => setShowMap(s => !s)}
+                    >
+                      {showMap
+                        ? t('autores.hideMap')
+                        : `${t('autores.viewMap')} (${mapMarkers.length})`}
+                    </button>
+                  )}
+                </div>
               </div>
               {showMap && (
                 <div className="autores-map-wrap">
@@ -192,8 +345,8 @@ export default function Autores() {
                 </div>
               )}
               <ul className="autor-bienes">
-                {bienes.map((b) => (
-                  <li key={b.id}>
+                {pageItems.map((b) => (
+                  <li key={b.id} id={`autor-bien-${b.id}`} className={b.id === visitedId ? 'visited' : ''}>
                     {idToN.has(b.id) && (
                       <span className="autor-bien-num">{idToN.get(b.id)}</span>
                     )}
@@ -201,7 +354,11 @@ export default function Autores() {
                       <img src={b.imagen_url} alt={b.denominacion} loading="lazy" />
                     )}
                     <div className="autor-bien-info">
-                      <Link to={`/monumento/${b.id}`} className="autor-bien-nombre">
+                      <Link
+                        to={`/monumento/${b.id}`}
+                        className="autor-bien-nombre"
+                        onClick={() => sessionStorage.setItem('autores_return', JSON.stringify({ modo, qid: selectedQid, page, bienId: b.id }))}
+                      >
                         {b.denominacion}
                       </Link>
                       <div className="autor-bien-meta">
@@ -215,11 +372,34 @@ export default function Autores() {
                           {b.tipo_monumento}{b.tipo_monumento && b.periodo ? ' · ' : ''}{b.periodo}
                         </div>
                       )}
-                      <div className="autor-bien-rol">{b.rol}</div>
+                      <div className="autor-bien-rol">{t(`autores.roles.${b.rol}`, b.rol)}</div>
                     </div>
                   </li>
                 ))}
               </ul>
+              {totalPages > 1 && (
+                <div className="autor-paging">
+                  <button
+                    type="button"
+                    className="autor-paging-btn"
+                    disabled={page <= 1}
+                    onClick={() => goToPage(page - 1)}
+                  >
+                    ‹ {t('autores.prevPage')}
+                  </button>
+                  <span className="autor-paging-info">
+                    {t('autores.pageOf', { page, total: totalPages })}
+                  </span>
+                  <button
+                    type="button"
+                    className="autor-paging-btn"
+                    disabled={page >= totalPages}
+                    onClick={() => goToPage(page + 1)}
+                  >
+                    {t('autores.nextPage')} ›
+                  </button>
+                </div>
+              )}
             </>
           )}
         </section>

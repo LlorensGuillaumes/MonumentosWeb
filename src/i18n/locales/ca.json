@@ -29,7 +29,9 @@
     "diary": "Diari",
     "myStats": "Les meves estadístiques",
     "askMe": "Pregunta'm",
-    "authors": "Autors"
+    "authors": "Autors",
+    "figures": "Figures",
+    "dedications": "Advocacions"
   },
   "preguntame": {
     "you": "Tu",
@@ -893,7 +895,8 @@
     "europeanaAttrib": "Imatges via",
     "copyrightOriginalSource": "Drets: arxiu d'origen",
     "readMore": "Llegir més",
-    "readLess": "Mostrar menys"
+    "readLess": "Mostrar menys",
+    "alsoKnownAs": "També conegut com"
   },
   "map": {
     "loading": "Carregant monuments...",
@@ -1566,5 +1569,48 @@
     "present": "actualitat",
     "early": "inicis",
     "late": "Finals"
+  },
+  "autores": {
+    "autoresTitle": "Autors, arquitectes i escultors",
+    "autoresSubtitle": "Més de 8.000 monuments del catàleg tenen autor identificat (arquitecte, creador, dissenyador, etc.)",
+    "autoresPlaceholder": "Cerca per nom (ex: Gaudí, Palladio, Cañas, Benlliure...)",
+    "autoresTopLabel": "Autors",
+    "sortBy": "Ordenar per",
+    "sortItems": "Nre. d'obres",
+    "sortName": "Alfabètic",
+    "sortRelevance": "Rellevància",
+    "prevPage": "Anterior",
+    "nextPage": "Següent",
+    "pageOf": "Pàgina {{page}} de {{total}}",
+    "autoresPlaceholderText": "Selecciona un autor per veure les seves obres al catàleg.",
+    "dedicadosTitle": "Advocacions i dedicatòries",
+    "dedicadosSubtitle": "Més de 18.000 monuments del catàleg estan dedicats a algú (Mare de Déu, Sant Pere, etc.)",
+    "dedicadosPlaceholder": "Cerca per nom (ex: Mare de Déu, Sant Jordi, Sant Pere...)",
+    "dedicadosTopLabel": "Advocacions",
+    "dedicadosPlaceholderText": "Selecciona una advocació per veure els monuments associats.",
+    "tabAutores": "🎨 Autors",
+    "tabDedicados": "✝️ Advocacions",
+    "results": "Resultats",
+    "loading": "Carregant…",
+    "noResults": "Sense resultats",
+    "bienes": "monuments",
+    "loadingObras": "Carregant obres…",
+    "hideMap": "Amaga el mapa",
+    "viewMap": "Veure al mapa",
+    "obrasOf": "{{count}} obres de {{name}}",
+    "obrasOnly": "{{count}} obres",
+    "dedicadosOf": "{{count}} monuments dedicats a {{name}}",
+    "dedicadosOnly": "{{count}} monuments",
+    "roles": {
+      "arquitecto": "arquitecte",
+      "escultor": "escultor",
+      "advocacion": "advocació",
+      "lleva_nombre_de": "porta el nom de",
+      "sepulcre_de": "sepulcre de",
+      "propietario": "propietari",
+      "encarregant": "encarregant",
+      "obra_conservada": "obra conservada",
+      "personaje_historico": "personatge històric"
+    }
   }
 }

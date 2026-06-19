@@ -29,7 +29,9 @@
     "diary": "Diario",
     "myStats": "Le mie statistiche",
     "askMe": "Chiedimi",
-    "authors": "Autori"
+    "authors": "Autori",
+    "figures": "Figure",
+    "dedications": "Advocazioni"
   },
   "preguntame": {
     "you": "Tu",
@@ -893,7 +895,8 @@
     "europeanaAttrib": "Immagini tramite",
     "copyrightOriginalSource": "Diritti: archivio originale",
     "readMore": "Leggi di più",
-    "readLess": "Mostra meno"
+    "readLess": "Mostra meno",
+    "alsoKnownAs": "Noto anche come"
   },
   "map": {
     "loading": "Caricamento monumenti...",
@@ -1566,5 +1569,48 @@
     "present": "oggi",
     "early": "inizi",
     "late": "Fine"
+  },
+  "autores": {
+    "autoresTitle": "Autori, architetti e scultori",
+    "autoresSubtitle": "Più di 8.000 monumenti del catalogo hanno un autore identificato (architetto, creatore, designer, ecc.)",
+    "autoresPlaceholder": "Cerca per nome (es: Gaudí, Palladio, Cañas, Benlliure...)",
+    "autoresTopLabel": "Autori",
+    "sortBy": "Ordina per",
+    "sortItems": "N. di opere",
+    "sortName": "Alfabetico",
+    "sortRelevance": "Rilevanza",
+    "prevPage": "Precedente",
+    "nextPage": "Successivo",
+    "pageOf": "Pagina {{page}} di {{total}}",
+    "autoresPlaceholderText": "Seleziona un autore per vedere le sue opere nel catalogo.",
+    "dedicadosTitle": "Dediche e advocazioni",
+    "dedicadosSubtitle": "Più di 18.000 monumenti del catalogo sono dedicati a qualcuno (Vergine Maria, San Pietro, ecc.)",
+    "dedicadosPlaceholder": "Cerca per nome (es: Vergine Maria, San Giorgio, San Pietro...)",
+    "dedicadosTopLabel": "Advocazioni",
+    "dedicadosPlaceholderText": "Seleziona un'advocazione per vedere i monumenti associati.",
+    "tabAutores": "🎨 Autori",
+    "tabDedicados": "✝️ Advocazioni",
+    "results": "Risultati",
+    "loading": "Caricamento…",
+    "noResults": "Nessun risultato",
+    "bienes": "monumenti",
+    "loadingObras": "Caricamento opere…",
+    "hideMap": "Nascondi mappa",
+    "viewMap": "Vedi sulla mappa",
+    "obrasOf": "{{count}} opere di {{name}}",
+    "obrasOnly": "{{count}} opere",
+    "dedicadosOf": "{{count}} monumenti dedicati a {{name}}",
+    "dedicadosOnly": "{{count}} monumenti",
+    "roles": {
+      "arquitecto": "architetto",
+      "escultor": "scultore",
+      "advocacion": "advocazione",
+      "lleva_nombre_de": "intitolato a",
+      "sepulcre_de": "sepolcro di",
+      "propietario": "proprietario",
+      "encarregant": "committente",
+      "obra_conservada": "opera conservata",
+      "personaje_historico": "figura storica"
+    }
   }
 }

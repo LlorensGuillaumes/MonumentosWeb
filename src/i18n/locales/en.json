@@ -29,7 +29,9 @@
     "diary": "Diary",
     "myStats": "My statistics",
     "askMe": "Ask me",
-    "authors": "Authors"
+    "authors": "Authors",
+    "figures": "Figures",
+    "dedications": "Patronages"
   },
   "preguntame": {
     "you": "You",
@@ -893,7 +895,8 @@
     "europeanaAttrib": "Images via",
     "copyrightOriginalSource": "Rights: source archive",
     "readMore": "Read more",
-    "readLess": "Show less"
+    "readLess": "Show less",
+    "alsoKnownAs": "Also known as"
   },
   "map": {
     "loading": "Loading monuments...",
@@ -1566,5 +1569,48 @@
     "present": "present",
     "early": "early",
     "late": "Late"
+  },
+  "autores": {
+    "autoresTitle": "Authors, architects and sculptors",
+    "autoresSubtitle": "Over 8,000 monuments in the catalogue have a known author (architect, creator, designer, etc.)",
+    "autoresPlaceholder": "Search by name (e.g.: Gaudí, Palladio, Cañas, Benlliure...)",
+    "autoresTopLabel": "Authors",
+    "sortBy": "Sort by",
+    "sortItems": "Number of works",
+    "sortName": "Alphabetical",
+    "sortRelevance": "Relevance",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "pageOf": "Page {{page}} of {{total}}",
+    "autoresPlaceholderText": "Select an author to see their works in the catalogue.",
+    "dedicadosTitle": "Patronages and dedications",
+    "dedicadosSubtitle": "Over 18,000 monuments in the catalogue are dedicated to someone (Virgin Mary, Saint Peter, etc.)",
+    "dedicadosPlaceholder": "Search by name (e.g.: Virgin Mary, Saint George, Saint Peter...)",
+    "dedicadosTopLabel": "Patronages",
+    "dedicadosPlaceholderText": "Select a patronage to see the related monuments.",
+    "tabAutores": "🎨 Authors",
+    "tabDedicados": "✝️ Patronages",
+    "results": "Results",
+    "loading": "Loading…",
+    "noResults": "No results",
+    "bienes": "monuments",
+    "loadingObras": "Loading works…",
+    "hideMap": "Hide map",
+    "viewMap": "View on map",
+    "obrasOf": "{{count}} works by {{name}}",
+    "obrasOnly": "{{count}} works",
+    "dedicadosOf": "{{count}} monuments dedicated to {{name}}",
+    "dedicadosOnly": "{{count}} monuments",
+    "roles": {
+      "arquitecto": "architect",
+      "escultor": "sculptor",
+      "advocacion": "patronage",
+      "lleva_nombre_de": "named after",
+      "sepulcre_de": "tomb of",
+      "propietario": "owner",
+      "encarregant": "commissioned by",
+      "obra_conservada": "preserved work",
+      "personaje_historico": "historical figure"
+    }
   }
 }

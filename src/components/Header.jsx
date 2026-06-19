@@ -17,6 +17,7 @@ export default function Header() {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [rutasOpen, setRutasOpen] = useState(false);
+  const [figurasOpen, setFigurasOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.getAttribute('data-theme') === 'dark');
@@ -36,9 +37,12 @@ export default function Header() {
   const menuRef = useRef(null);
   const rutasRef = useRef(null);
   const rutasBtnRef = useRef(null);
+  const figurasRef = useRef(null);
+  const figurasBtnRef = useRef(null);
   const settingsRef = useRef(null);
   const settingsDropdownRef = useRef(null);
   const [rutasMenuStyle, setRutasMenuStyle] = useState({});
+  const [figurasMenuStyle, setFigurasMenuStyle] = useState({});
 
   // Cuando se abre el dropdown de Rutas, calcular su posición fixed en móvil
   useEffect(() => {
@@ -59,6 +63,24 @@ export default function Header() {
     });
   }, [rutasOpen]);
 
+  // Cuando se abre el dropdown de Figuras, calcular su posición fixed en móvil
+  useEffect(() => {
+    if (!figurasOpen || !figurasBtnRef.current) {
+      setFigurasMenuStyle({});
+      return;
+    }
+    if (window.innerWidth > 768) {
+      setFigurasMenuStyle({});
+      return;
+    }
+    const rect = figurasBtnRef.current.getBoundingClientRect();
+    setFigurasMenuStyle({
+      position: 'fixed',
+      top: `${rect.bottom + 6}px`,
+      left: `${Math.max(8, rect.left)}px`,
+    });
+  }, [figurasOpen]);
+
   // Cerrar menús al hacer clic fuera
   useEffect(() => {
     function handleClick(e) {
@@ -67,6 +89,9 @@ export default function Header() {
       }
       if (rutasRef.current && !rutasRef.current.contains(e.target)) {
         setRutasOpen(false);
+      }
+      if (figurasRef.current && !figurasRef.current.contains(e.target)) {
+        setFigurasOpen(false);
       }
       // Settings dropdown is rendered via Portal, so check both the button wrapper AND the portal node
       if (
@@ -169,12 +194,21 @@ export default function Header() {
               >
                 {t('nav.search')}
               </Link>
-              <Link
-                to="/autores"
-                className={`nav-link ${location.pathname === '/autores' ? 'active' : ''}`}
-              >
-                {t('nav.authors')}
-              </Link>
+              <div className="nav-dropdown" ref={figurasRef}>
+                <button
+                  ref={figurasBtnRef}
+                  className={`nav-dropdown-btn ${location.pathname === '/autores' ? 'active' : ''}`}
+                  onClick={() => setFigurasOpen(!figurasOpen)}
+                >
+                  {t('nav.figures')} <span className="dropdown-arrow">&#9662;</span>
+                </button>
+                {figurasOpen && (
+                  <div className="nav-dropdown-menu" style={figurasMenuStyle}>
+                    <Link to="/autores" onClick={() => setFigurasOpen(false)}>{t('nav.authors')}</Link>
+                    <Link to="/autores?modo=dedicados" onClick={() => setFigurasOpen(false)}>{t('nav.dedications')}</Link>
+                  </div>
+                )}
+              </div>
               <Link
                 to="/mapa"
                 className={`nav-link ${location.pathname === '/mapa' ? 'active' : ''}`}

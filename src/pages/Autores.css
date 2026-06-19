@@ -135,6 +135,43 @@
   background: var(--bg-card, #fff);
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 8px;
+  scroll-margin-top: 80px;
+}
+/* Item recién visitado (al volver del detalle): resaltado + flash */
+.autor-bienes li.visited {
+  border-color: var(--accent, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+  animation: autor-visited-flash 2.5s ease-out;
+}
+@keyframes autor-visited-flash {
+  0% { background: rgba(59, 130, 246, 0.18); }
+  100% { background: var(--bg-card, #fff); }
+}
+
+/* Controles de paginación de obras */
+.autor-paging {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.autor-paging-btn {
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #1a202c);
+  border: 1px solid var(--border-color, #e5e7eb);
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.autor-paging-btn:hover:not(:disabled) { background: var(--bg-hover, #f9fafb); }
+.autor-paging-btn:disabled { opacity: 0.4; cursor: default; }
+.autor-paging-info {
+  font-size: 0.85rem;
+  color: var(--text-muted, #6b7280);
+  min-width: 7rem;
+  text-align: center;
 }
 .autor-bienes img {
   width: 90px;
@@ -188,6 +225,48 @@
 }
 .autores-detail-head h3 { margin: 0; }
 
+/* Cabecera de la lista lateral con selector de orden */
+.autores-list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.autores-list-head h3 { margin: 0; }
+
+/* Selector de orden (lista y detalle) */
+.autores-sort {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #1a202c);
+  cursor: pointer;
+}
+
+/* Acciones del detalle (ver ficha + orden + ver mapa) */
+.autores-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.autores-ficha-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--accent, #3b82f6);
+  color: #fff;
+  padding: 0.45rem 0.8rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.autores-ficha-btn:hover { opacity: 0.9; }
+
 .autores-map-toggle {
   background: var(--accent, #0369a1);
   color: #fff;
@@ -221,4 +300,28 @@
   border-radius: 50%;
   margin-right: 0.5rem;
   flex-shrink: 0;
+}
+
+/* Tabs Autores vs Advocaciones */
+.autores-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  border-bottom: 2px solid var(--border-color, #e2e8f0);
+}
+.autores-tab {
+  padding: 0.5rem 1rem;
+  color: var(--text-secondary, #64748b);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+}
+.autores-tab:hover { color: #2563eb; }
+.autores-tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  font-weight: 600;
 }

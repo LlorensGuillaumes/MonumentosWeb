@@ -371,6 +371,19 @@ export default function Detail() {
             </button>
           </div>
 
+          {/* Denominaciones alternativas (otros nombres conocidos) */}
+          {monumento.denominaciones_alternativas?.length > 0 && (
+            <div className="detail-alt-names">
+              <span className="detail-alt-label">{t('detail.alsoKnownAs', 'Tambi\u00E9n conocido como')}:</span>
+              {monumento.denominaciones_alternativas.map((a, i) => (
+                <span key={i} className="detail-alt-chip" title={a.fuente ? `${a.fuente}${a.idioma ? ' \u00B7 ' + a.idioma : ''}` : (a.idioma || '')}>
+                  {a.denominacion}
+                  {a.idioma && <span className="detail-alt-lang">{a.idioma}</span>}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Share */}
           <div className="detail-share">
             <a

@@ -29,7 +29,9 @@
     "diary": "Egunkaria",
     "myStats": "Nire estatistikak",
     "askMe": "Galdetu",
-    "authors": "Egileak"
+    "authors": "Egileak",
+    "figures": "Figurak",
+    "dedications": "Patronatuak"
   },
   "preguntame": {
     "you": "Zu",
@@ -893,7 +895,8 @@
     "europeanaAttrib": "Irudiak honen bidez:",
     "copyrightOriginalSource": "Eskubideak: jatorrizko artxiboa",
     "readMore": "Irakurri gehiago",
-    "readLess": "Erakutsi gutxiago"
+    "readLess": "Erakutsi gutxiago",
+    "alsoKnownAs": "Beste izenak"
   },
   "map": {
     "loading": "Monumentuak kargatzen...",
@@ -1566,5 +1569,48 @@
     "present": "gaur egun",
     "early": "hasiera",
     "late": "Amaiera"
+  },
+  "autores": {
+    "autoresTitle": "Egileak, arkitektoak eta eskultoreak",
+    "autoresSubtitle": "Katalogoko 8.000 monumentu baino gehiagok egile ezaguna dute (arkitektoa, sortzailea, diseinatzailea, etab.)",
+    "autoresPlaceholder": "Bilatu izenez (adib.: Gaudí, Palladio, Cañas, Benlliure...)",
+    "autoresTopLabel": "Egileak",
+    "sortBy": "Ordenatu",
+    "sortItems": "Obra kopurua",
+    "sortName": "Alfabetikoa",
+    "sortRelevance": "Garrantzia",
+    "prevPage": "Aurrekoa",
+    "nextPage": "Hurrengoa",
+    "pageOf": "{{page}}/{{total}} orria",
+    "autoresPlaceholderText": "Hautatu egile bat haren lanak katalogoan ikusteko.",
+    "dedicadosTitle": "Patronatuak eta eskaintzak",
+    "dedicadosSubtitle": "Katalogoko 18.000 monumentu baino gehiago norbaiti eskainita daude (Andre Maria, San Pedro, etab.)",
+    "dedicadosPlaceholder": "Bilatu izenez (adib.: Andre Maria, San Jorge, San Pedro...)",
+    "dedicadosTopLabel": "Patronatuak",
+    "dedicadosPlaceholderText": "Hautatu patronatu bat erlazionatutako monumentuak ikusteko.",
+    "tabAutores": "🎨 Egileak",
+    "tabDedicados": "✝️ Patronatuak",
+    "results": "Emaitzak",
+    "loading": "Kargatzen…",
+    "noResults": "Emaitzarik gabe",
+    "bienes": "monumentuak",
+    "loadingObras": "Lanak kargatzen…",
+    "hideMap": "Ezkutatu mapa",
+    "viewMap": "Ikusi mapan",
+    "obrasOf": "{{name}}-ren {{count}} lan",
+    "obrasOnly": "{{count}} lan",
+    "dedicadosOf": "{{name}}-ri eskainitako {{count}} monumentu",
+    "dedicadosOnly": "{{count}} monumentu",
+    "roles": {
+      "arquitecto": "arkitektoa",
+      "escultor": "eskultorea",
+      "advocacion": "patronatua",
+      "lleva_nombre_de": "izena darama",
+      "sepulcre_de": "hilobia",
+      "propietario": "jabea",
+      "encarregant": "eskatzailea",
+      "obra_conservada": "gordetako lana",
+      "personaje_historico": "historiako pertsonaia"
+    }
   }
 }
