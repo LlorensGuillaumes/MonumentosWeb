@@ -1128,19 +1128,15 @@ export default function Admin() {
     const imgUrl = socialSelected?.imagen_url || socialSelected?.imagenes?.[0]?.url;
     if (!imgUrl) return;
     try {
-      // El portapapeles solo acepta PNG: cargamos la imagen (con CORS) y la convertimos a PNG
-      // via canvas. Antes se intentaba copiar el blob JPEG directo → fallaba → s'obria en gran.
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = imgUrl;
-      });
+      // Via proxy del backend (mateix origen, sense CORS) → blob sense taint → convertim a PNG
+      // (el portapapers només accepta PNG) i copiem.
+      const proxyUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/image-proxy?url=${encodeURIComponent(imgUrl)}`;
+      const srcBlob = await (await fetch(proxyUrl)).blob();
+      const bitmap = await createImageBitmap(srcBlob);
       const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      canvas.getContext('2d').drawImage(img, 0, 0);
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      canvas.getContext('2d').drawImage(bitmap, 0, 0);
       const blob = await new Promise((resolve, reject) =>
         canvas.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob null'))), 'image/png')
       );
@@ -1159,7 +1155,9 @@ export default function Admin() {
     const imgUrl = socialSelected?.imagen_url || socialSelected?.imagenes?.[0]?.url;
     if (!imgUrl) return;
     try {
-      const resp = await fetch(imgUrl);
+      // Via proxy del backend (mateix origen) per evitar el bloqueig CORS en la descàrrega.
+      const proxyUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/image-proxy?url=${encodeURIComponent(imgUrl)}`;
+      const resp = await fetch(proxyUrl);
       const blob = await resp.blob();
       const blobUrl = URL.createObjectURL(blob);
       // Build filename from monument name + extension inferred from blob type
