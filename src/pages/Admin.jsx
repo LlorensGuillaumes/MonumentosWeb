@@ -1131,7 +1131,9 @@ export default function Admin() {
       // Via proxy del backend (mateix origen, sense CORS) → blob sense taint → convertim a PNG
       // (el portapapers només accepta PNG) i copiem.
       const proxyUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/image-proxy?url=${encodeURIComponent(imgUrl)}`;
-      const srcBlob = await (await fetch(proxyUrl)).blob();
+      const resp = await fetch(proxyUrl);
+      if (!resp.ok) throw new Error(`proxy ${resp.status}`);
+      const srcBlob = await resp.blob();
       const bitmap = await createImageBitmap(srcBlob);
       const canvas = document.createElement('canvas');
       canvas.width = bitmap.width;
@@ -1158,6 +1160,7 @@ export default function Admin() {
       // Via proxy del backend (mateix origen) per evitar el bloqueig CORS en la descàrrega.
       const proxyUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/image-proxy?url=${encodeURIComponent(imgUrl)}`;
       const resp = await fetch(proxyUrl);
+      if (!resp.ok) throw new Error(`proxy ${resp.status}`);
       const blob = await resp.blob();
       const blobUrl = URL.createObjectURL(blob);
       // Build filename from monument name + extension inferred from blob type
