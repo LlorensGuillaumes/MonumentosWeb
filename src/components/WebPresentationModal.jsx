@@ -51,10 +51,12 @@ const POST_COPIES = {
     body: `🏛️ ¿Te apasiona la historia y la arquitectura? Te presentamos Patrimonio Europeo, una web gratuita para descubrir el patrimonio arquitectónico de España, Italia, Francia y Portugal.
 
 ✨ ¿Qué encontrarás?
-🗺️ Mapa interactivo con más de 258.000 monumentos
-📸 Miles de fotografías y fichas detalladas
+🗺️ Mapa interactivo con más de 300.000 monumentos
+📸 Fotografías y fichas detalladas con su descripción
+👤 Fichas de autores: arquitectos y escultores con biografía y obras
 🚶 Rutas culturales temáticas
-🎯 Planificador de visitas personalizado
+🛟 Patrimonio en riesgo: Lista Roja de Hispania Nostra
+🔎 Búsqueda y filtros avanzados (estilo, época, tipo…)
 🌍 Disponible en 8 idiomas
 
 Todos los datos provienen de fuentes oficiales: Wikidata, IAPH Andalucía, DIBA Barcelona, Ministerio de Cultura de Francia, DGPC Portugal y más.
@@ -67,10 +69,12 @@ Todos los datos provienen de fuentes oficiales: Wikidata, IAPH Andalucía, DIBA 
     body: `🏛️ Passionate about history and architecture? Meet Patrimonio Europeo, a free web app to explore the architectural heritage of Spain, Italy, France and Portugal.
 
 ✨ What you will find:
-🗺️ Interactive map with over 258,000 monuments
-📸 Thousands of photos and detailed records
+🗺️ Interactive map with over 300,000 monuments
+📸 Photos and detailed records with descriptions
+👤 Creator profiles: architects and sculptors with biography and works
 🚶 Themed cultural routes
-🎯 Visit planner
+🛟 Heritage at risk: Hispania Nostra's Red List
+🔎 Advanced search and filters (style, period, type…)
 🌍 Available in 8 languages
 
 All data comes from official sources: Wikidata, IAPH Andalucía, DIBA Barcelona, French Ministry of Culture, DGPC Portugal and more.
