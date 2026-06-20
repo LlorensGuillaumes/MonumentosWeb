@@ -1128,9 +1128,23 @@ export default function Admin() {
     const imgUrl = socialSelected?.imagen_url || socialSelected?.imagenes?.[0]?.url;
     if (!imgUrl) return;
     try {
-      const resp = await fetch(imgUrl);
-      const blob = await resp.blob();
-      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      // El portapapeles solo acepta PNG: cargamos la imagen (con CORS) y la convertimos a PNG
+      // via canvas. Antes se intentaba copiar el blob JPEG directo → fallaba → s'obria en gran.
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = imgUrl;
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      const blob = await new Promise((resolve, reject) =>
+        canvas.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob null'))), 'image/png')
+      );
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       setSocialCopied('image');
       setTimeout(() => setSocialCopied(''), 2000);
     } catch {
