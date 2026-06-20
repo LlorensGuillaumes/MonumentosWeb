@@ -1198,6 +1198,10 @@ export default function Admin() {
   };
 
   const socialImageUrl = socialSelected?.imagen_url || socialSelected?.imagenes?.[0]?.url || null;
+  // Mostrar via proxy (mateix origen) perquè la imatge es pugui arrossegar/guardar sense bloqueig CORS.
+  const socialImageProxied = socialImageUrl
+    ? `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/image-proxy?url=${encodeURIComponent(socialImageUrl)}`
+    : null;
 
   return (
     <div className="admin-layout">
@@ -2180,7 +2184,7 @@ export default function Admin() {
                     <div className="social-preview-area">
                       {(socialMode === 'monumento' || socialMode === 'diario') && socialImageUrl && (
                         <div className="social-image-preview">
-                          <img src={socialImageUrl} alt={socialSelected.denominacion} onError={e => { e.target.onerror = null; e.target.src = '/no-image.svg'; }} />
+                          <img src={socialImageProxied} alt={socialSelected.denominacion} onError={e => { e.target.onerror = null; e.target.src = socialImageUrl; }} />
                           <div className="social-image-actions">
                             <button className="social-copy-btn" onClick={handleSocialCopyImage} title="Copiar imagen o abrir en nueva pestaña">
                               {socialCopied === 'image' ? '✓ Imagen copiada' : socialCopied === 'image-url' ? '↗ Abierta en pestaña' : 'Copiar imagen'}
