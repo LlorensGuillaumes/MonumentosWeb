@@ -37,10 +37,13 @@ const Preguntame = lazy(() => import('./pages/Preguntame'));
 const Diary = lazy(() => import('./pages/Diary'));
 const UserStats = lazy(() => import('./pages/UserStats'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-// Integracions (només local — gitignored). Si no existeix → component nul.
-const Integraciones = lazy(() =>
-  import('./pages/admin/Integraciones').catch(() => ({ default: () => null }))
-);
+// Integracions (només local — gitignored). import.meta.glob NO trenca el build si la
+// carpeta no existeix (a Netlify/producció); en local la troba i la carrega.
+const _integGlob = import.meta.glob('./pages/admin/Integraciones/index.jsx');
+const Integraciones = lazy(() => {
+  const loader = _integGlob['./pages/admin/Integraciones/index.jsx'];
+  return loader ? loader() : Promise.resolve({ default: () => null });
+});
 
 function LazyFallback() {
   return <div className="loading" style={{ textAlign: 'center', padding: '4rem 2rem', color: '#94a3b8' }}>...</div>;
