@@ -3,8 +3,10 @@
   publish = "dist"
 
 [build.environment]
-  VITE_API_URL = "https://monumentosback.onrender.com/api"
-  VITE_API_URL_FALLBACK = "https://patrimonio-api-pmvp.onrender.com/api"
+  # Migración 22/06/2026: producción en Oracle Cloud (BD+backend propios, autónomo)
+  VITE_API_URL = "https://patrimonio-europeo.duckdns.org/api"
+  # Fallback automático a Render→Neon por si Oracle no responde (rollback de seguridad)
+  VITE_API_URL_FALLBACK = "https://monumentosback.onrender.com/api"
   SITE_URL = "https://patrimonio-europeo.netlify.app"
 
 # Redirect dominio antiguo al nuevo (preserva path)
