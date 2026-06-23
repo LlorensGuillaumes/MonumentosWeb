@@ -352,7 +352,14 @@ export default function Detail() {
             </div>
           )}
           <div className="detail-title-row">
-            <h1>{monumento.denominacion}</h1>
+            <h1>
+              {monumento.denominacion}
+              {monumento.hn_lista && (
+                <span className={`hn-badge hn-badge-${monumento.hn_lista}`} title={`Hispania Nostra · Lista ${monumento.hn_lista}`}>
+                  {monumento.hn_lista === 'roja' ? '🔴' : monumento.hn_lista === 'verde' ? '🟢' : '⚫'} Lista {monumento.hn_lista.charAt(0).toUpperCase() + monumento.hn_lista.slice(1)}
+                </span>
+              )}
+            </h1>
             <button
               className={`fav-btn ${isFavorito(monumento.id) ? 'fav-active' : ''}`}
               disabled={favLoading}
@@ -592,7 +599,7 @@ export default function Detail() {
           <PhotoUpload bienId={monumento.id} />
 
           {/* Description */}
-          {(monumento.descripcion_completa || monumento.wiki_descripcion || wikiExtract) ? (
+          {(monumento.descripcion_completa || monumento.wiki_descripcion || wikiExtract || monumento.hn_ficha?.extract) ? (
             <section className="detail-section">
               <h2>{t('detail.description')}</h2>
               {monumento.descripcion_completa ? (
@@ -667,6 +674,8 @@ export default function Detail() {
                 </>
               ) : monumento.wiki_descripcion ? (
                 <p>{monumento.wiki_descripcion}</p>
+              ) : monumento.hn_ficha?.extract ? (
+                <p>{monumento.hn_ficha.extract}</p>
               ) : null}
             </section>
           ) : wikiLoading ? (
@@ -677,33 +686,60 @@ export default function Detail() {
           ) : null}
 
           {/* History */}
-          {monumento.sintesis_historica && (
+          {(monumento.sintesis_historica || monumento.hn_ficha?.full_text) && (
             <section className="detail-section">
               <h2>{t('detail.history')}</h2>
-              {i18n.language !== 'es' && (
-                <div className="lang-notice">
-                  <span>{t('detail.spanishOnly', 'Texto disponible solo en español')}</span>
-                  <a
-                    href={`https://translate.google.com/?sl=es&tl=${i18n.language}&text=${encodeURIComponent(monumento.sintesis_historica)}&op=translate`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t('detail.translateWithGoogle', 'Traducir con Google')} ↗
-                  </a>
-                </div>
+              {monumento.sintesis_historica ? (
+                <>
+                  {i18n.language !== 'es' && (
+                    <div className="lang-notice">
+                      <span>{t('detail.spanishOnly', 'Texto disponible solo en español')}</span>
+                      <a
+                        href={`https://translate.google.com/?sl=es&tl=${i18n.language}&text=${encodeURIComponent(monumento.sintesis_historica)}&op=translate`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t('detail.translateWithGoogle', 'Traducir con Google')} ↗
+                      </a>
+                    </div>
+                  )}
+                  <p>{monumento.sintesis_historica}</p>
+                </>
+              ) : (
+                <div className="hn-texto" dangerouslySetInnerHTML={{ __html: monumento.hn_ficha.full_text }} />
               )}
-              <p>{monumento.sintesis_historica}</p>
+            </section>
+          )}
+
+          {/* Estado de conservación (datos Hispania Nostra) */}
+          {(monumento.metadata_externa?.hn_estado || monumento.metadata_externa?.hn_riesgo || monumento.metadata_externa?.hn_grado_proteccion || monumento.metadata_externa?.hn_propiedad) && (
+            <section className="detail-section">
+              <h2>{t('detail.conservacion', 'Estado de conservación')}</h2>
+              <dl className="detail-dl">
+                {monumento.metadata_externa?.hn_estado && <><dt>{t('detail.estado', 'Estado')}</dt><dd>{monumento.metadata_externa.hn_estado}</dd></>}
+                {monumento.metadata_externa?.hn_riesgo && <><dt>{t('detail.riesgo', 'Riesgo')}</dt><dd>{monumento.metadata_externa.hn_riesgo}</dd></>}
+                {monumento.metadata_externa?.hn_grado_proteccion && <><dt>{t('detail.proteccion', 'Protección')}</dt><dd>{monumento.metadata_externa.hn_grado_proteccion}</dd></>}
+                {monumento.metadata_externa?.hn_propiedad && <><dt>{t('detail.propiedad', 'Propiedad')}</dt><dd>{monumento.metadata_externa.hn_propiedad}</dd></>}
+              </dl>
+              {(monumento.hn_ficha?.source_url || monumento.metadata_externa?.hn_url) && (
+                <p className="wiki-attribution">
+                  <a href={monumento.hn_ficha?.source_url || monumento.metadata_externa?.hn_url} target="_blank" rel="noopener noreferrer">
+                    {t('detail.sourceHN', 'Fuente: Hispania Nostra')} ↗
+                  </a>
+                </p>
+              )}
             </section>
           )}
 
           {/* Dating */}
-          {(monumento.datacion || monumento.inception || monumento.periodo_historico || monumento.siglo) && (
+          {(monumento.datacion || monumento.inception || monumento.periodo_historico || monumento.siglo || monumento.periodo) && (
             <section className="detail-section">
               <h2>{t('detail.dating')}</h2>
               <dl className="detail-dl">
                 {monumento.datacion && <><dt>{t('detail.date')}</dt><dd>{monumento.datacion}</dd></>}
                 {monumento.inception && <><dt>{t('detail.construction')}</dt><dd>{formatInception(monumento.inception, t)}</dd></>}
                 {monumento.periodo_historico && <><dt>{t('detail.period')}</dt><dd>{monumento.periodo_historico}</dd></>}
+                {monumento.periodo && !monumento.periodo_historico && <><dt>{t('detail.epoca', 'Época')}</dt><dd>{monumento.periodo}</dd></>}
                 {monumento.siglo && <><dt>{t('detail.century')}</dt><dd>{monumento.siglo}</dd></>}
               </dl>
             </section>
@@ -960,20 +996,21 @@ export default function Detail() {
                 </a>
               )}
               {(() => {
-                const listType = getHispaniaNostraListType(monumento.heritage_label)
+                const listType = monumento.hn_lista
+                  || getHispaniaNostraListType(monumento.heritage_label)
                   || getHispaniaNostraListType(monumento.tipo)
                   || getHispaniaNostraListType(monumento.categoria)
                   || getHispaniaNostraListType(HN_SYNERGY_OVERRIDE[parseInt(id)]);
                 if (!listType) return null;
-                const directUrl = HN_FICHA_URL[parseInt(id)];
+                const directUrl = monumento.hn_ficha?.source_url || monumento.metadata_externa?.hn_url || HN_FICHA_URL[parseInt(id)];
                 const url = directUrl || buildHNSearchUrl(listType, monumento.denominacion);
                 const llabel = listType === 'roja' ? 'Roja' : listType === 'verde' ? 'Verde' : 'Negra';
                 const tip = directUrl
-                  ? `Veure fitxa a la Lista ${llabel} de Hispania Nostra`
-                  : `Cercar la fitxa a Hispania Nostra (Lista ${llabel})`;
+                  ? `Ver ficha en la Lista ${llabel} de Hispania Nostra`
+                  : `Buscar la ficha en Hispania Nostra (Lista ${llabel})`;
                 return (
                   <a href={url} target="_blank" rel="noopener noreferrer" title={tip}>
-                    🛡️ Fitxa a Hispania Nostra ({`Lista ${llabel}`})
+                    🛡️ Ficha en Hispania Nostra (Lista {llabel})
                   </a>
                 );
               })()}
