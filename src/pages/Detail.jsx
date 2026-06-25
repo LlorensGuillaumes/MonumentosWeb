@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import api, { getMonumento, getMonumentos, getMonumentosRadio, getWikipediaExtract, getValoraciones, addValoracion, getNotasMonumento, addNotaMonumento, deleteNotaMonumento, trackEvent } from '../services/api';
 import PhotoUpload from '../components/PhotoUpload';
+import ImagenesAdmin from '../components/ImagenesAdmin';
 import { useAuth } from '../context/AuthContext';
 import { DetailSkeleton } from '../components/Skeleton';
 import 'leaflet/dist/leaflet.css';
@@ -597,6 +598,7 @@ export default function Detail() {
 
           {/* User Photos */}
           <PhotoUpload bienId={monumento.id} />
+          <ImagenesAdmin bienId={monumento.id} />
 
           {/* Description */}
           {(monumento.descripcion_completa || monumento.wiki_descripcion || wikiExtract || monumento.hn_ficha?.extract) ? (

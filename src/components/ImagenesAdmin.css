@@ -1,0 +1,47 @@
+.img-admin h2 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.img-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.img-admin-card {
+  position: relative;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-secondary, #f8f9fa);
+}
+.img-admin-card.principal { border: 2px solid #f39c12; }
+.img-admin-card.pendiente { border: 2px dashed #e67e22; }
+.img-admin-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
+.img-admin-meta {
+  padding: 6px;
+  font-size: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.img-fuente { background: var(--border, #e0e0e0); border-radius: 4px; padding: 1px 6px; }
+.img-pend { background: #fdebd0; color: #c0651a; border-radius: 4px; padding: 1px 6px; }
+.img-prin { background: #fff3cd; color: #b8860b; border-radius: 4px; padding: 1px 6px; }
+.img-user { color: var(--text-muted, #6b7280); }
+.img-admin-actions {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  justify-content: center;
+  border-top: 1px solid var(--border, #eee);
+}
+.img-admin-actions button {
+  cursor: pointer;
+  border: 1px solid var(--border, #ccc);
+  background: var(--bg, #fff);
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.img-admin-actions button:hover { background: var(--bg-secondary, #f0f0f0); }
+.img-admin-actions button.del:hover { background: #fde8e8; border-color: #e74c3c; }

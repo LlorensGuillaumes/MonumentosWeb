@@ -359,6 +359,16 @@ export const uploadMonumentoPhoto = (bienId, file, caption = '') => {
 export const deleteMonumentoPhoto = (bienId, photoId) =>
   api.delete(`/monumentos/${bienId}/photos/${photoId}`).then(r => r.data);
 
+// Admin/colaborador: gestión de TODAS las imágenes del bien
+export const getAdminImagenes = (bienId) =>
+  api.get(`/admin/monumentos/${bienId}/imagenes`).then(r => r.data);
+export const deleteAdminImagen = (photoId) =>
+  api.delete(`/admin/imagenes/${photoId}`).then(r => r.data);
+export const setImagenPrincipal = (photoId) =>
+  api.post(`/admin/imagenes/${photoId}/principal`).then(r => r.data);
+export const aprobarImagen = (photoId) =>
+  api.post(`/admin/imagenes/${photoId}/aprobar`).then(r => r.data);
+
 // ============== TRAVEL DIARY ==============
 
 export const getDiaryEntries = (params = {}) =>
